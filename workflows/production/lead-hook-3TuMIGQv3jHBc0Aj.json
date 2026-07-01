@@ -1,0 +1,1195 @@
+{
+  "updatedAt": "2026-05-04T17:13:44.877Z",
+  "createdAt": "2026-05-02T18:43:45.096Z",
+  "id": "3TuMIGQv3jHBc0Aj",
+  "name": "Lead hook",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "14f55d76-e059-4862-8085-490dfac8f2eb",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -416,
+        112
+      ],
+      "id": "8b4c9cee-6574-4c09-8212-ca63db865266",
+      "name": "Webhook",
+      "webhookId": "14f55d76-e059-4862-8085-490dfac8f2eb"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c1a50797-f64b-4438-8ed2-d9dccf371af1",
+              "name": "Name",
+              "value": "={{ $json['Ім\\'я'] }}",
+              "type": "string"
+            },
+            {
+              "id": "758158f3-9a0d-4c88-992d-b8b5dad49524",
+              "name": "Phone",
+              "value": "={{ $json['Номер телефона'] }}",
+              "type": "string"
+            },
+            {
+              "id": "bee1fadd-d056-4d6f-9567-c470efeb421f",
+              "name": "Email",
+              "value": "={{ $json.Email }}",
+              "type": "string"
+            },
+            {
+              "id": "2980be1c-8e31-4e9d-9720-374500501241",
+              "name": "Comment",
+              "value": "={{ $json['Коментар'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        32,
+        112
+      ],
+      "id": "5bc5f97e-0458-456c-b823-8913a6249e03",
+      "name": "Form"
+    },
+    {
+      "parameters": {
+        "jsCode": "const submissions = $json.body?.data?.submissions || [];\n\nconst result = {};\n\nfor (const item of submissions) {\n  result[item.label] = item.value;\n}\n\nreturn [\n  {\n    json: result\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -192,
+        112
+      ],
+      "id": "82712ac1-be32-4c9d-8dbb-dc9a7b4c0511",
+      "name": "transform form"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1PsTjC0poLJnWKqgo6izX7Ui39BvvZ5CieW4SQ52g57c/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1PsTjC0poLJnWKqgo6izX7Ui39BvvZ5CieW4SQ52g57c/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json.Name }}",
+            "Phone": "={{ $json.Phone }}",
+            "Email": "={{ $json.Email }}",
+            "Коментар": "={{ $json.Coment }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Коментар",
+              "displayName": "Коментар",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        624,
+        -80
+      ],
+      "id": "84bbfbbd-ba9c-407c-b2ae-f8e86e33fc30",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "=1679040654",
+        "text": "={{ $json.text }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        800,
+        304
+      ],
+      "id": "e8cd9682-4dff-4e82-8b03-ae332253b366",
+      "name": "Send a text message",
+      "webhookId": "499c196a-5354-49ab-99e8-0ce42d404ed2",
+      "credentials": {
+        "telegramApi": {
+          "id": "oQnP3EggjnEw5VgO",
+          "name": "TelegramLeadbot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $json;\n\nconst name = data[\"Ім'я\"] || data[\"Name\"] || \"—\";\nconst phone = data[\"Номер телефона\"] || data[\"Phone\"] || \"—\";\nconst email = data[\"Email\"] || \"—\";\nconst comment = data[\"Comment\"] || data[\"Коментар\"] || \"-\";\n\nconst message = \n`💌 Нова заявка з форми\n\n👤 Імʼя: ${name}\n📞 Телефон: ${phone}\n📧 Email: ${email}\n💬 Коментар: ${comment}\n\n✨ Звʼяжіться з клієнтом якомога швидше`;\n\nreturn [\n  {\n    json: {\n      text: message\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        624,
+        304
+      ],
+      "id": "8a34ad96-cf49-41ce-8b55-94f61f34833a",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "resource": "lead",
+        "Company": "-",
+        "lastName": "={{ $json.Name }}",
+        "additionalFields": {
+          "Description": "={{ $json.Comment }}",
+          "Email": "={{ $json.Email }}",
+          "Phone": "={{ $json.Phone }}"
+        }
+      },
+      "type": "n8n-nodes-base.zohoCrm",
+      "typeVersion": 1,
+      "position": [
+        624,
+        112
+      ],
+      "id": "349fae14-5bee-4552-bf4e-36f0c56958e7",
+      "name": "Send lead to crm",
+      "credentials": {
+        "zohoOAuth2Api": {
+          "id": "54SnRsgfMZ4wyzKL",
+          "name": "Zoho account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Ти маєш визначити статус ліда, який залишив заявку в салоні краси. Лід може бути в одному з наступних станів:\nHot - Гарячий, готовий купити послугу тут і зараз\nWarm - Зацікавлений, але з якоїсь причини не хочу купувати зараз\nCold - Не зацікавлений\n\nЯкщо клієнт взагалі не залишив коментар, результат - Warm.\n\nПовернути відповідь у форматі JSON.\nПриклад\n{\n\"state\": \"Hot|Warm|Cold\"\n}\n\nОсь коментар: {{ $json.Comment }}",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        640,
+        -384
+      ],
+      "id": "7bf0b94b-12f5-4dcb-9a75-3a515046529c",
+      "name": "Lead qualifier"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        512,
+        -240
+      ],
+      "id": "277cbada-3cf5-428f-9b14-b6ef6c250835",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "wmMo2Lknq3Hi5ts2",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\"state\": \"Hot|Warm|Cold\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        784,
+        -176
+      ],
+      "id": "44105a08-0195-460f-b506-89475ffe4856",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bc9c3655-25b3-41db-ab76-12df7c6fe385",
+              "name": "state",
+              "value": "={{ $json.output.state }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        992,
+        -384
+      ],
+      "id": "f5edd1c4-1b0f-40ec-8208-dc31f02cb832",
+      "name": "Castomate"
+    },
+    {
+      "parameters": {
+        "content": "Hot - UKZ3Gf\nWarm- Xe4e2e\ncold - U9Nv9r"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1216,
+        -640
+      ],
+      "typeVersion": 1,
+      "id": "2a5e3603-7b9a-4a0e-8d93-489b646811ee",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.state }}",
+                    "rightValue": "Hot",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "e624ebbe-492f-4d64-bff2-5014a23d3594"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Hot"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "298b3ef8-7df1-4697-b71f-93f31301b8cc",
+                    "leftValue": "={{ $json.state }}",
+                    "rightValue": "Warm",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Warm"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c7cab013-055c-4a8e-995f-540881b95f77",
+                    "leftValue": "={{ $json.state }}",
+                    "rightValue": "Cold",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Cold"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1200,
+        -384
+      ],
+      "id": "e8f1a3ab-c207-4df1-aff1-61be7d3f8c22",
+      "name": "Switch state"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5d71e43a-6217-439b-b3fc-74d3127cf7d0",
+              "name": "id",
+              "value": "=U9Nv9r",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1488,
+        -240
+      ],
+      "id": "f6ae6b38-dbc0-403f-b28b-cf8b38d2d929",
+      "name": "cold Id"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5d71e43a-6217-439b-b3fc-74d3127cf7d0",
+              "name": "id",
+              "value": "=UKZ3Gf",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1488,
+        -544
+      ],
+      "id": "c5943574-1d9a-4cc1-8876-c20c409bbd96",
+      "name": "Hot Id"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5d71e43a-6217-439b-b3fc-74d3127cf7d0",
+              "name": "id",
+              "value": "=Xe4e2e",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1488,
+        -400
+      ],
+      "id": "c93efb30-2441-480b-9f78-840865c56a31",
+      "name": "Warm id"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5b65e265-fa1a-4661-9522-072175ef9695",
+              "name": "Id",
+              "value": "={{$json.id}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1840,
+        -400
+      ],
+      "id": "48c5bdad-c55e-46c8-ba9e-0a21e766fc59",
+      "name": "List Id"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://a.klaviyo.com/api/profile-import",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "REVISION",
+              "value": "2026-04-15"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"data\": {\n    \"type\": \"profile\",\n    \"attributes\": {\n      \"email\": \"{{ $('Form').item.json.Email }}\",\n      \"phone_number\": \"{{ $('Form').item.json.Phone }}\"\n    }\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        2048,
+        -400
+      ],
+      "id": "fc6c2639-e3ff-4f3c-bf6f-afba0ffedfce",
+      "name": "Create or Update Profile",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "AMjmBni3aHzJuw3t",
+          "name": "Klaviyo"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ee8c2fb0-2923-47b8-b4ee-6dcf8185e662",
+              "name": "profile id",
+              "value": "={{JSON.parse($json.data).data.id}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2256,
+        -400
+      ],
+      "id": "47d39210-f466-45b9-8eb2-55452af3736d",
+      "name": "Parse id"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://a.klaviyo.com/api/lists/{{ $('List Id').item.json.Id }}/relationships/profiles ",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "revision",
+              "value": "2026-04-15"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"data\": [\n    {\n      \"type\": \"profile\",\n      \"id\": \"{{ $json[\"profile id\"] }}\"\n    }\n  ]\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        2464,
+        -400
+      ],
+      "id": "429cec21-f16e-4d1d-81a1-44fe50930423",
+      "name": "Add Profiles to List",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "AMjmBni3aHzJuw3t",
+          "name": "Klaviyo"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "transform form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "transform form": {
+      "main": [
+        [
+          {
+            "node": "Form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Form": {
+      "main": [
+        [
+          {
+            "node": "Send lead to crm",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Lead qualifier",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        []
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lead qualifier": {
+      "main": [
+        [
+          {
+            "node": "Castomate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Lead qualifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Lead qualifier",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Castomate": {
+      "main": [
+        [
+          {
+            "node": "Switch state",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch state": {
+      "main": [
+        [
+          {
+            "node": "Hot Id",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Warm id",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "cold Id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hot Id": {
+      "main": [
+        [
+          {
+            "node": "List Id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Warm id": {
+      "main": [
+        [
+          {
+            "node": "List Id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "cold Id": {
+      "main": [
+        [
+          {
+            "node": "List Id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Id": {
+      "main": [
+        [
+          {
+            "node": "Create or Update Profile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create or Update Profile": {
+      "main": [
+        [
+          {
+            "node": "Parse id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse id": {
+      "main": [
+        [
+          {
+            "node": "Add Profiles to List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "malligos.app.n8n.cloud",
+            "user-agent": "axios/0.21.4",
+            "content-length": "1363",
+            "accept": "application/json, text/plain, */*",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "64.95.157.68",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "US",
+            "cf-ray": "9f68aade8d9f0ccf-PDX",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json",
+            "x-forwarded-for": "64.95.157.68, 172.68.174.190",
+            "x-forwarded-host": "malligos.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-28-854bc9cc5d-jcvxr",
+            "x-is-trusted": "yes",
+            "x-real-ip": "64.95.157.68"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "data": {
+              "formName": "Contact",
+              "submissions": [
+                {
+                  "label": "Ім'я",
+                  "value": "Sergei"
+                },
+                {
+                  "label": "Номер телефона",
+                  "value": "+380631984403"
+                },
+                {
+                  "label": "Email",
+                  "value": "Buts@gmail.com"
+                },
+                {
+                  "label": "Коментар",
+                  "value": "Jrtq"
+                }
+              ],
+              "submissionTime": "2026-05-04T15:49:10.500Z",
+              "context": {
+                "metaSiteId": "bc2e2c46-f578-41f7-86b9-9a2ac1ca14bd",
+                "activationId": "9d5d8d76-1c8b-4d57-9a69-53f78f7fce24"
+              },
+              "_context": {
+                "activation": {
+                  "id": "9d5d8d76-1c8b-4d57-9a69-53f78f7fce24"
+                },
+                "configuration": {
+                  "id": "e782846e-0f17-47ae-a5bc-5efa36781a04"
+                },
+                "app": {
+                  "id": "14ce1214-b278-a7e4-1373-00cebd1bef7c"
+                },
+                "action": {
+                  "id": "1cc67d56-cf3e-47d7-8ba9-fccf51b32a63"
+                },
+                "trigger": {
+                  "key": "wix_forms-form_submit"
+                }
+              },
+              "field:comp-morc6xz6": "Хочу підстригтися",
+              "field:comp-mooofz1r": "Sergei",
+              "contact": {
+                "name": {
+                  "first": "DWSeqf",
+                  "last": "+385616"
+                },
+                "email": "buts@gmail.com",
+                "locale": "ru",
+                "labelKeys": {
+                  "items": []
+                },
+                "contactId": "96475c6a-ef16-42ff-a92e-9a59a89b0408",
+                "emails": [
+                  {
+                    "tag": "UNTAGGED",
+                    "email": "buts@gmail.com",
+                    "primary": true
+                  }
+                ],
+                "updatedDate": "2026-05-04T15:50:06.691Z",
+                "phone": "",
+                "createdDate": "2026-05-04T15:19:47.559Z"
+              },
+              "submissionId": "7a403861-d94b-448e-be0a-c7147b6930a8",
+              "field:comp-mooofz2b": "+380631984403",
+              "contactId": "96475c6a-ef16-42ff-a92e-9a59a89b0408",
+              "formType": "Basic Form",
+              "field:comp-mooofz2d": "Buts@gmail.com",
+              "formId": "comp-mooofz191"
+            }
+          },
+          "webhookUrl": "https://malligos.app.n8n.cloud/webhook-test/14f55d76-e059-4862-8085-490dfac8f2eb",
+          "executionMode": "test"
+        }
+      }
+    ]
+  },
+  "versionId": "88a62d3c-ff78-4218-aa84-23ee34dd8137",
+  "activeVersionId": "2a00b900-123c-4a92-9125-8351fa0fc717",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-05-02T18:43:45.100Z",
+      "createdAt": "2026-05-02T18:43:45.100Z",
+      "role": "workflow:owner",
+      "workflowId": "3TuMIGQv3jHBc0Aj",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-05-04T15:12:41.000Z",
+    "createdAt": "2026-05-03T10:16:36.373Z",
+    "versionId": "2a00b900-123c-4a92-9125-8351fa0fc717",
+    "workflowId": "3TuMIGQv3jHBc0Aj",
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "14f55d76-e059-4862-8085-490dfac8f2eb",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          -176,
+          144
+        ],
+        "id": "8b4c9cee-6574-4c09-8212-ca63db865266",
+        "name": "Webhook",
+        "webhookId": "14f55d76-e059-4862-8085-490dfac8f2eb"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "c1a50797-f64b-4438-8ed2-d9dccf371af1",
+                "name": "Name",
+                "value": "={{ $json['Ім\\'я'] }}",
+                "type": "string"
+              },
+              {
+                "id": "758158f3-9a0d-4c88-992d-b8b5dad49524",
+                "name": "Phone",
+                "value": "={{ $json['Номер телефона'] }}",
+                "type": "string"
+              },
+              {
+                "id": "bee1fadd-d056-4d6f-9567-c470efeb421f",
+                "name": "Email",
+                "value": "={{ $json.Email }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          272,
+          144
+        ],
+        "id": "5bc5f97e-0458-456c-b823-8913a6249e03",
+        "name": "Form"
+      },
+      {
+        "parameters": {
+          "jsCode": "const submissions = $json.body?.data?.submissions || [];\n\nconst result = {};\n\nfor (const item of submissions) {\n  result[item.label] = item.value;\n}\n\nreturn [\n  {\n    json: result\n  }\n];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          48,
+          144
+        ],
+        "id": "82712ac1-be32-4c9d-8dbb-dc9a7b4c0511",
+        "name": "transform form"
+      },
+      {
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "https://docs.google.com/spreadsheets/d/1PsTjC0poLJnWKqgo6izX7Ui39BvvZ5CieW4SQ52g57c/edit?gid=0#gid=0",
+            "mode": "url"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Лист1",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1PsTjC0poLJnWKqgo6izX7Ui39BvvZ5CieW4SQ52g57c/edit#gid=0"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "Name": "={{ $json.Name }}",
+              "Phone": "={{ $json.Phone }}",
+              "Email": "={{ $json.Email }}"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "Name",
+                "displayName": "Name",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Phone",
+                "displayName": "Phone",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Email",
+                "displayName": "Email",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          496,
+          -48
+        ],
+        "id": "84bbfbbd-ba9c-407c-b2ae-f8e86e33fc30",
+        "name": "Append row in sheet",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "0Gdvf3Mhmj7whXEv",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "chatId": "=1679040654",
+          "text": "={{ $json.text }}",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          720,
+          336
+        ],
+        "id": "e8cd9682-4dff-4e82-8b03-ae332253b366",
+        "name": "Send a text message",
+        "webhookId": "499c196a-5354-49ab-99e8-0ce42d404ed2",
+        "credentials": {
+          "telegramApi": {
+            "id": "oQnP3EggjnEw5VgO",
+            "name": "TelegramLeadbot"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const data = $json;\n\nconst name = data[\"Ім'я\"] || data[\"Name\"] || \"—\";\nconst phone = data[\"Номер телефона\"] || data[\"Phone\"] || \"—\";\nconst email = data[\"Email\"] || \"—\";\n\nconst message = \n`💌 Нова заявка з форми\n\n👤 Імʼя: ${name}\n📞 Телефон: ${phone}\n📧 Email: ${email}\n\n✨ Звʼяжіться з клієнтом якомога швидше`;\n\nreturn [\n  {\n    json: {\n      text: message\n    }\n  }\n];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          496,
+          336
+        ],
+        "id": "8a34ad96-cf49-41ce-8b55-94f61f34833a",
+        "name": "Code in JavaScript"
+      },
+      {
+        "parameters": {
+          "resource": "lead",
+          "Company": "-",
+          "lastName": "={{ $json.Name }}",
+          "additionalFields": {
+            "Email": "={{ $json.Email }}",
+            "First_Name": "={{ $json.Name }}",
+            "Phone": "={{ $json.Phone }}"
+          }
+        },
+        "type": "n8n-nodes-base.zohoCrm",
+        "typeVersion": 1,
+        "position": [
+          496,
+          144
+        ],
+        "id": "349fae14-5bee-4552-bf4e-36f0c56958e7",
+        "name": "Send lead to crm",
+        "credentials": {
+          "zohoOAuth2Api": {
+            "id": "54SnRsgfMZ4wyzKL",
+            "name": "Zoho account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "transform form",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "transform form": {
+        "main": [
+          [
+            {
+              "node": "Form",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Form": {
+        "main": [
+          [
+            {
+              "node": "Send lead to crm",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Code in JavaScript",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Append row in sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Send a text message": {
+        "main": [
+          []
+        ]
+      },
+      "Code in JavaScript": {
+        "main": [
+          [
+            {
+              "node": "Send a text message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Buts Sergei",
+    "name": "Version 2a00b900",
+    "description": "",
+    "autosaved": false
+  },
+  "tags": []
+}
