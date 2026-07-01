@@ -1,0 +1,5503 @@
+{
+  "updatedAt": "2026-06-22T09:08:19.249Z",
+  "createdAt": "2026-06-04T19:28:46.828Z",
+  "id": "4OCeBFYfU5uJpnY3",
+  "name": "Ai_assistant_Garmash",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message",
+          "callback_query"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -3056,
+        -656
+      ],
+      "id": "d7f6cd69-af8e-4b7b-a3b6-47ed669255d5",
+      "name": "Telegram Trigger",
+      "webhookId": "bbbcbadd-d2e8-46f3-b48a-97f5b5b449bd",
+      "credentials": {
+        "telegramApi": {
+          "id": "LAKXnWIRDoCt8OvO",
+          "name": "Ai_assistent_Garmash"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6a6382a7-d4ed-499a-995f-94849aa61274",
+              "leftValue": "={{ $json.message.voice }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -2384,
+        -176
+      ],
+      "id": "f63d5651-1dcf-4bb3-ada4-6ba3b7cf5bd7",
+      "name": "IF Message Type"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.voice.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -2160,
+        -176
+      ],
+      "id": "a14b6731-47f8-488e-bb13-55fedd491c5f",
+      "name": "Get Voice File",
+      "webhookId": "806df69e-b88e-4e67-abdd-90ffd61d776b",
+      "credentials": {
+        "telegramApi": {
+          "id": "LAKXnWIRDoCt8OvO",
+          "name": "Ai_assistent_Garmash"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {
+          "language": "uk"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        -1936,
+        -176
+      ],
+      "id": "620e5db1-ea8c-4893-a8ce-bf6016d578ea",
+      "name": "Transcribe a recording",
+      "credentials": {
+        "openAiApi": {
+          "id": "SuJ6fVcyIeq9uR1k",
+          "name": "OpenAI account Garmash"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9b584f2-dfc6-4faf-bedf-181b3876a469",
+              "name": "user_text",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1712,
+        -176
+      ],
+      "id": "9e4efbe5-41d8-4b7e-918d-3764d50129fe",
+      "name": "Set Voice Text"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9b584f2-dfc6-4faf-bedf-181b3876a469",
+              "name": "user_text",
+              "value": "={{ $json.message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1712,
+        16
+      ],
+      "id": "468b40c5-61cc-45fe-b595-f6338d907c54",
+      "name": "Set Text Message"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=Ти AI-асистент для Telegram.\n\nТвоє завдання — визначити тип повідомлення користувача.\n\nUser Message:\n{{ $json.user_text }}\n\nТипи:\n\n1. meeting — зустріч, дзвінок, подія в календарі\n2. task — задача, яку потрібно виконати\n3. note — нотатка, ідея, думка, яку потрібно зберегти\n4. note_search — пошук інформації в раніше збережених нотатках\n5. notes_list — показати список останніх нотаток\n6. expense — витрата, списання грошей, покупка, оплата\n7. income — дохід, надходження грошей, зарплата, консультація, оплата від клієнта\n8. finance_report — коли користувач хоче отримати інформацію про свої доходи, витрати, баланс, категорії витрат або фінансову статистику.\n9.recurring_payment - коли користувачу потрібно нагадування про про оплату.\n10. unsupported — якщо неможливо зрозуміти намір користувача\n\nПоточна дата:\n\n{{ $now }}\n\nTimezone:\n\nEurope/Kyiv\n\nПоверни тільки валідний JSON.\n\nФормат відповіді:\n\n{\n\"type\": \"meeting | task | note | note_search | notes_list | expense | income | finance_report | recurring_payment | unsupported\",\n\"title\": \"\",\n\"description\": \"\",\n\"date\": \"\",\n\"time\": \"\",\n\"end_time\": \"\",\n\"due_date\": \"\",\n\"priority\": \"normal\",\n\"query\": \"\",\n\"amount\": \"\",\n\"currency\": \"UAH\",\n\"finance_category\": \"\",\n\"payment_name\": \"\",\n\"payment_day\": \"\",\n\"reminder_days\": \"\",\n\"original_text\": \"\"\n}\n\nПравила:\n\n* Якщо це meeting, обов'язково визнач date і time.\n* Якщо end_time не вказано, встанови +1 годину від time.\n* Якщо це task, створи короткий title.\n* Якщо дата задачі не вказана, due_date залиш порожнім.\n* Кожна task повинна містити лише одну конкретну дію.\n* Якщо користувач вказав кілька дій, створи тільки першу наступну конкретну дію.\n* Якщо це note, створи короткий title та description.\n* Якщо це note_search, заповни query темою пошуку.\n* Якщо це notes_list, query залиш порожнім.\n* Для note_search та notes_list не заповнюй date, time, end_time, due_date.\n* Якщо це expense або income, обов'язково визнач amount, currency, finance_category, description і date.\n* Якщо дата фінансової операції не вказана, використовуй поточну дату.\n* Якщо валюта не вказана, використовуй UAH.\n* amount має бути тільки числом без валюти.\n* description має бути коротким коментарем до операції.\n* Не вигадуй людей, місце або зайві деталі.\n* Не додавай зайві поля.\n\nКатегорії для expense:\n\nFood\nRestaurant\nFuel\nTaxi\nCar\nRent\nUtilities\nHealth\nSport\nEducation\nEntertainment\nBusiness\nPersonal\nFinance\nOther\n\nКатегорії для income:\n\nSalary\nConsulting\nFreelance\nBusiness\nInvestment\nGift\nOther\n\nПриклади:\n\nКористувач:\nЗапиши нотатку інтегрувати Zoho з Telegram\n\nВідповідь:\n\n{\n\"type\": \"note\",\n\"title\": \"Інтеграція Zoho з Telegram\",\n\"description\": \"Інтегрувати Zoho з Telegram\",\n\"date\": \"\",\n\"time\": \"\",\n\"end_time\": \"\",\n\"due_date\": \"\",\n\"priority\": \"normal\",\n\"query\": \"\",\n\"amount\": \"\",\n\"currency\": \"UAH\",\n\"finance_category\": \"\",\n\"original_text\": \"Запиши нотатку інтегрувати Zoho з Telegram\"\n}\n\nКористувач:\nЩо я записував про Zoho?\n\nВідповідь:\n\n{\n\"type\": \"note_search\",\n\"title\": \"\",\n\"description\": \"\",\n\"date\": \"\",\n\"time\": \"\",\n\"end_time\": \"\",\n\"due_date\": \"\",\n\"priority\": \"normal\",\n\"query\": \"Zoho\",\n\"amount\": \"\",\n\"currency\": \"UAH\",\n\"finance_category\": \"\",\n\"original_text\": \"Що я записував про Zoho?\"\n}\n\nКористувач:\nЯкі в мене ідеї?\n\nВідповідь:\n\n{\n\"type\": \"notes_list\",\n\"title\": \"\",\n\"description\": \"\",\n\"date\": \"\",\n\"time\": \"\",\n\"end_time\": \"\",\n\"due_date\": \"\",\n\"priority\": \"normal\",\n\"query\": \"\",\n\"amount\": \"\",\n\"currency\": \"UAH\",\n\"finance_category\": \"\",\n\"original_text\": \"Які в мене ідеї?\"\n}\n\nКористувач:\nВитрата: 3200 грн бензин\n\nВідповідь:\n\n{\n\"type\": \"expense\",\n\"title\": \"Бензин\",\n\"description\": \"Бензин\",\n\"date\": \"{{ $now.toFormat('yyyy-MM-dd') }}\",\n\"time\": \"\",\n\"end_time\": \"\",\n\"due_date\": \"\",\n\"priority\": \"normal\",\n\"query\": \"\",\n\"amount\": 3200,\n\"currency\": \"UAH\",\n\"finance_category\": \"Fuel\",\n\"original_text\": \"Витрата: 3200 грн бензин\"\n}\n\nКористувач:\nВитрата: заплатив 850 грн за стоматолога\n\nВідповідь:\n\n{\n\"type\": \"expense\",\n\"title\": \"Стоматолог\",\n\"description\": \"Стоматолог\",\n\"date\": \"{{ $now.toFormat('yyyy-MM-dd') }}\",\n\"time\": \"\",\n\"end_time\": \"\",\n\"due_date\": \"\",\n\"priority\": \"normal\",\n\"query\": \"\",\n\"amount\": 850,\n\"currency\": \"UAH\",\n\"finance_category\": \"Health\",\n\"original_text\": \"Витрата: заплатив 850 грн за стоматолога\"\n}\n\nКористувач:\nДохід: 15000 грн консультація\n\nВідповідь:\n\n{\n\"type\": \"income\",\n\"title\": \"Консультація\",\n\"description\": \"Консультація\",\n\"date\": \"{{ $now.toFormat('yyyy-MM-dd') }}\",\n\"time\": \"\",\n\"end_time\": \"\",\n\"due_date\": \"\",\n\"priority\": \"normal\",\n\"query\": \"\",\n\"amount\": 15000,\n\"currency\": \"UAH\",\n\"finance_category\": \"Consulting\",\n\"original_text\": \"Дохід: 15000 грн консультація\"\n}\n\nКористувач:\nЗнайти терапевта, поговорити з Артемом і скласти план\n\nВідповідь:\n\n{\n\"type\": \"task\",\n\"title\": \"Скласти список кандидатів на позицію терапевта\",\n\"description\": \"Скласти список кандидатів на позицію терапевта\",\n\"date\": \"\",\n\"time\": \"\",\n\"end_time\": \"\",\n\"due_date\": \"\",\n\"priority\": \"normal\",\n\"query\": \"\",\n\"amount\": \"\",\n\"currency\": \"UAH\",\n\"finance_category\": \"\",\n\"original_text\": \"Знайти терапевта, поговорити з Артемом і скласти план\"\n}\n\n* Якщо це recurring_payment, обов'язково визнач:\n  - payment_name\n  - payment_day\n  - reminder_days\n  - finance_category\n\n* Якщо кількість днів для нагадування не вказана,\n  використовуй reminder_days = 3.\n\n* payment_day має містити тільки число місяця.\n\n* Для recurring_payment не заповнюй:\n  date, time, end_time, due_date.\n\n* finance_category для recurring_payment використовуй із фінансових категорій.\nПоверни тільки валідний JSON.\n\nНе використовуй markdown.\nНе обгортай відповідь у ```json.\nНе додавай пояснення.\n"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        -1488,
+        -176
+      ],
+      "id": "5eb04a08-9954-408c-8a9d-04aa0f3d1257",
+      "name": "AI Classify Message",
+      "credentials": {
+        "openAiApi": {
+          "id": "SuJ6fVcyIeq9uR1k",
+          "name": "OpenAI account Garmash"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw =\n  $json.output?.[0]?.content?.[0]?.text ||\n  $json.message?.content ||\n  $json.text ||\n  $json.output ||\n  JSON.stringify($json);\n\nlet parsed;\n\ntry {\n  parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;\n} catch (error) {\n  parsed = {\n    type: \"unsupported\",\n    title: \"Не вдалося розпізнати повідомлення\",\n    description: String(raw),\n    original_text: String(raw)\n  };\n}\n\nreturn [\n  {\n    json: parsed\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1136,
+        -176
+      ],
+      "id": "676573ab-6209-4f0f-a265-b83f7c6cce29",
+      "name": "Parse AI JSON"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "=meeting",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "ef31b8a1-ac4f-4415-aa19-6c5e11d24699"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Meeting"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "75aa9273-b007-4ec3-99b7-435bca7896bf",
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "task",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "task"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "eae6ab95-f228-4c2c-bdde-102cf00a7bad",
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "note",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "note"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "bf0ed17a-94a8-4df4-97e3-5253470ac4c2",
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "notes_list",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "notes_list"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "fb68315f-377a-4459-a2ad-6687371f713c",
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "note_search",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "note_search"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "aa5a3096-2cc6-46be-bc3a-a6947f01f35f",
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "unsupported",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "unsupported"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "4cddde8d-c409-4df7-b888-e5ad9d919972",
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "expense",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "expense"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "6863ceaf-5cee-46b1-a3ed-c7d07d70226c",
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "income",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "income"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "dcf50396-bd8d-432f-b532-b8b866d8ee19",
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "finance_report",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "finance_report"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "e3e72414-def3-4b31-b10f-e34bc99a3486",
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "recurring_payment",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "recurring_payment"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -912,
+        -304
+      ],
+      "id": "975a36fb-2bbf-414e-87ca-9a362bbe0b3d",
+      "name": "Switch Type"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=📅 Знайшов зустріч:\nНазва: {{ $json.title }}\nДата: {{ $json.date }}\nЧас: {{ $json.time }} \nПовна інфомація:{{ $json.description }}\nСтворити подію в Google Calendar?",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "✅ Створити",
+                    "additionalFields": {
+                      "callback_data": "confirm_meeting"
+                    }
+                  },
+                  {
+                    "text": "❌ Скасувати",
+                    "additionalFields": {
+                      "callback_data": "cancel_meeting"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        336,
+        -944
+      ],
+      "id": "0aa58063-1ff9-47bb-9f4f-6deb0bfebfac",
+      "name": "Confirm Meeting",
+      "webhookId": "2c94ac4e-c1d7-49ee-baa5-0d4497bb86cf",
+      "credentials": {
+        "telegramApi": {
+          "id": "LAKXnWIRDoCt8OvO",
+          "name": "Ai_assistent_Garmash"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.callback_query ? 'callback' : 'message' }}",
+                    "rightValue": "callback",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "2ccaef7c-afbd-4818-874d-45db97f06c25"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "callback"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "f4f223ab-9366-4da1-b74a-ed0b3e654082",
+                    "leftValue": "={{ $json.callback_query ? 'callback' : 'message' }}",
+                    "rightValue": "message",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "message"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -2608,
+        -560
+      ],
+      "id": "b6d4e403-0894-4f4f-9d01-1afc425f0a90",
+      "name": "Switch Update Type"
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "arturgarmash@gmail.com",
+          "mode": "list",
+          "cachedResultName": "arturgarmash@gmail.com"
+        },
+        "start": "={{ $json.date + 'T' + $json.time + ':00+03:00' }}",
+        "end": "={{ $json.date + 'T' + $json.end_time + ':00+03:00' }}",
+        "useDefaultReminders": false,
+        "additionalFields": {
+          "description": "={{ $json.description }}",
+          "summary": "={{ $json.title }}"
+        },
+        "remindersUi": {
+          "remindersValues": [
+            {
+              "method": "popup",
+              "minutes": 60
+            },
+            {
+              "method": "popup",
+              "minutes": 10
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        -1936,
+        -944
+      ],
+      "id": "9aa31463-dc75-4350-9371-24451b03f18c",
+      "name": "Create an event",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "OgolbcqXuI5q9oWX",
+          "name": "Google Calendar account Garmash"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "OHoQBm1pGO4YfyVf",
+          "mode": "list",
+          "cachedResultName": "Ai_assistant_Garmash",
+          "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/OHoQBm1pGO4YfyVf"
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -2160,
+        -944
+      ],
+      "id": "d9109ac2-42fd-4cf3-a306-d0ccce5d9278",
+      "name": "Get row(s)"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
+        "text": "=✅ Подію створено в Google Calendar:\n\n{{ $('Get row(s)').item.json.title }}\n {{ $('Get row(s)').item.json.date }} о {{ $('Get row(s)').item.json.time }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -1712,
+        -944
+      ],
+      "id": "b86bda44-f9cd-4f45-9847-40f87b4a1dc2",
+      "name": "Telegram Success",
+      "webhookId": "2c94ac4e-c1d7-49ee-baa5-0d4497bb86cf",
+      "credentials": {
+        "telegramApi": {
+          "id": "LAKXnWIRDoCt8OvO",
+          "name": "Ai_assistent_Garmash"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
+        "text": "=❌ Створення зустрічі скасовано.\n\nПодію не додано до Google Calendar.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -1936,
+        -752
+      ],
+      "id": "5c9ea0e2-6e7d-4aa0-8cba-77bcabdca2ea",
+      "name": "cancellation messege",
+      "webhookId": "2c94ac4e-c1d7-49ee-baa5-0d4497bb86cf",
+      "credentials": {
+        "telegramApi": {
+          "id": "LAKXnWIRDoCt8OvO",
+          "name": "Ai_assistent_Garmash"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "53102bfe-a4e8-41a3-8092-062520f9f36f",
+              "leftValue": "={{ $json.message.text }}",
+              "rightValue": "/start",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -2832,
+        -656
+      ],
+      "id": "65fd0d02-b85f-4e63-a00f-ca23a349da4a",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.message.chat.id }}",
+        "text": "=🤖 Вітаю! Я ваш персональний AI Assistant.\n\nЯ допомагаю керувати часом, задачами, знаннями та фінансами через Telegram.\n\n📅 Зустрічі\n\nСтворюю події в Google Calendar.\n\nПриклади:\n\n• Зустріч: Дзвінок з клієнтом завтра о 14:00\n• Зустріч: Стоматолог 25 червня о 10:30\n\nДля кожної зустрічі автоматично додаються нагадування за 60 та 10 хвилин.\n\n━━━━━━━━━━━━━━\n\n✅ Задачі\n\nСтворюю задачі в Google Tasks.\n\nПриклади:\n\n• Задача: Підготувати комерційну пропозицію\n• Задача: Купити подарунок мамі\n\nКожна задача зберігається як одна конкретна дія.\n\n━━━━━━━━━━━━━━\n\n📝 Нотатки та ідеї\n\nЗберігаю знання та ідеї в Notion.\n\nПриклади:\n\n• Нотатка: Інтегрувати Zoho CRM з Telegram\n• Нотатка: Ідея для нового AI-агента\n\nНотатки автоматично категоризуються та зберігаються у базі знань.\n\n━━━━━━━━━━━━━━\n\n🔍 Пошук по пам'яті\n\nМожу знайти будь-яку збережену інформацію.\n\nПриклади:\n\n• Що я записував про Zoho?\n• Покажи нотатки про стоматологію\n• Що я пам'ятаю про цей проєкт?\n\n━━━━━━━━━━━━━━\n\n📚 Список нотаток\n\nПриклади:\n\n• Які в мене ідеї?\n• Покажи останні нотатки\n• Покажи всі нотатки\n\n━━━━━━━━━━━━━━\n\n💰 Фінанси\n\nВеду облік доходів та витрат.\n\nПриклади:\n\n• Витрата: 3200 грн бензин\n• Витрата: 850 грн стоматолог\n• Дохід: 15000 грн консультація\n• Дохід: 42000 грн зарплата\n\nУсі операції автоматично записуються у фінансову базу.\n\n━━━━━━━━━━━━━━\n\n📊 Фінансові звіти\n\nПриклади:\n\n• Скільки я витратив цього місяця?\n• Який дохід цього місяця?\n• Покажи витрати на бензин\n• Покажи фінансовий звіт\n\n━━━━━━━━━━━━━━\n\n🎤 Підтримую текстові та голосові повідомлення.\n\nПросто напишіть або надішліть голосове повідомлення — я сам визначу потрібну дію та виконаю її.\n",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -2608,
+        -752
+      ],
+      "id": "1fbf892f-c309-4c72-9e2c-0a7a82b1250f",
+      "name": "Telegram Success1",
+      "webhookId": "2c94ac4e-c1d7-49ee-baa5-0d4497bb86cf",
+      "credentials": {
+        "telegramApi": {
+          "id": "LAKXnWIRDoCt8OvO",
+          "name": "Ai_assistent_Garmash"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "deleteRows",
+        "dataTableId": {
+          "__rl": true,
+          "value": "OHoQBm1pGO4YfyVf",
+          "mode": "list",
+          "cachedResultName": "Ai_assistant_Garmash",
+          "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/OHoQBm1pGO4YfyVf"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "={{ $('Get row(s)').item.json.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -1424,
+        -944
+      ],
+      "id": "347e328a-0765-4a41-a1e4-69cd40762323",
+      "name": "Delete row(s)"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "OHoQBm1pGO4YfyVf",
+          "mode": "list",
+          "cachedResultName": "Ai_assistant_Garmash",
+          "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/OHoQBm1pGO4YfyVf"
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -2160,
+        -752
+      ],
+      "id": "e52321cb-d0de-4144-8dee-428dfb813b1c",
+      "name": "Get row(s)1"
+    },
+    {
+      "parameters": {
+        "operation": "deleteRows",
+        "dataTableId": {
+          "__rl": true,
+          "value": "OHoQBm1pGO4YfyVf",
+          "mode": "list",
+          "cachedResultName": "Ai_assistant_Garmash",
+          "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/OHoQBm1pGO4YfyVf"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "={{ $('Get row(s)1').item.json.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -1712,
+        -752
+      ],
+      "id": "6c1a9597-7362-4668-92d3-d9ae4133e54d",
+      "name": "Delete row(s)1"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=✅ Знайшов задачу:\n\n{{ $json.title }}\n\nСтворити задачу?",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "✅ Створити",
+                    "additionalFields": {
+                      "callback_data": "confirm_task"
+                    }
+                  },
+                  {
+                    "text": "❌ Скасувати",
+                    "additionalFields": {
+                      "callback_data": "cancel_task"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -688,
+        -848
+      ],
+      "id": "d9feae83-5d43-4e7f-86ce-58ff8bb6d55d",
+      "name": "Confirm Task",
+      "webhookId": "2c94ac4e-c1d7-49ee-baa5-0d4497bb86cf",
+      "credentials": {
+        "telegramApi": {
+          "id": "LAKXnWIRDoCt8OvO",
+          "name": "Ai_assistent_Garmash"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "OHoQBm1pGO4YfyVf",
+          "mode": "list",
+          "cachedResultName": "Ai_assistant_Garmash",
+          "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/OHoQBm1pGO4YfyVf"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chat_id": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+            "action_type": "={{ $('Parse AI JSON').item.json.type }}",
+            "title": "={{ $('Parse AI JSON').item.json.title }}",
+            "description": "={{ $('Parse AI JSON').item.json.description }}",
+            "date": "={{ $('Parse AI JSON').item.json.date }}",
+            "time": "={{ $('Parse AI JSON').item.json.time }}",
+            "end_time": "={{ $('Parse AI JSON').item.json.end_time }}",
+            "due_date": "={{ $('Parse AI JSON').item.json.due_date }}",
+            "priority": "={{ $('Parse AI JSON').item.json.priority }}",
+            "status": "pending",
+            "created_at": "={{ $now }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "action_type",
+              "displayName": "action_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "time",
+              "displayName": "time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "end_time",
+              "displayName": "end_time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "due_date",
+              "displayName": "due_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "priority",
+              "displayName": "priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        560,
+        -944
+      ],
+      "id": "ff7f99d5-883b-4e83-99a0-a82965d65e8a",
+      "name": "Insert row Meeting"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "OHoQBm1pGO4YfyVf",
+          "mode": "list",
+          "cachedResultName": "Ai_assistant_Garmash",
+          "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/OHoQBm1pGO4YfyVf"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "action_type": "={{ $('Parse AI JSON').item.json.type }}",
+            "status": "pending",
+            "created_at": "={{ $now }}",
+            "title": "={{ $('Parse AI JSON').item.json.title }}",
+            "description": "={{ $('Parse AI JSON').item.json.description }}",
+            "due_date": "={{ $('Parse AI JSON').item.json.due_date }}",
+            "date": "={{ $('Parse AI JSON').item.json.date }}",
+            "time": "={{ $('Parse AI JSON').item.json.time }}",
+            "end_time": "={{ $('Parse AI JSON').item.json.end_time }}",
+            "chat_id": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+            "priority": "={{ $('Parse AI JSON').item.json.priority }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "action_type",
+              "displayName": "action_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "time",
+              "displayName": "time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "end_time",
+              "displayName": "end_time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "due_date",
+              "displayName": "due_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "priority",
+              "displayName": "priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -464,
+        -848
+      ],
+      "id": "d7e54808-a0c3-4c61-a666-be2422db1c95",
+      "name": "Insert row Task"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.callback_query.data }}",
+                    "rightValue": "confirm_meeting",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "bd29712b-cab4-49f7-815c-673eff269dbe"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "confirm_meeting"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "206d006d-3bda-4d3a-b6af-c380eb7cf9b5",
+                    "leftValue": "={{ $json.callback_query.data }}",
+                    "rightValue": "cancel_meeting",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "cancel_meeting"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "713c12a8-4123-4dfd-b26e-a0c6463aa3ea",
+                    "leftValue": "={{ $json.callback_query.data }}",
+                    "rightValue": "confirm_task",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "confirm_task"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "a3c76649-7a34-4fca-86af-33e7658f5a2a",
+                    "leftValue": "={{ $json.callback_query.data }}",
+                    "rightValue": "cancel_task",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "cancel_task"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -2384,
+        -880
+      ],
+      "id": "92f1faa7-2221-4ef8-98ba-de4e6a7ed6e0",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "OHoQBm1pGO4YfyVf",
+          "mode": "list",
+          "cachedResultName": "Ai_assistant_Garmash",
+          "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/OHoQBm1pGO4YfyVf"
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -2160,
+        -560
+      ],
+      "id": "08265df0-2e8d-43ab-a0e3-ceb84e413b99",
+      "name": "Get row(s)Task"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "OHoQBm1pGO4YfyVf",
+          "mode": "list",
+          "cachedResultName": "Ai_assistant_Garmash",
+          "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/OHoQBm1pGO4YfyVf"
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -2160,
+        -368
+      ],
+      "id": "0a2c618a-b5f1-492d-a785-59be966090c1",
+      "name": "Get row(s)Task1"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
+        "text": "=❌ Створення Задачі скасовано.\n\nПодію не додано до Todoist.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -1936,
+        -368
+      ],
+      "id": "236312cb-fe6e-483b-b554-14121a4e138a",
+      "name": "cancellation messege Task",
+      "webhookId": "2c94ac4e-c1d7-49ee-baa5-0d4497bb86cf",
+      "credentials": {
+        "telegramApi": {
+          "id": "LAKXnWIRDoCt8OvO",
+          "name": "Ai_assistent_Garmash"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
+        "text": "=✅ Задачу створено\n\n📌{{ $json.content }}\n\nЗадачу додано до Todoist.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -1712,
+        -560
+      ],
+      "id": "af4e6578-31ed-4549-9319-b8345d73b2c2",
+      "name": "Telegram Success Task",
+      "webhookId": "2c94ac4e-c1d7-49ee-baa5-0d4497bb86cf",
+      "credentials": {
+        "telegramApi": {
+          "id": "LAKXnWIRDoCt8OvO",
+          "name": "Ai_assistent_Garmash"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "deleteRows",
+        "dataTableId": {
+          "__rl": true,
+          "value": "OHoQBm1pGO4YfyVf",
+          "mode": "list",
+          "cachedResultName": "Ai_assistant_Garmash",
+          "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/OHoQBm1pGO4YfyVf"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "={{ $('Get row(s)Task').item.json.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -1424,
+        -560
+      ],
+      "id": "a830cbf8-c39a-4d15-baf4-748535f32497",
+      "name": "Delete row(s) Task"
+    },
+    {
+      "parameters": {
+        "operation": "deleteRows",
+        "dataTableId": {
+          "__rl": true,
+          "value": "OHoQBm1pGO4YfyVf",
+          "mode": "list",
+          "cachedResultName": "Ai_assistant_Garmash",
+          "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/OHoQBm1pGO4YfyVf"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "={{ $('Get row(s)Task1').item.json.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -1712,
+        -368
+      ],
+      "id": "23368988-9c6d-4cf5-b654-94f884d5c7ec",
+      "name": "Delete row(s) Task1"
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "value": "6gq2WCCMJ6QwQfXX",
+          "mode": "list",
+          "cachedResultName": "Ai assistant"
+        },
+        "content": "=\n{{ $json.title }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.todoist",
+      "typeVersion": 2.2,
+      "position": [
+        -1936,
+        -560
+      ],
+      "id": "f5bc701c-5290-4a5e-a9f8-26366af21a35",
+      "name": "Create a task1",
+      "credentials": {
+        "todoistApi": {
+          "id": "TqFMMAS9MLn2IxBk",
+          "name": "Todoist account Garmash"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=📝 Нотатку збережено в Notion\n\nНазва:\n{{ $('Save Note to Notion').item.json.name || $('Parse AI JSON').item.json.title }}\n\n✅ Додано до бази AI Assistant Notes.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -464,
+        -656
+      ],
+      "id": "800284a3-c4d1-4920-b5bf-952fecb64689",
+      "name": "Telegram Success Note",
+      "webhookId": "2c94ac4e-c1d7-49ee-baa5-0d4497bb86cf",
+      "credentials": {
+        "telegramApi": {
+          "id": "LAKXnWIRDoCt8OvO",
+          "name": "Ai_assistent_Garmash"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=Я поки розумію тільки:\n\n🎙 голосові повідомлення\n✍️ текстові повідомлення\n\nІ можу створювати:\n📅 зустрічі\n✅ задачі\n💡 нотатки / ідеї",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -688,
+        304
+      ],
+      "id": "5cebc8e7-a4e9-42cf-b993-a6ad5d9ed6e3",
+      "name": "Telegram Unsupported",
+      "webhookId": "2c94ac4e-c1d7-49ee-baa5-0d4497bb86cf",
+      "credentials": {
+        "telegramApi": {
+          "id": "LAKXnWIRDoCt8OvO",
+          "name": "Ai_assistent_Garmash"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "3842d376-41af-800c-9344-c9bc21ed0f27",
+          "mode": "list",
+          "cachedResultName": "Ai Assistant",
+          "cachedResultUrl": "https://app.notion.com/p/3842d37641af800c9344c9bc21ed0f27"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Name|title",
+              "title": "={{ $json.title }}"
+            },
+            {
+              "key": "content|rich_text",
+              "textContent": "={{ $json.description }}"
+            },
+            {
+              "key": "type|select",
+              "selectValue": "={{ $json.type }}"
+            },
+            {
+              "key": "created|date",
+              "date": "={{ $now }}",
+              "timezone": "Europe/Kyiv"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        -688,
+        -656
+      ],
+      "id": "581cdc07-8150-4062-be2c-e1ea5778d164",
+      "name": "Save Note to Notion",
+      "credentials": {
+        "notionApi": {
+          "id": "ltK8tVELDuPM6GA3",
+          "name": "Notion account Garmash"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "3842d376-41af-800c-9344-c9bc21ed0f27",
+          "mode": "list",
+          "cachedResultName": "Ai Assistant",
+          "cachedResultUrl": "https://app.notion.com/p/3842d37641af800c9344c9bc21ed0f27"
+        },
+        "returnAll": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        -688,
+        -464
+      ],
+      "id": "c40000d2-cdd0-49f3-8c50-3cf79b0e195c",
+      "name": "Get many database pages",
+      "credentials": {
+        "notionApi": {
+          "id": "ltK8tVELDuPM6GA3",
+          "name": "Notion account Garmash"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const notes = items;\n\nif (notes.length === 0) {\n  return [{\n    json: {\n      text: \"У вас ще немає збережених нотаток.\"\n    }\n  }];\n}\n\nlet message = \"📝 Ваші останні нотатки:\\n\\n\";\n\nnotes.slice(0, 10).forEach((note, index) => {\n\n  const title =\n    note.json.Name ||\n    note.json.name ||\n    \"Без назви\";\n\n  message += `${index + 1}. ${title}\\n`;\n});\n\nreturn [{\n  json: {\n    text: message\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -464,
+        -464
+      ],
+      "id": "b497a90d-1b1d-43fc-a711-e5ef6eab3059",
+      "name": "Format Notes List"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.text }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -176,
+        -464
+      ],
+      "id": "49259a28-455d-4266-961b-be8b6867c1a7",
+      "name": "Telegram Success Note1",
+      "webhookId": "2c94ac4e-c1d7-49ee-baa5-0d4497bb86cf",
+      "credentials": {
+        "telegramApi": {
+          "id": "LAKXnWIRDoCt8OvO",
+          "name": "Ai_assistent_Garmash"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "3842d376-41af-800c-9344-c9bc21ed0f27",
+          "mode": "list",
+          "cachedResultName": "Ai Assistant",
+          "cachedResultUrl": "https://app.notion.com/p/3842d37641af800c9344c9bc21ed0f27"
+        },
+        "returnAll": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        -688,
+        -272
+      ],
+      "id": "8368571f-96bb-4fb1-9de9-169ec82ce4a5",
+      "name": "Get many database pages1",
+      "credentials": {
+        "notionApi": {
+          "id": "ltK8tVELDuPM6GA3",
+          "name": "Notion account Garmash"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const searchTerm = $('Parse AI JSON').first().json.query.toLowerCase();\n\nconst results = items.filter(item => {\n  const title = (item.json.property_name || '').toLowerCase();\n  const content = (item.json.property_content || '').toLowerCase();\n\n  return title.includes(searchTerm) || content.includes(searchTerm);\n});\n\nif (results.length === 0) {\n  return [\n    {\n      json: {\n        not_found: true,\n        text: `🔍 Нічого не знайдено по запиту: ${searchTerm}`\n      }\n    }\n  ];\n}\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -464,
+        -272
+      ],
+      "id": "f5450fce-0164-46f0-ac82-bdaa9cb5c6a2",
+      "name": "Filter Notes"
+    },
+    {
+      "parameters": {
+        "jsCode": "if (items[0].json.not_found) {\n  return [\n    {\n      json: {\n        text: items[0].json.text\n      }\n    }\n  ];\n}\n\nlet message = `🔍 Знайдено ${items.length} нотаток:\\n\\n`;\n\nitems.forEach((item, index) => {\n  message += `${index + 1}. ${item.json.property_name}\\n`;\n\n \n\n  message += \"\\n\";\n});\n\nreturn [\n  {\n    json: {\n      text: message\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -176,
+        -272
+      ],
+      "id": "0ba1b42f-cc3a-41ef-aaf1-71307e9b00c6",
+      "name": "Format Search Result"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.text }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        112,
+        -272
+      ],
+      "id": "f4285531-5c5a-4a83-938a-71f23f96bbc6",
+      "name": "Telegram Success Note2",
+      "webhookId": "2c94ac4e-c1d7-49ee-baa5-0d4497bb86cf",
+      "credentials": {
+        "telegramApi": {
+          "id": "LAKXnWIRDoCt8OvO",
+          "name": "Ai_assistent_Garmash"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1eGUTAW-BmF7OpPN3A95TZbQDAIGoJse43uXYQx4IFUM/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Transactions",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eGUTAW-BmF7OpPN3A95TZbQDAIGoJse43uXYQx4IFUM/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{ $json.date || $now.toFormat('yyyy-MM-dd') }}",
+            "Type": "={{ $json.type }}",
+            "Category": "={{ $json.finance_category || 'Other' }}",
+            "Amount": "={{ $json.amount }}",
+            "Currency": "={{ $json.currency || 'UAH' }}",
+            "Description": "={{ $json.description || $json.title || $json.original_text }}",
+            "Source": "Telegram",
+            "Created At": "={{ $now }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Type",
+              "displayName": "Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Amount",
+              "displayName": "Amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Currency",
+              "displayName": "Currency",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Description",
+              "displayName": "Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Created At",
+              "displayName": "Created At",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -688,
+        -80
+      ],
+      "id": "80678ae4-af50-41f1-a721-d76c8de320d3",
+      "name": "AI Assistant Finance",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=💰 Витрату додано\n\nСума: {{ $('Parse AI JSON').item.json.amount }} {{ $('Parse AI JSON').item.json.currency || 'UAH' }}\nКатегорія: {{ $('Parse AI JSON').item.json.finance_category }}\nКоментар: {{ $('Parse AI JSON').item.json.description }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -464,
+        -80
+      ],
+      "id": "46681e3c-c4c6-4ad4-a591-cdc3339becf2",
+      "name": "Telegram Success2",
+      "webhookId": "2c94ac4e-c1d7-49ee-baa5-0d4497bb86cf",
+      "credentials": {
+        "telegramApi": {
+          "id": "LAKXnWIRDoCt8OvO",
+          "name": "Ai_assistent_Garmash"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1eGUTAW-BmF7OpPN3A95TZbQDAIGoJse43uXYQx4IFUM/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Transactions",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eGUTAW-BmF7OpPN3A95TZbQDAIGoJse43uXYQx4IFUM/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": []
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -688,
+        496
+      ],
+      "id": "c0c600ce-ede5-4cc2-adb9-bf036939871d",
+      "name": "Get row(s) in sheet",
+      "retryOnFail": false,
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const query = $('Parse AI JSON').first().json.original_text.toLowerCase();\nconst rows = $input.all().map(item => item.json);\n\nconst now = new Date();\nconst currentMonth = now.getMonth();\nconst currentYear = now.getFullYear();\n\nfunction parseDate(value) {\n  if (!value) return null;\n  return new Date(value);\n}\n\nlet filtered = rows;\n\nif (query.includes('місяц') || query.includes('цього місяця')) {\n  filtered = filtered.filter(row => {\n    const d = parseDate(row.Date);\n    return d && d.getMonth() === currentMonth && d.getFullYear() === currentYear;\n  });\n}\n\nif (query.includes('тижд')) {\n  const weekAgo = new Date();\n  weekAgo.setDate(now.getDate() - 7);\n\n  filtered = filtered.filter(row => {\n    const d = parseDate(row.Date);\n    return d && d >= weekAgo && d <= now;\n  });\n}\n\nconst totalExpense = filtered\n  .filter(row => String(row.Type).toLowerCase() === 'expense')\n  .reduce((sum, row) => sum + Number(row.Amount || 0), 0);\n\nconst totalIncome = filtered\n  .filter(row => String(row.Type).toLowerCase() === 'income')\n  .reduce((sum, row) => sum + Number(row.Amount || 0), 0);\n\nconst categoryTotals = {};\n\nfor (const row of filtered) {\n  const category = row.Category || 'Other';\n  const amount = Number(row.Amount || 0);\n\n  if (!categoryTotals[category]) {\n    categoryTotals[category] = 0;\n  }\n\n  categoryTotals[category] += amount;\n}\n\nreturn [\n  {\n    json: {\n      query,\n      totalExpense,\n      totalIncome,\n      balance: totalIncome - totalExpense,\n      categoryTotals,\n      transactions: filtered\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -464,
+        496
+      ],
+      "id": "6723599d-8af4-470a-a061-03c6415ce83d",
+      "name": "Prepare Finance Report"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=Сформуй короткий фінансовий звіт українською мовою.\n\nЗапит користувача:\n{{ $json.query }}\n\nДані:\nЗагальні витрати: {{ $json.totalExpense }}\nЗагальні доходи: {{ $json.totalIncome }}\nБаланс: {{ $json.balance }}\n\nКатегорії:\n{{ JSON.stringify($json.categoryTotals) }}\n\nОперації:\n{{ JSON.stringify($json.transactions) }}\n\nФормат:\n💰 Фінансовий звіт\n\nВитрати:\n...\n\nДоходи:\n...\n\nПо категоріях:\n...\n\nКороткий висновок:\n1 речення.\n\nЯкщо даних немає — напиши, що операцій за цей період не знайдено."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        -240,
+        496
+      ],
+      "id": "8dbd6554-ec23-442e-bf81-5962aa800f02",
+      "name": "OpenAI Finance Summary",
+      "credentials": {
+        "openAiApi": {
+          "id": "SuJ6fVcyIeq9uR1k",
+          "name": "OpenAI account Garmash"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output[0].content[0].text }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        112,
+        496
+      ],
+      "id": "927d7bf5-eea2-4679-abe8-99d384353e6d",
+      "name": "Telegram Finance Summary",
+      "webhookId": "2c94ac4e-c1d7-49ee-baa5-0d4497bb86cf",
+      "credentials": {
+        "telegramApi": {
+          "id": "LAKXnWIRDoCt8OvO",
+          "name": "Ai_assistent_Garmash"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const date = $json.date;\nconst time = $json.time;\nconst endTime = $json.end_time;\n\nconst start = new Date(`${date}T${time}:00+03:00`);\nconst end = new Date(`${date}T${endTime}:00+03:00`);\n\nconst bufferStart = new Date(start);\nbufferStart.setMinutes(bufferStart.getMinutes() - 15);\n\nconst bufferEnd = new Date(end);\nbufferEnd.setMinutes(bufferEnd.getMinutes() + 15);\n\nreturn [{\n  json: {\n    ...$json,\n    start_iso: start.toISOString(),\n    end_iso: end.toISOString(),\n    buffer_start_iso: bufferStart.toISOString(),\n    buffer_end_iso: bufferEnd.toISOString()\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -688,
+        -1040
+      ],
+      "id": "e15a5115-9fa4-46cd-82fe-558f3d671d59",
+      "name": "Build Meeting Time"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "arturgarmash@gmail.com",
+          "mode": "list",
+          "cachedResultName": "arturgarmash@gmail.com"
+        },
+        "returnAll": true,
+        "timeMin": "={{ $json.buffer_start_iso }}",
+        "timeMax": "={{ $json.buffer_end_iso }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        -464,
+        -1040
+      ],
+      "id": "018de076-eece-455c-9945-c567259941b9",
+      "name": "Get Events for Conflict Check",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "OgolbcqXuI5q9oWX",
+          "name": "Google Calendar account Garmash"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const meeting = $('Build Meeting Time').first().json;\n\nconst events = $input.all().filter(e => {\n  const hasId = !!e.json.id;\n  const hasSummary = !!e.json.summary;\n  const hasStart = !!(e.json.start?.dateTime || e.json.start?.date);\n\n  return hasId || hasSummary || hasStart;\n});\n\nconst hasConflict = events.length > 0;\n\nreturn [{\n  json: {\n    ...meeting,\n    has_conflict: hasConflict,\n    conflicts_count: events.length,\n    conflicts: events.map(e => ({\n      title: e.json.summary || e.json.title || 'Без назви',\n      start: e.json.start?.dateTime || e.json.start?.date || '',\n      end: e.json.end?.dateTime || e.json.end?.date || ''\n    }))\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -176,
+        -1040
+      ],
+      "id": "5872fb30-eff8-46e0-a0fc-06b1ce93384b",
+      "name": "Check Meeting Conflict"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "7f010fcf-518b-45d3-a2a9-94ae060c6819",
+              "leftValue": "={{ $json.has_conflict }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        112,
+        -1040
+      ],
+      "id": "8a59bb1d-9dbb-4fd7-8691-6fbcabe2a012",
+      "name": "IF Calendar Conflict"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=⚠️ У цей час вже є подія або не вистачає 15 хвилин буфера між зустрічами.\n\nЗустріч не створена.\n\nКонфлікт:\n{{ $json.conflicts[0].title }}\n{{ $json.conflicts[0].start }} — {{ $json.conflicts[0].end }}\n\nСпробуйте обрати інший час.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        336,
+        -1136
+      ],
+      "id": "c3f44859-05db-426c-a26e-5f76f7f40437",
+      "name": "Telegram Conflict Message",
+      "webhookId": "2c94ac4e-c1d7-49ee-baa5-0d4497bb86cf",
+      "credentials": {
+        "telegramApi": {
+          "id": "LAKXnWIRDoCt8OvO",
+          "name": "Ai_assistent_Garmash"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1eGUTAW-BmF7OpPN3A95TZbQDAIGoJse43uXYQx4IFUM/edit?gid=1567013522#gid=1567013522",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1567013522,
+          "mode": "list",
+          "cachedResultName": "Recurring Payments",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eGUTAW-BmF7OpPN3A95TZbQDAIGoJse43uXYQx4IFUM/edit#gid=1567013522"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json.payment_name }}",
+            "Amount": "={{ $json.amount }}",
+            "Day": "={{ $json.payment_day }}",
+            "Category": "={{ $json.finance_category }}",
+            "Reminder Days": "={{ $json.reminder_days }}",
+            "Active": "TRUE"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Amount",
+              "displayName": "Amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Day",
+              "displayName": "Day",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Reminder Days",
+              "displayName": "Reminder Days",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Active",
+              "displayName": "Active",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -688,
+        112
+      ],
+      "id": "259da407-dcb4-4f32-b602-ede90845dca8",
+      "name": "Append row in sheet recurring_payment",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=🔁 Регулярний платіж додано\n\nНазва: {{ $('Parse AI JSON').item.json.payment_name }}\nСума: {{ $('Parse AI JSON').item.json.amount || 'не вказана' }} {{ $('Parse AI JSON').item.json.currency || 'UAH' }}\nДень оплати: {{ $('Parse AI JSON').item.json.payment_day }} число кожного місяця\nКатегорія: {{ $('Parse AI JSON').item.json.finance_category }}\nНагадування: за {{ $('Parse AI JSON').item.json.reminder_days }} дні\n\n✅ Я нагадаю про цей платіж заздалегідь.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -464,
+        112
+      ],
+      "id": "199ebd10-1351-40ab-84b2-0fac2e1fc381",
+      "name": "Telegram Success3",
+      "webhookId": "2c94ac4e-c1d7-49ee-baa5-0d4497bb86cf",
+      "credentials": {
+        "telegramApi": {
+          "id": "LAKXnWIRDoCt8OvO",
+          "name": "Ai_assistent_Garmash"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Message Type": {
+      "main": [
+        [
+          {
+            "node": "Get Voice File",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set Text Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Voice File": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording": {
+      "main": [
+        [
+          {
+            "node": "Set Voice Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Voice Text": {
+      "main": [
+        [
+          {
+            "node": "AI Classify Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Text Message": {
+      "main": [
+        [
+          {
+            "node": "AI Classify Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Classify Message": {
+      "main": [
+        [
+          {
+            "node": "Parse AI JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse AI JSON": {
+      "main": [
+        [
+          {
+            "node": "Switch Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch Type": {
+      "main": [
+        [
+          {
+            "node": "Build Meeting Time",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Confirm Task",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Save Note to Notion",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get many database pages",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get many database pages1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram Unsupported",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Assistant Finance",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Assistant Finance",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append row in sheet recurring_payment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Confirm Meeting": {
+      "main": [
+        [
+          {
+            "node": "Insert row Meeting",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch Update Type": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "IF Message Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s)": {
+      "main": [
+        [
+          {
+            "node": "Create an event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an event": {
+      "main": [
+        [
+          {
+            "node": "Telegram Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Telegram Success1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Switch Update Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Success": {
+      "main": [
+        [
+          {
+            "node": "Delete row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "cancellation messege": {
+      "main": [
+        [
+          {
+            "node": "Delete row(s)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s)1": {
+      "main": [
+        [
+          {
+            "node": "cancellation messege",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Confirm Task": {
+      "main": [
+        [
+          {
+            "node": "Insert row Task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Get row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get row(s)1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get row(s)Task",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get row(s)Task1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s)Task": {
+      "main": [
+        [
+          {
+            "node": "Create a task1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s)Task1": {
+      "main": [
+        [
+          {
+            "node": "cancellation messege Task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Success Task": {
+      "main": [
+        [
+          {
+            "node": "Delete row(s) Task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "cancellation messege Task": {
+      "main": [
+        [
+          {
+            "node": "Delete row(s) Task1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a task1": {
+      "main": [
+        [
+          {
+            "node": "Telegram Success Task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Note to Notion": {
+      "main": [
+        [
+          {
+            "node": "Telegram Success Note",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many database pages": {
+      "main": [
+        [
+          {
+            "node": "Format Notes List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Notes List": {
+      "main": [
+        [
+          {
+            "node": "Telegram Success Note1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many database pages1": {
+      "main": [
+        [
+          {
+            "node": "Filter Notes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Notes": {
+      "main": [
+        [
+          {
+            "node": "Format Search Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Search Result": {
+      "main": [
+        [
+          {
+            "node": "Telegram Success Note2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Assistant Finance": {
+      "main": [
+        [
+          {
+            "node": "Telegram Success2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Prepare Finance Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Finance Report": {
+      "main": [
+        [
+          {
+            "node": "OpenAI Finance Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Finance Summary": {
+      "main": [
+        [
+          {
+            "node": "Telegram Finance Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Meeting Time": {
+      "main": [
+        [
+          {
+            "node": "Get Events for Conflict Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Events for Conflict Check": {
+      "main": [
+        [
+          {
+            "node": "Check Meeting Conflict",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Meeting Conflict": {
+      "main": [
+        [
+          {
+            "node": "IF Calendar Conflict",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Calendar Conflict": {
+      "main": [
+        [
+          {
+            "node": "Telegram Conflict Message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Confirm Meeting",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet recurring_payment": {
+      "main": [
+        [
+          {
+            "node": "Telegram Success3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "ZC70w09Auv6IQKOQ",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "87ec646a-d523-4f6f-b429-ea363e4a7378",
+  "activeVersionId": "87ec646a-d523-4f6f-b429-ea363e4a7378",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-06-04T19:28:46.831Z",
+      "createdAt": "2026-06-04T19:28:46.831Z",
+      "role": "workflow:owner",
+      "workflowId": "4OCeBFYfU5uJpnY3",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-06-22T09:17:12.000Z",
+    "createdAt": "2026-06-22T09:08:19.251Z",
+    "versionId": "87ec646a-d523-4f6f-b429-ea363e4a7378",
+    "workflowId": "4OCeBFYfU5uJpnY3",
+    "nodes": [
+      {
+        "parameters": {
+          "updates": [
+            "message",
+            "callback_query"
+          ],
+          "additionalFields": {}
+        },
+        "type": "n8n-nodes-base.telegramTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          -3056,
+          -656
+        ],
+        "id": "d7f6cd69-af8e-4b7b-a3b6-47ed669255d5",
+        "name": "Telegram Trigger",
+        "webhookId": "bbbcbadd-d2e8-46f3-b48a-97f5b5b449bd",
+        "credentials": {
+          "telegramApi": {
+            "id": "LAKXnWIRDoCt8OvO",
+            "name": "Ai_assistent_Garmash"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "6a6382a7-d4ed-499a-995f-94849aa61274",
+                "leftValue": "={{ $json.message.voice }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "object",
+                  "operation": "exists",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "or"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          -2384,
+          -176
+        ],
+        "id": "f63d5651-1dcf-4bb3-ada4-6ba3b7cf5bd7",
+        "name": "IF Message Type"
+      },
+      {
+        "parameters": {
+          "resource": "file",
+          "fileId": "={{ $json.message.voice.file_id }}",
+          "additionalFields": {}
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          -2160,
+          -176
+        ],
+        "id": "a14b6731-47f8-488e-bb13-55fedd491c5f",
+        "name": "Get Voice File",
+        "webhookId": "806df69e-b88e-4e67-abdd-90ffd61d776b",
+        "credentials": {
+          "telegramApi": {
+            "id": "LAKXnWIRDoCt8OvO",
+            "name": "Ai_assistent_Garmash"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "resource": "audio",
+          "operation": "transcribe",
+          "options": {
+            "language": "uk"
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.openAi",
+        "typeVersion": 2.3,
+        "position": [
+          -1936,
+          -176
+        ],
+        "id": "620e5db1-ea8c-4893-a8ce-bf6016d578ea",
+        "name": "Transcribe a recording",
+        "credentials": {
+          "openAiApi": {
+            "id": "SuJ6fVcyIeq9uR1k",
+            "name": "OpenAI account Garmash"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "c9b584f2-dfc6-4faf-bedf-181b3876a469",
+                "name": "user_text",
+                "value": "={{ $json.text }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          -1712,
+          -176
+        ],
+        "id": "9e4efbe5-41d8-4b7e-918d-3764d50129fe",
+        "name": "Set Voice Text"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "c9b584f2-dfc6-4faf-bedf-181b3876a469",
+                "name": "user_text",
+                "value": "={{ $json.message.text }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          -1712,
+          16
+        ],
+        "id": "468b40c5-61cc-45fe-b595-f6338d907c54",
+        "name": "Set Text Message"
+      },
+      {
+        "parameters": {
+          "modelId": {
+            "__rl": true,
+            "value": "gpt-4.1-mini",
+            "mode": "list",
+            "cachedResultName": "GPT-4.1-MINI"
+          },
+          "responses": {
+            "values": [
+              {
+                "content": "=Ти AI-асистент для Telegram.\n\nТвоє завдання — визначити тип повідомлення користувача.\n\nUser Message:\n{{ $json.user_text }}\n\nТипи:\n\n1. meeting — зустріч, дзвінок, подія в календарі\n2. task — задача, яку потрібно виконати\n3. note — нотатка, ідея, думка, яку потрібно зберегти\n4. note_search — пошук інформації в раніше збережених нотатках\n5. notes_list — показати список останніх нотаток\n6. expense — витрата, списання грошей, покупка, оплата\n7. income — дохід, надходження грошей, зарплата, консультація, оплата від клієнта\n8. finance_report — коли користувач хоче отримати інформацію про свої доходи, витрати, баланс, категорії витрат або фінансову статистику.\n9.recurring_payment - коли користувачу потрібно нагадування про про оплату.\n10. unsupported — якщо неможливо зрозуміти намір користувача\n\nПоточна дата:\n\n{{ $now }}\n\nTimezone:\n\nEurope/Kyiv\n\nПоверни тільки валідний JSON.\n\nФормат відповіді:\n\n{\n\"type\": \"meeting | task | note | note_search | notes_list | expense | income | finance_report | recurring_payment | unsupported\",\n\"title\": \"\",\n\"description\": \"\",\n\"date\": \"\",\n\"time\": \"\",\n\"end_time\": \"\",\n\"due_date\": \"\",\n\"priority\": \"normal\",\n\"query\": \"\",\n\"amount\": \"\",\n\"currency\": \"UAH\",\n\"finance_category\": \"\",\n\"payment_name\": \"\",\n\"payment_day\": \"\",\n\"reminder_days\": \"\",\n\"original_text\": \"\"\n}\n\nПравила:\n\n* Якщо це meeting, обов'язково визнач date і time.\n* Якщо end_time не вказано, встанови +1 годину від time.\n* Якщо це task, створи короткий title.\n* Якщо дата задачі не вказана, due_date залиш порожнім.\n* Кожна task повинна містити лише одну конкретну дію.\n* Якщо користувач вказав кілька дій, створи тільки першу наступну конкретну дію.\n* Якщо це note, створи короткий title та description.\n* Якщо це note_search, заповни query темою пошуку.\n* Якщо це notes_list, query залиш порожнім.\n* Для note_search та notes_list не заповнюй date, time, end_time, due_date.\n* Якщо це expense або income, обов'язково визнач amount, currency, finance_category, description і date.\n* Якщо дата фінансової операції не вказана, використовуй поточну дату.\n* Якщо валюта не вказана, використовуй UAH.\n* amount має бути тільки числом без валюти.\n* description має бути коротким коментарем до операції.\n* Не вигадуй людей, місце або зайві деталі.\n* Не додавай зайві поля.\n\nКатегорії для expense:\n\nFood\nRestaurant\nFuel\nTaxi\nCar\nRent\nUtilities\nHealth\nSport\nEducation\nEntertainment\nBusiness\nPersonal\nFinance\nOther\n\nКатегорії для income:\n\nSalary\nConsulting\nFreelance\nBusiness\nInvestment\nGift\nOther\n\nПриклади:\n\nКористувач:\nЗапиши нотатку інтегрувати Zoho з Telegram\n\nВідповідь:\n\n{\n\"type\": \"note\",\n\"title\": \"Інтеграція Zoho з Telegram\",\n\"description\": \"Інтегрувати Zoho з Telegram\",\n\"date\": \"\",\n\"time\": \"\",\n\"end_time\": \"\",\n\"due_date\": \"\",\n\"priority\": \"normal\",\n\"query\": \"\",\n\"amount\": \"\",\n\"currency\": \"UAH\",\n\"finance_category\": \"\",\n\"original_text\": \"Запиши нотатку інтегрувати Zoho з Telegram\"\n}\n\nКористувач:\nЩо я записував про Zoho?\n\nВідповідь:\n\n{\n\"type\": \"note_search\",\n\"title\": \"\",\n\"description\": \"\",\n\"date\": \"\",\n\"time\": \"\",\n\"end_time\": \"\",\n\"due_date\": \"\",\n\"priority\": \"normal\",\n\"query\": \"Zoho\",\n\"amount\": \"\",\n\"currency\": \"UAH\",\n\"finance_category\": \"\",\n\"original_text\": \"Що я записував про Zoho?\"\n}\n\nКористувач:\nЯкі в мене ідеї?\n\nВідповідь:\n\n{\n\"type\": \"notes_list\",\n\"title\": \"\",\n\"description\": \"\",\n\"date\": \"\",\n\"time\": \"\",\n\"end_time\": \"\",\n\"due_date\": \"\",\n\"priority\": \"normal\",\n\"query\": \"\",\n\"amount\": \"\",\n\"currency\": \"UAH\",\n\"finance_category\": \"\",\n\"original_text\": \"Які в мене ідеї?\"\n}\n\nКористувач:\nВитрата: 3200 грн бензин\n\nВідповідь:\n\n{\n\"type\": \"expense\",\n\"title\": \"Бензин\",\n\"description\": \"Бензин\",\n\"date\": \"{{ $now.toFormat('yyyy-MM-dd') }}\",\n\"time\": \"\",\n\"end_time\": \"\",\n\"due_date\": \"\",\n\"priority\": \"normal\",\n\"query\": \"\",\n\"amount\": 3200,\n\"currency\": \"UAH\",\n\"finance_category\": \"Fuel\",\n\"original_text\": \"Витрата: 3200 грн бензин\"\n}\n\nКористувач:\nВитрата: заплатив 850 грн за стоматолога\n\nВідповідь:\n\n{\n\"type\": \"expense\",\n\"title\": \"Стоматолог\",\n\"description\": \"Стоматолог\",\n\"date\": \"{{ $now.toFormat('yyyy-MM-dd') }}\",\n\"time\": \"\",\n\"end_time\": \"\",\n\"due_date\": \"\",\n\"priority\": \"normal\",\n\"query\": \"\",\n\"amount\": 850,\n\"currency\": \"UAH\",\n\"finance_category\": \"Health\",\n\"original_text\": \"Витрата: заплатив 850 грн за стоматолога\"\n}\n\nКористувач:\nДохід: 15000 грн консультація\n\nВідповідь:\n\n{\n\"type\": \"income\",\n\"title\": \"Консультація\",\n\"description\": \"Консультація\",\n\"date\": \"{{ $now.toFormat('yyyy-MM-dd') }}\",\n\"time\": \"\",\n\"end_time\": \"\",\n\"due_date\": \"\",\n\"priority\": \"normal\",\n\"query\": \"\",\n\"amount\": 15000,\n\"currency\": \"UAH\",\n\"finance_category\": \"Consulting\",\n\"original_text\": \"Дохід: 15000 грн консультація\"\n}\n\nКористувач:\nЗнайти терапевта, поговорити з Артемом і скласти план\n\nВідповідь:\n\n{\n\"type\": \"task\",\n\"title\": \"Скласти список кандидатів на позицію терапевта\",\n\"description\": \"Скласти список кандидатів на позицію терапевта\",\n\"date\": \"\",\n\"time\": \"\",\n\"end_time\": \"\",\n\"due_date\": \"\",\n\"priority\": \"normal\",\n\"query\": \"\",\n\"amount\": \"\",\n\"currency\": \"UAH\",\n\"finance_category\": \"\",\n\"original_text\": \"Знайти терапевта, поговорити з Артемом і скласти план\"\n}\n\n* Якщо це recurring_payment, обов'язково визнач:\n  - payment_name\n  - payment_day\n  - reminder_days\n  - finance_category\n\n* Якщо кількість днів для нагадування не вказана,\n  використовуй reminder_days = 3.\n\n* payment_day має містити тільки число місяця.\n\n* Для recurring_payment не заповнюй:\n  date, time, end_time, due_date.\n\n* finance_category для recurring_payment використовуй із фінансових категорій.\nПоверни тільки валідний JSON.\n\nНе використовуй markdown.\nНе обгортай відповідь у ```json.\nНе додавай пояснення.\n"
+              }
+            ]
+          },
+          "builtInTools": {},
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.openAi",
+        "typeVersion": 2.3,
+        "position": [
+          -1488,
+          -176
+        ],
+        "id": "5eb04a08-9954-408c-8a9d-04aa0f3d1257",
+        "name": "AI Classify Message",
+        "credentials": {
+          "openAiApi": {
+            "id": "SuJ6fVcyIeq9uR1k",
+            "name": "OpenAI account Garmash"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const raw =\n  $json.output?.[0]?.content?.[0]?.text ||\n  $json.message?.content ||\n  $json.text ||\n  $json.output ||\n  JSON.stringify($json);\n\nlet parsed;\n\ntry {\n  parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;\n} catch (error) {\n  parsed = {\n    type: \"unsupported\",\n    title: \"Не вдалося розпізнати повідомлення\",\n    description: String(raw),\n    original_text: String(raw)\n  };\n}\n\nreturn [\n  {\n    json: parsed\n  }\n];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -1136,
+          -176
+        ],
+        "id": "676573ab-6209-4f0f-a265-b83f7c6cce29",
+        "name": "Parse AI JSON"
+      },
+      {
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.type }}",
+                      "rightValue": "=meeting",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      },
+                      "id": "ef31b8a1-ac4f-4415-aa19-6c5e11d24699"
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "Meeting"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "id": "75aa9273-b007-4ec3-99b7-435bca7896bf",
+                      "leftValue": "={{ $json.type }}",
+                      "rightValue": "task",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "task"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "id": "eae6ab95-f228-4c2c-bdde-102cf00a7bad",
+                      "leftValue": "={{ $json.type }}",
+                      "rightValue": "note",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "note"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "id": "bf0ed17a-94a8-4df4-97e3-5253470ac4c2",
+                      "leftValue": "={{ $json.type }}",
+                      "rightValue": "notes_list",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "notes_list"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "id": "fb68315f-377a-4459-a2ad-6687371f713c",
+                      "leftValue": "={{ $json.type }}",
+                      "rightValue": "note_search",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "note_search"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "id": "aa5a3096-2cc6-46be-bc3a-a6947f01f35f",
+                      "leftValue": "={{ $json.type }}",
+                      "rightValue": "unsupported",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "unsupported"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "id": "4cddde8d-c409-4df7-b888-e5ad9d919972",
+                      "leftValue": "={{ $json.type }}",
+                      "rightValue": "expense",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "expense"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "id": "6863ceaf-5cee-46b1-a3ed-c7d07d70226c",
+                      "leftValue": "={{ $json.type }}",
+                      "rightValue": "income",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "income"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "id": "dcf50396-bd8d-432f-b532-b8b866d8ee19",
+                      "leftValue": "={{ $json.type }}",
+                      "rightValue": "finance_report",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "finance_report"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "id": "e3e72414-def3-4b31-b10f-e34bc99a3486",
+                      "leftValue": "={{ $json.type }}",
+                      "rightValue": "recurring_payment",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "recurring_payment"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3.4,
+        "position": [
+          -912,
+          -304
+        ],
+        "id": "975a36fb-2bbf-414e-87ca-9a362bbe0b3d",
+        "name": "Switch Type"
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+          "text": "=📅 Знайшов зустріч:\nНазва: {{ $json.title }}\nДата: {{ $json.date }}\nЧас: {{ $json.time }} \nПовна інфомація:{{ $json.description }}\nСтворити подію в Google Calendar?",
+          "replyMarkup": "inlineKeyboard",
+          "inlineKeyboard": {
+            "rows": [
+              {
+                "row": {
+                  "buttons": [
+                    {
+                      "text": "✅ Створити",
+                      "additionalFields": {
+                        "callback_data": "confirm_meeting"
+                      }
+                    },
+                    {
+                      "text": "❌ Скасувати",
+                      "additionalFields": {
+                        "callback_data": "cancel_meeting"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          336,
+          -944
+        ],
+        "id": "0aa58063-1ff9-47bb-9f4f-6deb0bfebfac",
+        "name": "Confirm Meeting",
+        "webhookId": "2c94ac4e-c1d7-49ee-baa5-0d4497bb86cf",
+        "credentials": {
+          "telegramApi": {
+            "id": "LAKXnWIRDoCt8OvO",
+            "name": "Ai_assistent_Garmash"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.callback_query ? 'callback' : 'message' }}",
+                      "rightValue": "callback",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      },
+                      "id": "2ccaef7c-afbd-4818-874d-45db97f06c25"
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "callback"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "id": "f4f223ab-9366-4da1-b74a-ed0b3e654082",
+                      "leftValue": "={{ $json.callback_query ? 'callback' : 'message' }}",
+                      "rightValue": "message",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "message"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3.4,
+        "position": [
+          -2608,
+          -560
+        ],
+        "id": "b6d4e403-0894-4f4f-9d01-1afc425f0a90",
+        "name": "Switch Update Type"
+      },
+      {
+        "parameters": {
+          "calendar": {
+            "__rl": true,
+            "value": "arturgarmash@gmail.com",
+            "mode": "list",
+            "cachedResultName": "arturgarmash@gmail.com"
+          },
+          "start": "={{ $json.date + 'T' + $json.time + ':00+03:00' }}",
+          "end": "={{ $json.date + 'T' + $json.end_time + ':00+03:00' }}",
+          "useDefaultReminders": false,
+          "additionalFields": {
+            "description": "={{ $json.description }}",
+            "summary": "={{ $json.title }}"
+          },
+          "remindersUi": {
+            "remindersValues": [
+              {
+                "method": "popup",
+                "minutes": 60
+              },
+              {
+                "method": "popup",
+                "minutes": 10
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.googleCalendar",
+        "typeVersion": 1.3,
+        "position": [
+          -1936,
+          -944
+        ],
+        "id": "9aa31463-dc75-4350-9371-24451b03f18c",
+        "name": "Create an event",
+        "credentials": {
+          "googleCalendarOAuth2Api": {
+            "id": "OgolbcqXuI5q9oWX",
+            "name": "Google Calendar account Garmash"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "dataTableId": {
+            "__rl": true,
+            "value": "OHoQBm1pGO4YfyVf",
+            "mode": "list",
+            "cachedResultName": "Ai_assistant_Garmash",
+            "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/OHoQBm1pGO4YfyVf"
+          }
+        },
+        "type": "n8n-nodes-base.dataTable",
+        "typeVersion": 1.1,
+        "position": [
+          -2160,
+          -944
+        ],
+        "id": "d9109ac2-42fd-4cf3-a306-d0ccce5d9278",
+        "name": "Get row(s)"
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
+          "text": "=✅ Подію створено в Google Calendar:\n\n{{ $('Get row(s)').item.json.title }}\n {{ $('Get row(s)').item.json.date }} о {{ $('Get row(s)').item.json.time }}",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          -1712,
+          -944
+        ],
+        "id": "b86bda44-f9cd-4f45-9847-40f87b4a1dc2",
+        "name": "Telegram Success",
+        "webhookId": "2c94ac4e-c1d7-49ee-baa5-0d4497bb86cf",
+        "credentials": {
+          "telegramApi": {
+            "id": "LAKXnWIRDoCt8OvO",
+            "name": "Ai_assistent_Garmash"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
+          "text": "=❌ Створення зустрічі скасовано.\n\nПодію не додано до Google Calendar.",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          -1936,
+          -752
+        ],
+        "id": "5c9ea0e2-6e7d-4aa0-8cba-77bcabdca2ea",
+        "name": "cancellation messege",
+        "webhookId": "2c94ac4e-c1d7-49ee-baa5-0d4497bb86cf",
+        "credentials": {
+          "telegramApi": {
+            "id": "LAKXnWIRDoCt8OvO",
+            "name": "Ai_assistent_Garmash"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "53102bfe-a4e8-41a3-8092-062520f9f36f",
+                "leftValue": "={{ $json.message.text }}",
+                "rightValue": "/start",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          -2832,
+          -656
+        ],
+        "id": "65fd0d02-b85f-4e63-a00f-ca23a349da4a",
+        "name": "If"
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $json.message.chat.id }}",
+          "text": "=🤖 Вітаю! Я ваш персональний AI Assistant.\n\nЯ допомагаю керувати часом, задачами, знаннями та фінансами через Telegram.\n\n📅 Зустрічі\n\nСтворюю події в Google Calendar.\n\nПриклади:\n\n• Зустріч: Дзвінок з клієнтом завтра о 14:00\n• Зустріч: Стоматолог 25 червня о 10:30\n\nДля кожної зустрічі автоматично додаються нагадування за 60 та 10 хвилин.\n\n━━━━━━━━━━━━━━\n\n✅ Задачі\n\nСтворюю задачі в Google Tasks.\n\nПриклади:\n\n• Задача: Підготувати комерційну пропозицію\n• Задача: Купити подарунок мамі\n\nКожна задача зберігається як одна конкретна дія.\n\n━━━━━━━━━━━━━━\n\n📝 Нотатки та ідеї\n\nЗберігаю знання та ідеї в Notion.\n\nПриклади:\n\n• Нотатка: Інтегрувати Zoho CRM з Telegram\n• Нотатка: Ідея для нового AI-агента\n\nНотатки автоматично категоризуються та зберігаються у базі знань.\n\n━━━━━━━━━━━━━━\n\n🔍 Пошук по пам'яті\n\nМожу знайти будь-яку збережену інформацію.\n\nПриклади:\n\n• Що я записував про Zoho?\n• Покажи нотатки про стоматологію\n• Що я пам'ятаю про цей проєкт?\n\n━━━━━━━━━━━━━━\n\n📚 Список нотаток\n\nПриклади:\n\n• Які в мене ідеї?\n• Покажи останні нотатки\n• Покажи всі нотатки\n\n━━━━━━━━━━━━━━\n\n💰 Фінанси\n\nВеду облік доходів та витрат.\n\nПриклади:\n\n• Витрата: 3200 грн бензин\n• Витрата: 850 грн стоматолог\n• Дохід: 15000 грн консультація\n• Дохід: 42000 грн зарплата\n\nУсі операції автоматично записуються у фінансову базу.\n\n━━━━━━━━━━━━━━\n\n📊 Фінансові звіти\n\nПриклади:\n\n• Скільки я витратив цього місяця?\n• Який дохід цього місяця?\n• Покажи витрати на бензин\n• Покажи фінансовий звіт\n\n━━━━━━━━━━━━━━\n\n🎤 Підтримую текстові та голосові повідомлення.\n\nПросто напишіть або надішліть голосове повідомлення — я сам визначу потрібну дію та виконаю її.\n",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          -2608,
+          -752
+        ],
+        "id": "1fbf892f-c309-4c72-9e2c-0a7a82b1250f",
+        "name": "Telegram Success1",
+        "webhookId": "2c94ac4e-c1d7-49ee-baa5-0d4497bb86cf",
+        "credentials": {
+          "telegramApi": {
+            "id": "LAKXnWIRDoCt8OvO",
+            "name": "Ai_assistent_Garmash"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "deleteRows",
+          "dataTableId": {
+            "__rl": true,
+            "value": "OHoQBm1pGO4YfyVf",
+            "mode": "list",
+            "cachedResultName": "Ai_assistant_Garmash",
+            "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/OHoQBm1pGO4YfyVf"
+          },
+          "filters": {
+            "conditions": [
+              {
+                "keyValue": "={{ $('Get row(s)').item.json.id }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.dataTable",
+        "typeVersion": 1.1,
+        "position": [
+          -1424,
+          -944
+        ],
+        "id": "347e328a-0765-4a41-a1e4-69cd40762323",
+        "name": "Delete row(s)"
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "dataTableId": {
+            "__rl": true,
+            "value": "OHoQBm1pGO4YfyVf",
+            "mode": "list",
+            "cachedResultName": "Ai_assistant_Garmash",
+            "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/OHoQBm1pGO4YfyVf"
+          }
+        },
+        "type": "n8n-nodes-base.dataTable",
+        "typeVersion": 1.1,
+        "position": [
+          -2160,
+          -752
+        ],
+        "id": "e52321cb-d0de-4144-8dee-428dfb813b1c",
+        "name": "Get row(s)1"
+      },
+      {
+        "parameters": {
+          "operation": "deleteRows",
+          "dataTableId": {
+            "__rl": true,
+            "value": "OHoQBm1pGO4YfyVf",
+            "mode": "list",
+            "cachedResultName": "Ai_assistant_Garmash",
+            "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/OHoQBm1pGO4YfyVf"
+          },
+          "filters": {
+            "conditions": [
+              {
+                "keyValue": "={{ $('Get row(s)1').item.json.id }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.dataTable",
+        "typeVersion": 1.1,
+        "position": [
+          -1712,
+          -752
+        ],
+        "id": "6c1a9597-7362-4668-92d3-d9ae4133e54d",
+        "name": "Delete row(s)1"
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+          "text": "=✅ Знайшов задачу:\n\n{{ $json.title }}\n\nСтворити задачу?",
+          "replyMarkup": "inlineKeyboard",
+          "inlineKeyboard": {
+            "rows": [
+              {
+                "row": {
+                  "buttons": [
+                    {
+                      "text": "✅ Створити",
+                      "additionalFields": {
+                        "callback_data": "confirm_task"
+                      }
+                    },
+                    {
+                      "text": "❌ Скасувати",
+                      "additionalFields": {
+                        "callback_data": "cancel_task"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          -688,
+          -848
+        ],
+        "id": "d9feae83-5d43-4e7f-86ce-58ff8bb6d55d",
+        "name": "Confirm Task",
+        "webhookId": "2c94ac4e-c1d7-49ee-baa5-0d4497bb86cf",
+        "credentials": {
+          "telegramApi": {
+            "id": "LAKXnWIRDoCt8OvO",
+            "name": "Ai_assistent_Garmash"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "dataTableId": {
+            "__rl": true,
+            "value": "OHoQBm1pGO4YfyVf",
+            "mode": "list",
+            "cachedResultName": "Ai_assistant_Garmash",
+            "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/OHoQBm1pGO4YfyVf"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "chat_id": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+              "action_type": "={{ $('Parse AI JSON').item.json.type }}",
+              "title": "={{ $('Parse AI JSON').item.json.title }}",
+              "description": "={{ $('Parse AI JSON').item.json.description }}",
+              "date": "={{ $('Parse AI JSON').item.json.date }}",
+              "time": "={{ $('Parse AI JSON').item.json.time }}",
+              "end_time": "={{ $('Parse AI JSON').item.json.end_time }}",
+              "due_date": "={{ $('Parse AI JSON').item.json.due_date }}",
+              "priority": "={{ $('Parse AI JSON').item.json.priority }}",
+              "status": "pending",
+              "created_at": "={{ $now }}"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "chat_id",
+                "displayName": "chat_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              },
+              {
+                "id": "action_type",
+                "displayName": "action_type",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              },
+              {
+                "id": "title",
+                "displayName": "title",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              },
+              {
+                "id": "description",
+                "displayName": "description",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              },
+              {
+                "id": "date",
+                "displayName": "date",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              },
+              {
+                "id": "time",
+                "displayName": "time",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              },
+              {
+                "id": "end_time",
+                "displayName": "end_time",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              },
+              {
+                "id": "due_date",
+                "displayName": "due_date",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              },
+              {
+                "id": "priority",
+                "displayName": "priority",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              },
+              {
+                "id": "status",
+                "displayName": "status",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              },
+              {
+                "id": "created_at",
+                "displayName": "created_at",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.dataTable",
+        "typeVersion": 1.1,
+        "position": [
+          560,
+          -944
+        ],
+        "id": "ff7f99d5-883b-4e83-99a0-a82965d65e8a",
+        "name": "Insert row Meeting"
+      },
+      {
+        "parameters": {
+          "dataTableId": {
+            "__rl": true,
+            "value": "OHoQBm1pGO4YfyVf",
+            "mode": "list",
+            "cachedResultName": "Ai_assistant_Garmash",
+            "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/OHoQBm1pGO4YfyVf"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "action_type": "={{ $('Parse AI JSON').item.json.type }}",
+              "status": "pending",
+              "created_at": "={{ $now }}",
+              "title": "={{ $('Parse AI JSON').item.json.title }}",
+              "description": "={{ $('Parse AI JSON').item.json.description }}",
+              "due_date": "={{ $('Parse AI JSON').item.json.due_date }}",
+              "date": "={{ $('Parse AI JSON').item.json.date }}",
+              "time": "={{ $('Parse AI JSON').item.json.time }}",
+              "end_time": "={{ $('Parse AI JSON').item.json.end_time }}",
+              "chat_id": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+              "priority": "={{ $('Parse AI JSON').item.json.priority }}"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "chat_id",
+                "displayName": "chat_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              },
+              {
+                "id": "action_type",
+                "displayName": "action_type",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              },
+              {
+                "id": "title",
+                "displayName": "title",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              },
+              {
+                "id": "description",
+                "displayName": "description",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              },
+              {
+                "id": "date",
+                "displayName": "date",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              },
+              {
+                "id": "time",
+                "displayName": "time",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              },
+              {
+                "id": "end_time",
+                "displayName": "end_time",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              },
+              {
+                "id": "due_date",
+                "displayName": "due_date",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              },
+              {
+                "id": "priority",
+                "displayName": "priority",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              },
+              {
+                "id": "status",
+                "displayName": "status",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              },
+              {
+                "id": "created_at",
+                "displayName": "created_at",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.dataTable",
+        "typeVersion": 1.1,
+        "position": [
+          -464,
+          -848
+        ],
+        "id": "d7e54808-a0c3-4c61-a666-be2422db1c95",
+        "name": "Insert row Task"
+      },
+      {
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.callback_query.data }}",
+                      "rightValue": "confirm_meeting",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      },
+                      "id": "bd29712b-cab4-49f7-815c-673eff269dbe"
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "confirm_meeting"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "id": "206d006d-3bda-4d3a-b6af-c380eb7cf9b5",
+                      "leftValue": "={{ $json.callback_query.data }}",
+                      "rightValue": "cancel_meeting",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "cancel_meeting"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "id": "713c12a8-4123-4dfd-b26e-a0c6463aa3ea",
+                      "leftValue": "={{ $json.callback_query.data }}",
+                      "rightValue": "confirm_task",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "confirm_task"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "id": "a3c76649-7a34-4fca-86af-33e7658f5a2a",
+                      "leftValue": "={{ $json.callback_query.data }}",
+                      "rightValue": "cancel_task",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "cancel_task"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3.4,
+        "position": [
+          -2384,
+          -880
+        ],
+        "id": "92f1faa7-2221-4ef8-98ba-de4e6a7ed6e0",
+        "name": "Switch"
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "dataTableId": {
+            "__rl": true,
+            "value": "OHoQBm1pGO4YfyVf",
+            "mode": "list",
+            "cachedResultName": "Ai_assistant_Garmash",
+            "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/OHoQBm1pGO4YfyVf"
+          }
+        },
+        "type": "n8n-nodes-base.dataTable",
+        "typeVersion": 1.1,
+        "position": [
+          -2160,
+          -560
+        ],
+        "id": "08265df0-2e8d-43ab-a0e3-ceb84e413b99",
+        "name": "Get row(s)Task"
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "dataTableId": {
+            "__rl": true,
+            "value": "OHoQBm1pGO4YfyVf",
+            "mode": "list",
+            "cachedResultName": "Ai_assistant_Garmash",
+            "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/OHoQBm1pGO4YfyVf"
+          }
+        },
+        "type": "n8n-nodes-base.dataTable",
+        "typeVersion": 1.1,
+        "position": [
+          -2160,
+          -368
+        ],
+        "id": "0a2c618a-b5f1-492d-a785-59be966090c1",
+        "name": "Get row(s)Task1"
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
+          "text": "=❌ Створення Задачі скасовано.\n\nПодію не додано до Todoist.",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          -1936,
+          -368
+        ],
+        "id": "236312cb-fe6e-483b-b554-14121a4e138a",
+        "name": "cancellation messege Task",
+        "webhookId": "2c94ac4e-c1d7-49ee-baa5-0d4497bb86cf",
+        "credentials": {
+          "telegramApi": {
+            "id": "LAKXnWIRDoCt8OvO",
+            "name": "Ai_assistent_Garmash"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
+          "text": "=✅ Задачу створено\n\n📌{{ $json.content }}\n\nЗадачу додано до Todoist.",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          -1712,
+          -560
+        ],
+        "id": "af4e6578-31ed-4549-9319-b8345d73b2c2",
+        "name": "Telegram Success Task",
+        "webhookId": "2c94ac4e-c1d7-49ee-baa5-0d4497bb86cf",
+        "credentials": {
+          "telegramApi": {
+            "id": "LAKXnWIRDoCt8OvO",
+            "name": "Ai_assistent_Garmash"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "deleteRows",
+          "dataTableId": {
+            "__rl": true,
+            "value": "OHoQBm1pGO4YfyVf",
+            "mode": "list",
+            "cachedResultName": "Ai_assistant_Garmash",
+            "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/OHoQBm1pGO4YfyVf"
+          },
+          "filters": {
+            "conditions": [
+              {
+                "keyValue": "={{ $('Get row(s)Task').item.json.id }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.dataTable",
+        "typeVersion": 1.1,
+        "position": [
+          -1424,
+          -560
+        ],
+        "id": "a830cbf8-c39a-4d15-baf4-748535f32497",
+        "name": "Delete row(s) Task"
+      },
+      {
+        "parameters": {
+          "operation": "deleteRows",
+          "dataTableId": {
+            "__rl": true,
+            "value": "OHoQBm1pGO4YfyVf",
+            "mode": "list",
+            "cachedResultName": "Ai_assistant_Garmash",
+            "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/OHoQBm1pGO4YfyVf"
+          },
+          "filters": {
+            "conditions": [
+              {
+                "keyValue": "={{ $('Get row(s)Task1').item.json.id }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.dataTable",
+        "typeVersion": 1.1,
+        "position": [
+          -1712,
+          -368
+        ],
+        "id": "23368988-9c6d-4cf5-b654-94f884d5c7ec",
+        "name": "Delete row(s) Task1"
+      },
+      {
+        "parameters": {
+          "project": {
+            "__rl": true,
+            "value": "6gq2WCCMJ6QwQfXX",
+            "mode": "list",
+            "cachedResultName": "Ai assistant"
+          },
+          "content": "=\n{{ $json.title }}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.todoist",
+        "typeVersion": 2.2,
+        "position": [
+          -1936,
+          -560
+        ],
+        "id": "f5bc701c-5290-4a5e-a9f8-26366af21a35",
+        "name": "Create a task1",
+        "credentials": {
+          "todoistApi": {
+            "id": "TqFMMAS9MLn2IxBk",
+            "name": "Todoist account Garmash"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+          "text": "=📝 Нотатку збережено в Notion\n\nНазва:\n{{ $('Save Note to Notion').item.json.name || $('Parse AI JSON').item.json.title }}\n\n✅ Додано до бази AI Assistant Notes.",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          -464,
+          -656
+        ],
+        "id": "800284a3-c4d1-4920-b5bf-952fecb64689",
+        "name": "Telegram Success Note",
+        "webhookId": "2c94ac4e-c1d7-49ee-baa5-0d4497bb86cf",
+        "credentials": {
+          "telegramApi": {
+            "id": "LAKXnWIRDoCt8OvO",
+            "name": "Ai_assistent_Garmash"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+          "text": "=Я поки розумію тільки:\n\n🎙 голосові повідомлення\n✍️ текстові повідомлення\n\nІ можу створювати:\n📅 зустрічі\n✅ задачі\n💡 нотатки / ідеї",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          -688,
+          304
+        ],
+        "id": "5cebc8e7-a4e9-42cf-b993-a6ad5d9ed6e3",
+        "name": "Telegram Unsupported",
+        "webhookId": "2c94ac4e-c1d7-49ee-baa5-0d4497bb86cf",
+        "credentials": {
+          "telegramApi": {
+            "id": "LAKXnWIRDoCt8OvO",
+            "name": "Ai_assistent_Garmash"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "resource": "databasePage",
+          "databaseId": {
+            "__rl": true,
+            "value": "3842d376-41af-800c-9344-c9bc21ed0f27",
+            "mode": "list",
+            "cachedResultName": "Ai Assistant",
+            "cachedResultUrl": "https://app.notion.com/p/3842d37641af800c9344c9bc21ed0f27"
+          },
+          "propertiesUi": {
+            "propertyValues": [
+              {
+                "key": "Name|title",
+                "title": "={{ $json.title }}"
+              },
+              {
+                "key": "content|rich_text",
+                "textContent": "={{ $json.description }}"
+              },
+              {
+                "key": "type|select",
+                "selectValue": "={{ $json.type }}"
+              },
+              {
+                "key": "created|date",
+                "date": "={{ $now }}",
+                "timezone": "Europe/Kyiv"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.notion",
+        "typeVersion": 2.2,
+        "position": [
+          -688,
+          -656
+        ],
+        "id": "581cdc07-8150-4062-be2c-e1ea5778d164",
+        "name": "Save Note to Notion",
+        "credentials": {
+          "notionApi": {
+            "id": "ltK8tVELDuPM6GA3",
+            "name": "Notion account Garmash"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "resource": "databasePage",
+          "operation": "getAll",
+          "databaseId": {
+            "__rl": true,
+            "value": "3842d376-41af-800c-9344-c9bc21ed0f27",
+            "mode": "list",
+            "cachedResultName": "Ai Assistant",
+            "cachedResultUrl": "https://app.notion.com/p/3842d37641af800c9344c9bc21ed0f27"
+          },
+          "returnAll": true,
+          "options": {}
+        },
+        "type": "n8n-nodes-base.notion",
+        "typeVersion": 2.2,
+        "position": [
+          -688,
+          -464
+        ],
+        "id": "c40000d2-cdd0-49f3-8c50-3cf79b0e195c",
+        "name": "Get many database pages",
+        "credentials": {
+          "notionApi": {
+            "id": "ltK8tVELDuPM6GA3",
+            "name": "Notion account Garmash"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const notes = items;\n\nif (notes.length === 0) {\n  return [{\n    json: {\n      text: \"У вас ще немає збережених нотаток.\"\n    }\n  }];\n}\n\nlet message = \"📝 Ваші останні нотатки:\\n\\n\";\n\nnotes.slice(0, 10).forEach((note, index) => {\n\n  const title =\n    note.json.Name ||\n    note.json.name ||\n    \"Без назви\";\n\n  message += `${index + 1}. ${title}\\n`;\n});\n\nreturn [{\n  json: {\n    text: message\n  }\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -464,
+          -464
+        ],
+        "id": "b497a90d-1b1d-43fc-a711-e5ef6eab3059",
+        "name": "Format Notes List"
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+          "text": "={{ $json.text }}",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          -176,
+          -464
+        ],
+        "id": "49259a28-455d-4266-961b-be8b6867c1a7",
+        "name": "Telegram Success Note1",
+        "webhookId": "2c94ac4e-c1d7-49ee-baa5-0d4497bb86cf",
+        "credentials": {
+          "telegramApi": {
+            "id": "LAKXnWIRDoCt8OvO",
+            "name": "Ai_assistent_Garmash"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "resource": "databasePage",
+          "operation": "getAll",
+          "databaseId": {
+            "__rl": true,
+            "value": "3842d376-41af-800c-9344-c9bc21ed0f27",
+            "mode": "list",
+            "cachedResultName": "Ai Assistant",
+            "cachedResultUrl": "https://app.notion.com/p/3842d37641af800c9344c9bc21ed0f27"
+          },
+          "returnAll": true,
+          "options": {}
+        },
+        "type": "n8n-nodes-base.notion",
+        "typeVersion": 2.2,
+        "position": [
+          -688,
+          -272
+        ],
+        "id": "8368571f-96bb-4fb1-9de9-169ec82ce4a5",
+        "name": "Get many database pages1",
+        "credentials": {
+          "notionApi": {
+            "id": "ltK8tVELDuPM6GA3",
+            "name": "Notion account Garmash"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const searchTerm = $('Parse AI JSON').first().json.query.toLowerCase();\n\nconst results = items.filter(item => {\n  const title = (item.json.property_name || '').toLowerCase();\n  const content = (item.json.property_content || '').toLowerCase();\n\n  return title.includes(searchTerm) || content.includes(searchTerm);\n});\n\nif (results.length === 0) {\n  return [\n    {\n      json: {\n        not_found: true,\n        text: `🔍 Нічого не знайдено по запиту: ${searchTerm}`\n      }\n    }\n  ];\n}\n\nreturn results;"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -464,
+          -272
+        ],
+        "id": "f5450fce-0164-46f0-ac82-bdaa9cb5c6a2",
+        "name": "Filter Notes"
+      },
+      {
+        "parameters": {
+          "jsCode": "if (items[0].json.not_found) {\n  return [\n    {\n      json: {\n        text: items[0].json.text\n      }\n    }\n  ];\n}\n\nlet message = `🔍 Знайдено ${items.length} нотаток:\\n\\n`;\n\nitems.forEach((item, index) => {\n  message += `${index + 1}. ${item.json.property_name}\\n`;\n\n \n\n  message += \"\\n\";\n});\n\nreturn [\n  {\n    json: {\n      text: message\n    }\n  }\n];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -176,
+          -272
+        ],
+        "id": "0ba1b42f-cc3a-41ef-aaf1-71307e9b00c6",
+        "name": "Format Search Result"
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+          "text": "={{ $json.text }}",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          112,
+          -272
+        ],
+        "id": "f4285531-5c5a-4a83-938a-71f23f96bbc6",
+        "name": "Telegram Success Note2",
+        "webhookId": "2c94ac4e-c1d7-49ee-baa5-0d4497bb86cf",
+        "credentials": {
+          "telegramApi": {
+            "id": "LAKXnWIRDoCt8OvO",
+            "name": "Ai_assistent_Garmash"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "https://docs.google.com/spreadsheets/d/1eGUTAW-BmF7OpPN3A95TZbQDAIGoJse43uXYQx4IFUM/edit?gid=0#gid=0",
+            "mode": "url"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Transactions",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eGUTAW-BmF7OpPN3A95TZbQDAIGoJse43uXYQx4IFUM/edit#gid=0"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "Date": "={{ $json.date || $now.toFormat('yyyy-MM-dd') }}",
+              "Type": "={{ $json.type }}",
+              "Category": "={{ $json.finance_category || 'Other' }}",
+              "Amount": "={{ $json.amount }}",
+              "Currency": "={{ $json.currency || 'UAH' }}",
+              "Description": "={{ $json.description || $json.title || $json.original_text }}",
+              "Source": "Telegram",
+              "Created At": "={{ $now }}"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "Date",
+                "displayName": "Date",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Type",
+                "displayName": "Type",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Category",
+                "displayName": "Category",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Amount",
+                "displayName": "Amount",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Currency",
+                "displayName": "Currency",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Description",
+                "displayName": "Description",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Source",
+                "displayName": "Source",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Created At",
+                "displayName": "Created At",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          -688,
+          -80
+        ],
+        "id": "80678ae4-af50-41f1-a721-d76c8de320d3",
+        "name": "AI Assistant Finance",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "0Gdvf3Mhmj7whXEv",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+          "text": "=💰 Витрату додано\n\nСума: {{ $('Parse AI JSON').item.json.amount }} {{ $('Parse AI JSON').item.json.currency || 'UAH' }}\nКатегорія: {{ $('Parse AI JSON').item.json.finance_category }}\nКоментар: {{ $('Parse AI JSON').item.json.description }}",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          -464,
+          -80
+        ],
+        "id": "46681e3c-c4c6-4ad4-a591-cdc3339becf2",
+        "name": "Telegram Success2",
+        "webhookId": "2c94ac4e-c1d7-49ee-baa5-0d4497bb86cf",
+        "credentials": {
+          "telegramApi": {
+            "id": "LAKXnWIRDoCt8OvO",
+            "name": "Ai_assistent_Garmash"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "https://docs.google.com/spreadsheets/d/1eGUTAW-BmF7OpPN3A95TZbQDAIGoJse43uXYQx4IFUM/edit?gid=0#gid=0",
+            "mode": "url"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Transactions",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eGUTAW-BmF7OpPN3A95TZbQDAIGoJse43uXYQx4IFUM/edit#gid=0"
+          },
+          "filtersUI": {
+            "values": []
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          -688,
+          496
+        ],
+        "id": "c0c600ce-ede5-4cc2-adb9-bf036939871d",
+        "name": "Get row(s) in sheet",
+        "retryOnFail": false,
+        "alwaysOutputData": true,
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "0Gdvf3Mhmj7whXEv",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const query = $('Parse AI JSON').first().json.original_text.toLowerCase();\nconst rows = $input.all().map(item => item.json);\n\nconst now = new Date();\nconst currentMonth = now.getMonth();\nconst currentYear = now.getFullYear();\n\nfunction parseDate(value) {\n  if (!value) return null;\n  return new Date(value);\n}\n\nlet filtered = rows;\n\nif (query.includes('місяц') || query.includes('цього місяця')) {\n  filtered = filtered.filter(row => {\n    const d = parseDate(row.Date);\n    return d && d.getMonth() === currentMonth && d.getFullYear() === currentYear;\n  });\n}\n\nif (query.includes('тижд')) {\n  const weekAgo = new Date();\n  weekAgo.setDate(now.getDate() - 7);\n\n  filtered = filtered.filter(row => {\n    const d = parseDate(row.Date);\n    return d && d >= weekAgo && d <= now;\n  });\n}\n\nconst totalExpense = filtered\n  .filter(row => String(row.Type).toLowerCase() === 'expense')\n  .reduce((sum, row) => sum + Number(row.Amount || 0), 0);\n\nconst totalIncome = filtered\n  .filter(row => String(row.Type).toLowerCase() === 'income')\n  .reduce((sum, row) => sum + Number(row.Amount || 0), 0);\n\nconst categoryTotals = {};\n\nfor (const row of filtered) {\n  const category = row.Category || 'Other';\n  const amount = Number(row.Amount || 0);\n\n  if (!categoryTotals[category]) {\n    categoryTotals[category] = 0;\n  }\n\n  categoryTotals[category] += amount;\n}\n\nreturn [\n  {\n    json: {\n      query,\n      totalExpense,\n      totalIncome,\n      balance: totalIncome - totalExpense,\n      categoryTotals,\n      transactions: filtered\n    }\n  }\n];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -464,
+          496
+        ],
+        "id": "6723599d-8af4-470a-a061-03c6415ce83d",
+        "name": "Prepare Finance Report"
+      },
+      {
+        "parameters": {
+          "modelId": {
+            "__rl": true,
+            "value": "gpt-4o-mini",
+            "mode": "list",
+            "cachedResultName": "GPT-4O-MINI"
+          },
+          "responses": {
+            "values": [
+              {
+                "content": "=Сформуй короткий фінансовий звіт українською мовою.\n\nЗапит користувача:\n{{ $json.query }}\n\nДані:\nЗагальні витрати: {{ $json.totalExpense }}\nЗагальні доходи: {{ $json.totalIncome }}\nБаланс: {{ $json.balance }}\n\nКатегорії:\n{{ JSON.stringify($json.categoryTotals) }}\n\nОперації:\n{{ JSON.stringify($json.transactions) }}\n\nФормат:\n💰 Фінансовий звіт\n\nВитрати:\n...\n\nДоходи:\n...\n\nПо категоріях:\n...\n\nКороткий висновок:\n1 речення.\n\nЯкщо даних немає — напиши, що операцій за цей період не знайдено."
+              }
+            ]
+          },
+          "builtInTools": {},
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.openAi",
+        "typeVersion": 2.3,
+        "position": [
+          -240,
+          496
+        ],
+        "id": "8dbd6554-ec23-442e-bf81-5962aa800f02",
+        "name": "OpenAI Finance Summary",
+        "credentials": {
+          "openAiApi": {
+            "id": "SuJ6fVcyIeq9uR1k",
+            "name": "OpenAI account Garmash"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+          "text": "={{ $json.output[0].content[0].text }}",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          112,
+          496
+        ],
+        "id": "927d7bf5-eea2-4679-abe8-99d384353e6d",
+        "name": "Telegram Finance Summary",
+        "webhookId": "2c94ac4e-c1d7-49ee-baa5-0d4497bb86cf",
+        "credentials": {
+          "telegramApi": {
+            "id": "LAKXnWIRDoCt8OvO",
+            "name": "Ai_assistent_Garmash"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const date = $json.date;\nconst time = $json.time;\nconst endTime = $json.end_time;\n\nconst start = new Date(`${date}T${time}:00+03:00`);\nconst end = new Date(`${date}T${endTime}:00+03:00`);\n\nconst bufferStart = new Date(start);\nbufferStart.setMinutes(bufferStart.getMinutes() - 15);\n\nconst bufferEnd = new Date(end);\nbufferEnd.setMinutes(bufferEnd.getMinutes() + 15);\n\nreturn [{\n  json: {\n    ...$json,\n    start_iso: start.toISOString(),\n    end_iso: end.toISOString(),\n    buffer_start_iso: bufferStart.toISOString(),\n    buffer_end_iso: bufferEnd.toISOString()\n  }\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -688,
+          -1040
+        ],
+        "id": "e15a5115-9fa4-46cd-82fe-558f3d671d59",
+        "name": "Build Meeting Time"
+      },
+      {
+        "parameters": {
+          "operation": "getAll",
+          "calendar": {
+            "__rl": true,
+            "value": "arturgarmash@gmail.com",
+            "mode": "list",
+            "cachedResultName": "arturgarmash@gmail.com"
+          },
+          "returnAll": true,
+          "timeMin": "={{ $json.buffer_start_iso }}",
+          "timeMax": "={{ $json.buffer_end_iso }}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleCalendar",
+        "typeVersion": 1.3,
+        "position": [
+          -464,
+          -1040
+        ],
+        "id": "018de076-eece-455c-9945-c567259941b9",
+        "name": "Get Events for Conflict Check",
+        "alwaysOutputData": true,
+        "credentials": {
+          "googleCalendarOAuth2Api": {
+            "id": "OgolbcqXuI5q9oWX",
+            "name": "Google Calendar account Garmash"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const meeting = $('Build Meeting Time').first().json;\n\nconst events = $input.all().filter(e => {\n  const hasId = !!e.json.id;\n  const hasSummary = !!e.json.summary;\n  const hasStart = !!(e.json.start?.dateTime || e.json.start?.date);\n\n  return hasId || hasSummary || hasStart;\n});\n\nconst hasConflict = events.length > 0;\n\nreturn [{\n  json: {\n    ...meeting,\n    has_conflict: hasConflict,\n    conflicts_count: events.length,\n    conflicts: events.map(e => ({\n      title: e.json.summary || e.json.title || 'Без назви',\n      start: e.json.start?.dateTime || e.json.start?.date || '',\n      end: e.json.end?.dateTime || e.json.end?.date || ''\n    }))\n  }\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -176,
+          -1040
+        ],
+        "id": "5872fb30-eff8-46e0-a0fc-06b1ce93384b",
+        "name": "Check Meeting Conflict"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "7f010fcf-518b-45d3-a2a9-94ae060c6819",
+                "leftValue": "={{ $json.has_conflict }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          112,
+          -1040
+        ],
+        "id": "8a59bb1d-9dbb-4fd7-8691-6fbcabe2a012",
+        "name": "IF Calendar Conflict"
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+          "text": "=⚠️ У цей час вже є подія або не вистачає 15 хвилин буфера між зустрічами.\n\nЗустріч не створена.\n\nКонфлікт:\n{{ $json.conflicts[0].title }}\n{{ $json.conflicts[0].start }} — {{ $json.conflicts[0].end }}\n\nСпробуйте обрати інший час.",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          336,
+          -1136
+        ],
+        "id": "c3f44859-05db-426c-a26e-5f76f7f40437",
+        "name": "Telegram Conflict Message",
+        "webhookId": "2c94ac4e-c1d7-49ee-baa5-0d4497bb86cf",
+        "credentials": {
+          "telegramApi": {
+            "id": "LAKXnWIRDoCt8OvO",
+            "name": "Ai_assistent_Garmash"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "https://docs.google.com/spreadsheets/d/1eGUTAW-BmF7OpPN3A95TZbQDAIGoJse43uXYQx4IFUM/edit?gid=1567013522#gid=1567013522",
+            "mode": "url"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 1567013522,
+            "mode": "list",
+            "cachedResultName": "Recurring Payments",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eGUTAW-BmF7OpPN3A95TZbQDAIGoJse43uXYQx4IFUM/edit#gid=1567013522"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "Name": "={{ $json.payment_name }}",
+              "Amount": "={{ $json.amount }}",
+              "Day": "={{ $json.payment_day }}",
+              "Category": "={{ $json.finance_category }}",
+              "Reminder Days": "={{ $json.reminder_days }}",
+              "Active": "TRUE"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "Name",
+                "displayName": "Name",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Amount",
+                "displayName": "Amount",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Day",
+                "displayName": "Day",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Category",
+                "displayName": "Category",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Reminder Days",
+                "displayName": "Reminder Days",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Active",
+                "displayName": "Active",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          -688,
+          112
+        ],
+        "id": "259da407-dcb4-4f32-b602-ede90845dca8",
+        "name": "Append row in sheet recurring_payment",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "0Gdvf3Mhmj7whXEv",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+          "text": "=🔁 Регулярний платіж додано\n\nНазва: {{ $('Parse AI JSON').item.json.payment_name }}\nСума: {{ $('Parse AI JSON').item.json.amount || 'не вказана' }} {{ $('Parse AI JSON').item.json.currency || 'UAH' }}\nДень оплати: {{ $('Parse AI JSON').item.json.payment_day }} число кожного місяця\nКатегорія: {{ $('Parse AI JSON').item.json.finance_category }}\nНагадування: за {{ $('Parse AI JSON').item.json.reminder_days }} дні\n\n✅ Я нагадаю про цей платіж заздалегідь.",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          -464,
+          112
+        ],
+        "id": "199ebd10-1351-40ab-84b2-0fac2e1fc381",
+        "name": "Telegram Success3",
+        "webhookId": "2c94ac4e-c1d7-49ee-baa5-0d4497bb86cf",
+        "credentials": {
+          "telegramApi": {
+            "id": "LAKXnWIRDoCt8OvO",
+            "name": "Ai_assistent_Garmash"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Telegram Trigger": {
+        "main": [
+          [
+            {
+              "node": "If",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "IF Message Type": {
+        "main": [
+          [
+            {
+              "node": "Get Voice File",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Set Text Message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Voice File": {
+        "main": [
+          [
+            {
+              "node": "Transcribe a recording",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Transcribe a recording": {
+        "main": [
+          [
+            {
+              "node": "Set Voice Text",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Set Voice Text": {
+        "main": [
+          [
+            {
+              "node": "AI Classify Message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Set Text Message": {
+        "main": [
+          [
+            {
+              "node": "AI Classify Message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "AI Classify Message": {
+        "main": [
+          [
+            {
+              "node": "Parse AI JSON",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Parse AI JSON": {
+        "main": [
+          [
+            {
+              "node": "Switch Type",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Switch Type": {
+        "main": [
+          [
+            {
+              "node": "Build Meeting Time",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Confirm Task",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Save Note to Notion",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Get many database pages",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Get many database pages1",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Telegram Unsupported",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "AI Assistant Finance",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "AI Assistant Finance",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Get row(s) in sheet",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Append row in sheet recurring_payment",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Confirm Meeting": {
+        "main": [
+          [
+            {
+              "node": "Insert row Meeting",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Switch Update Type": {
+        "main": [
+          [
+            {
+              "node": "Switch",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "IF Message Type",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get row(s)": {
+        "main": [
+          [
+            {
+              "node": "Create an event",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create an event": {
+        "main": [
+          [
+            {
+              "node": "Telegram Success",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If": {
+        "main": [
+          [
+            {
+              "node": "Telegram Success1",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Switch Update Type",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Telegram Success": {
+        "main": [
+          [
+            {
+              "node": "Delete row(s)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "cancellation messege": {
+        "main": [
+          [
+            {
+              "node": "Delete row(s)1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get row(s)1": {
+        "main": [
+          [
+            {
+              "node": "cancellation messege",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Confirm Task": {
+        "main": [
+          [
+            {
+              "node": "Insert row Task",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Switch": {
+        "main": [
+          [
+            {
+              "node": "Get row(s)",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Get row(s)1",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Get row(s)Task",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Get row(s)Task1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get row(s)Task": {
+        "main": [
+          [
+            {
+              "node": "Create a task1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get row(s)Task1": {
+        "main": [
+          [
+            {
+              "node": "cancellation messege Task",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Telegram Success Task": {
+        "main": [
+          [
+            {
+              "node": "Delete row(s) Task",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "cancellation messege Task": {
+        "main": [
+          [
+            {
+              "node": "Delete row(s) Task1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create a task1": {
+        "main": [
+          [
+            {
+              "node": "Telegram Success Task",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Save Note to Notion": {
+        "main": [
+          [
+            {
+              "node": "Telegram Success Note",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get many database pages": {
+        "main": [
+          [
+            {
+              "node": "Format Notes List",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Format Notes List": {
+        "main": [
+          [
+            {
+              "node": "Telegram Success Note1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get many database pages1": {
+        "main": [
+          [
+            {
+              "node": "Filter Notes",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Filter Notes": {
+        "main": [
+          [
+            {
+              "node": "Format Search Result",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Format Search Result": {
+        "main": [
+          [
+            {
+              "node": "Telegram Success Note2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "AI Assistant Finance": {
+        "main": [
+          [
+            {
+              "node": "Telegram Success2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get row(s) in sheet": {
+        "main": [
+          [
+            {
+              "node": "Prepare Finance Report",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Prepare Finance Report": {
+        "main": [
+          [
+            {
+              "node": "OpenAI Finance Summary",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenAI Finance Summary": {
+        "main": [
+          [
+            {
+              "node": "Telegram Finance Summary",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Meeting Time": {
+        "main": [
+          [
+            {
+              "node": "Get Events for Conflict Check",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Events for Conflict Check": {
+        "main": [
+          [
+            {
+              "node": "Check Meeting Conflict",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Check Meeting Conflict": {
+        "main": [
+          [
+            {
+              "node": "IF Calendar Conflict",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "IF Calendar Conflict": {
+        "main": [
+          [
+            {
+              "node": "Telegram Conflict Message",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Confirm Meeting",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Append row in sheet recurring_payment": {
+        "main": [
+          [
+            {
+              "node": "Telegram Success3",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Buts Sergei",
+    "name": "Version 87ec646a",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
