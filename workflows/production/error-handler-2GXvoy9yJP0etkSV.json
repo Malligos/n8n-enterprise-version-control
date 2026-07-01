@@ -1,0 +1,81 @@
+{
+  "updatedAt": "2026-03-29T19:14:00.672Z",
+  "createdAt": "2026-03-29T19:01:34.092Z",
+  "id": "2GXvoy9yJP0etkSV",
+  "name": "Error Handler",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "3e868fbf-0e3a-43c3-9bd2-c542b457919b",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "chatId": "1679040654",
+        "text": "=⚠️ Упс… щось пішло не так.\nСпробуй ще раз трохи пізніше 🙏",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "b061c641-a61e-4629-9d0b-3a3537736426",
+      "name": "Send a text message",
+      "webhookId": "27dd0a10-fbdb-4fbb-b665-24ae2ed884cf",
+      "credentials": {
+        "telegramApi": {
+          "id": "wIxKfjFCXEi8oTjZ",
+          "name": "HomeworkBot"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "c1cabee1-1615-4482-b645-32195c34d2d4",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-03-29T19:01:34.094Z",
+      "createdAt": "2026-03-29T19:01:34.094Z",
+      "role": "workflow:owner",
+      "workflowId": "2GXvoy9yJP0etkSV",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
