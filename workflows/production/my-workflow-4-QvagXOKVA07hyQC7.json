@@ -1,0 +1,78 @@
+{
+  "updatedAt": "2026-03-31T19:10:17.281Z",
+  "createdAt": "2026-03-31T19:09:52.807Z",
+  "id": "QvagXOKVA07hyQC7",
+  "name": "My workflow 4",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "7dbe305b-cd7d-448a-a881-53a76954f556",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "95acb635-d0f6-4fcc-bd13-23f20ca5577c",
+      "name": "Get many messages",
+      "webhookId": "e94dd97c-8eba-4d04-a89a-c895149f3931",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ixxxIk9O8nJTHaVD",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get many messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "f69ede85-25ea-4a77-a4b7-c63ce50524bc",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-03-31T19:09:52.809Z",
+      "createdAt": "2026-03-31T19:09:52.809Z",
+      "role": "workflow:owner",
+      "workflowId": "QvagXOKVA07hyQC7",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
