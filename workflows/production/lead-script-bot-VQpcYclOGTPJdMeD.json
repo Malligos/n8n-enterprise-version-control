@@ -1,0 +1,671 @@
+{
+  "updatedAt": "2026-05-20T14:09:13.052Z",
+  "createdAt": "2026-05-15T17:30:56.588Z",
+  "id": "VQpcYclOGTPJdMeD",
+  "name": "Lead Script Bot",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -1328,
+        16
+      ],
+      "id": "58fd26c9-ebc5-4374-be53-28d3918530a4",
+      "name": "Telegram Trigger",
+      "webhookId": "b87533d6-5de6-49b9-8b69-d29b7b027483",
+      "credentials": {
+        "telegramApi": {
+          "id": "wIxKfjFCXEi8oTjZ",
+          "name": "HomeworkBot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "3e29cfff-7696-41be-8598-6c92dd8adb5f",
+              "leftValue": "={{ $json.message.text }}",
+              "rightValue": "/start",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1120,
+        16
+      ],
+      "id": "354ab04e-c2ee-4c29-9725-db2aa4bba421",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=👋 Привіт! Я AI-помічник для дзвінків у Zoho CRM.\n\nНадішли Lead ID — і я за кілька секунд підготую:\n✅ короткий контекст по ліду\n✅ персоналізований скрипт дзвінка\n✅ можливі заперечення\n✅ рекомендації для менеджера\n\n📌 Приклад:\n4589000001234567\n\n⚡ Менше рутини — більше продажів.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -848,
+        -192
+      ],
+      "id": "39740491-9536-4fe8-9601-14e9486a8b48",
+      "name": "Send a text message",
+      "webhookId": "6008a994-a38a-4f4f-99a0-4482b71c0004",
+      "credentials": {
+        "telegramApi": {
+          "id": "wIxKfjFCXEi8oTjZ",
+          "name": "HomeworkBot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Витягуємо Lead ID з повідомлення\nconst message = $input.first().json.message;\nconst text = message.text || '';\nconst chatId = message.chat.id;\n\n// Перевіряємо формат (тільки цифри)\nconst leadId = text.trim();\n\nif (!leadId || !/^\\d+$/.test(leadId)) {\n  return [{json: {\n    error: true,\n    chatId,\n    message: '❌ Надішліть числовий Lead ID з Zoho CRM'\n  }}];\n}\n\nreturn [{json: { leadId, chatId, error: false }}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -832,
+        48
+      ],
+      "id": "889654eb-185f-4b95-a3bf-ae4d84cdf673",
+      "name": "Парсинг Lead ID"
+    },
+    {
+      "parameters": {
+        "url": "=https://www.zohoapis.eu/crm/v2/Leads/{{ $json.leadId }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "zohoOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -368,
+        144
+      ],
+      "id": "5a1809ac-c186-425a-a752-858af5f0c944",
+      "name": "HTTP Request",
+      "credentials": {
+        "zohoOAuth2Api": {
+          "id": "54SnRsgfMZ4wyzKL",
+          "name": "Zoho account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=Ти — експерт з продажів. На основі даних ліда з CRM\nствори короткий скрипт наступної дії для менеджера.\n\nДані ліда:\n{{ JSON.stringify($json.data ? $json.data[0] : $json) }}\n\nФормат відповіді:\n1. СТАТУС — поточний етап угоди (1 речення)\n2. РЕКОМЕНДАЦІЯ — що робити далі (1-2 речення)\n3. СКРИПТ ДЗВІНКА — що сказати (3-5 речень)\n4. КЛЮЧОВЕ ПИТАННЯ — одне питання для ліда\n\nФорматуй відповідь для Telegram у HTML.\nДля жирних заголовків використовуй тільки <b>...</b>.\nНе використовуй Markdown, **, # або таблиці.\n\nПиши українською. Будь конкретним, без води.\n"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        -144,
+        144
+      ],
+      "id": "b1657103-8d8b-440e-bfbc-c8197efe2ccc",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "wmMo2Lknq3Hi5ts2",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Парсинг Lead ID').first().json.chatId }}",
+        "text": "=📋 Скрипт для ліда #{{ $('Парсинг Lead ID').first().json.leadId }}  {{ $json.output[0].content[0].text }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        192,
+        144
+      ],
+      "id": "ce53d9fd-5e10-477b-9fad-b3d74db82d58",
+      "name": "Send a text message1",
+      "webhookId": "e53f1805-0fd1-45a4-b488-c516a72d7313",
+      "credentials": {
+        "telegramApi": {
+          "id": "wIxKfjFCXEi8oTjZ",
+          "name": "HomeworkBot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "7253337e-b711-4410-a289-b0e05f9706eb",
+              "leftValue": "={{ $json.error }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -624,
+        48
+      ],
+      "id": "b20acde5-6226-452c-918b-80b79249b4de",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Парсинг Lead ID').first().json.chatId }}",
+        "text": "=❌ Некоректний формат Lead ID.\n\nНадішліть тільки числовий Lead ID з Zoho CRM.\n\n📌 Приклад:\n4589000001234567\n",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -368,
+        -64
+      ],
+      "id": "26255ba2-4433-4047-be9f-ddb34556cea1",
+      "name": "error",
+      "webhookId": "e53f1805-0fd1-45a4-b488-c516a72d7313",
+      "credentials": {
+        "telegramApi": {
+          "id": "wIxKfjFCXEi8oTjZ",
+          "name": "HomeworkBot"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Парсинг Lead ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Парсинг Lead ID": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "error",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "87729c5f-2627-4353-8a88-9984638deed6",
+  "activeVersionId": "87729c5f-2627-4353-8a88-9984638deed6",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-05-15T17:30:56.590Z",
+      "createdAt": "2026-05-15T17:30:56.590Z",
+      "role": "workflow:owner",
+      "workflowId": "VQpcYclOGTPJdMeD",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-05-20T14:09:14.000Z",
+    "createdAt": "2026-05-20T14:09:13.053Z",
+    "versionId": "87729c5f-2627-4353-8a88-9984638deed6",
+    "workflowId": "VQpcYclOGTPJdMeD",
+    "nodes": [
+      {
+        "parameters": {
+          "updates": [
+            "message"
+          ],
+          "additionalFields": {}
+        },
+        "type": "n8n-nodes-base.telegramTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          -1328,
+          16
+        ],
+        "id": "58fd26c9-ebc5-4374-be53-28d3918530a4",
+        "name": "Telegram Trigger",
+        "webhookId": "b87533d6-5de6-49b9-8b69-d29b7b027483",
+        "credentials": {
+          "telegramApi": {
+            "id": "wIxKfjFCXEi8oTjZ",
+            "name": "HomeworkBot"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "3e29cfff-7696-41be-8598-6c92dd8adb5f",
+                "leftValue": "={{ $json.message.text }}",
+                "rightValue": "/start",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          -1120,
+          16
+        ],
+        "id": "354ab04e-c2ee-4c29-9725-db2aa4bba421",
+        "name": "If"
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+          "text": "=👋 Привіт! Я AI-помічник для дзвінків у Zoho CRM.\n\nНадішли Lead ID — і я за кілька секунд підготую:\n✅ короткий контекст по ліду\n✅ персоналізований скрипт дзвінка\n✅ можливі заперечення\n✅ рекомендації для менеджера\n\n📌 Приклад:\n4589000001234567\n\n⚡ Менше рутини — більше продажів.",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          -848,
+          -192
+        ],
+        "id": "39740491-9536-4fe8-9601-14e9486a8b48",
+        "name": "Send a text message",
+        "webhookId": "6008a994-a38a-4f4f-99a0-4482b71c0004",
+        "credentials": {
+          "telegramApi": {
+            "id": "wIxKfjFCXEi8oTjZ",
+            "name": "HomeworkBot"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Витягуємо Lead ID з повідомлення\nconst message = $input.first().json.message;\nconst text = message.text || '';\nconst chatId = message.chat.id;\n\n// Перевіряємо формат (тільки цифри)\nconst leadId = text.trim();\n\nif (!leadId || !/^\\d+$/.test(leadId)) {\n  return [{json: {\n    error: true,\n    chatId,\n    message: '❌ Надішліть числовий Lead ID з Zoho CRM'\n  }}];\n}\n\nreturn [{json: { leadId, chatId, error: false }}];\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -832,
+          48
+        ],
+        "id": "889654eb-185f-4b95-a3bf-ae4d84cdf673",
+        "name": "Парсинг Lead ID"
+      },
+      {
+        "parameters": {
+          "url": "=https://www.zohoapis.eu/crm/v2/Leads/{{ $json.leadId }}",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "zohoOAuth2Api",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          -368,
+          144
+        ],
+        "id": "5a1809ac-c186-425a-a752-858af5f0c944",
+        "name": "HTTP Request",
+        "credentials": {
+          "zohoOAuth2Api": {
+            "id": "54SnRsgfMZ4wyzKL",
+            "name": "Zoho account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "modelId": {
+            "__rl": true,
+            "value": "gpt-4o-mini",
+            "mode": "list",
+            "cachedResultName": "GPT-4O-MINI"
+          },
+          "responses": {
+            "values": [
+              {
+                "content": "=Ти — експерт з продажів. На основі даних ліда з CRM\nствори короткий скрипт наступної дії для менеджера.\n\nДані ліда:\n{{ JSON.stringify($json.data ? $json.data[0] : $json) }}\n\nФормат відповіді:\n1. СТАТУС — поточний етап угоди (1 речення)\n2. РЕКОМЕНДАЦІЯ — що робити далі (1-2 речення)\n3. СКРИПТ ДЗВІНКА — що сказати (3-5 речень)\n4. КЛЮЧОВЕ ПИТАННЯ — одне питання для ліда\n\nФорматуй відповідь для Telegram у HTML.\nДля жирних заголовків використовуй тільки <b>...</b>.\nНе використовуй Markdown, **, # або таблиці.\n\nПиши українською. Будь конкретним, без води.\n"
+              }
+            ]
+          },
+          "builtInTools": {},
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.openAi",
+        "typeVersion": 2.3,
+        "position": [
+          -144,
+          144
+        ],
+        "id": "b1657103-8d8b-440e-bfbc-c8197efe2ccc",
+        "name": "Message a model",
+        "credentials": {
+          "openAiApi": {
+            "id": "wmMo2Lknq3Hi5ts2",
+            "name": "OpenAi account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Парсинг Lead ID').first().json.chatId }}",
+          "text": "=📋 Скрипт для ліда #{{ $('Парсинг Lead ID').first().json.leadId }}  {{ $json.output[0].content[0].text }}",
+          "additionalFields": {
+            "appendAttribution": false,
+            "parse_mode": "HTML"
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          192,
+          144
+        ],
+        "id": "ce53d9fd-5e10-477b-9fad-b3d74db82d58",
+        "name": "Send a text message1",
+        "webhookId": "e53f1805-0fd1-45a4-b488-c516a72d7313",
+        "credentials": {
+          "telegramApi": {
+            "id": "wIxKfjFCXEi8oTjZ",
+            "name": "HomeworkBot"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "7253337e-b711-4410-a289-b0e05f9706eb",
+                "leftValue": "={{ $json.error }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          -624,
+          48
+        ],
+        "id": "b20acde5-6226-452c-918b-80b79249b4de",
+        "name": "If1"
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Парсинг Lead ID').first().json.chatId }}",
+          "text": "=❌ Некоректний формат Lead ID.\n\nНадішліть тільки числовий Lead ID з Zoho CRM.\n\n📌 Приклад:\n4589000001234567\n",
+          "additionalFields": {
+            "appendAttribution": false,
+            "parse_mode": "Markdown"
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          -368,
+          -64
+        ],
+        "id": "26255ba2-4433-4047-be9f-ddb34556cea1",
+        "name": "error",
+        "webhookId": "e53f1805-0fd1-45a4-b488-c516a72d7313",
+        "credentials": {
+          "telegramApi": {
+            "id": "wIxKfjFCXEi8oTjZ",
+            "name": "HomeworkBot"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Telegram Trigger": {
+        "main": [
+          [
+            {
+              "node": "If",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If": {
+        "main": [
+          [
+            {
+              "node": "Send a text message",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Парсинг Lead ID",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Парсинг Lead ID": {
+        "main": [
+          [
+            {
+              "node": "If1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "HTTP Request": {
+        "main": [
+          [
+            {
+              "node": "Message a model",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Message a model": {
+        "main": [
+          [
+            {
+              "node": "Send a text message1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If1": {
+        "main": [
+          [
+            {
+              "node": "error",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "HTTP Request",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Buts Sergei",
+    "name": "Version 87729c5f",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
