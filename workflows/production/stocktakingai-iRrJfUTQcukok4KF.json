@@ -1,0 +1,376 @@
+{
+  "updatedAt": "2026-06-28T10:40:26.672Z",
+  "createdAt": "2026-06-28T10:24:39.613Z",
+  "id": "iRrJfUTQcukok4KF",
+  "name": "stocktakingAI",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -528,
+        -48
+      ],
+      "id": "5cba5b6d-d00c-4108-bafc-f3cf6cf3f25b",
+      "name": "Telegram Trigger",
+      "webhookId": "586b7a16-ae8b-49c3-afe6-80fbbb0b03bc",
+      "credentials": {
+        "telegramApi": {
+          "id": "HdYtgfV1noTqi1CX",
+          "name": "My_ai"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8cb64a1a-9bc1-4bd9-a044-674fa6a9e2cf",
+              "name": "chat.id",
+              "value": "={{ $json.message.chat.id }}",
+              "type": "number"
+            },
+            {
+              "id": "77813e24-c5f6-49a8-9834-2a6680dcd6e3",
+              "name": "user_name",
+              "value": "={{ $json.message.chat.username }}",
+              "type": "string"
+            },
+            {
+              "id": "c807db43-306c-4d40-b4bd-ab6450a47eed",
+              "name": "text",
+              "value": "={{ $json.message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -320,
+        -48
+      ],
+      "id": "9aba3ea4-77dc-4a35-b633-c28d1d12d7f9",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1pO2iEr2ZcI0dPrDBRiicSxcXoKRlFqrLWeW8E0kh2-s/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Inventory_Raw",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1pO2iEr2ZcI0dPrDBRiicSxcXoKRlFqrLWeW8E0kh2-s/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "inventory_date": "={{ $json.inventory_date }}",
+            "department": "={{ $json.department }}",
+            "product_name_raw": "={{ $json.product_name_raw }}",
+            "qty ": "={{ $json.qty }}",
+            "unit": "={{ $json.unit }}",
+            "status": "={{ $json.status }}",
+            "raw_line": "={{ $json.raw_line }}",
+            "user_name": "={{ $json.user_name }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "inventory_date",
+              "displayName": "inventory_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "department",
+              "displayName": "department",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "product_name_raw",
+              "displayName": "product_name_raw",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "qty ",
+              "displayName": "qty ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "unit",
+              "displayName": "unit",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "user_name",
+              "displayName": "user_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "raw_line",
+              "displayName": "raw_line",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        96,
+        -48
+      ],
+      "id": "d09b3d59-0eb7-4aca-a158-da31b35ad529",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all().map(i => i.json);\n\nconst parsed = items.filter(i => i.status === 'parsed');\nconst errors = items.filter(i => i.status === 'parse_error');\n\nconst department = items[0]?.department || '';\nconst date = items[0]?.inventory_date || '';\n\nconst text = `\n✅ Переоблік прийнято.\n\nЦех: ${department}\nДата: ${date}\n\nДодано позицій: ${parsed.length}\nПомилок: ${errors.length}\n\n${errors.length ? '⚠️ Не розпізнано:\\n' + errors.map(e => `- ${e.raw_line}`).join('\\n') : ''}\n`.trim();\n\nreturn [\n  {\n    json: {\n      chat_id: items[0]?.chat_id,\n      text\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        304,
+        -48
+      ],
+      "id": "ed9f1872-3c44-494b-8ab5-c55e591c1375",
+      "name": "Build Summary"
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = $json.text;\nconst chatId = $json.chat_id;\nconst userName = $json.user_name;\n\nconst lines = text\n  .split('\\n')\n  .map(line => line.trim())\n  .filter(line => line.length > 0);\n\nif (lines.length < 2) {\n  throw new Error('Повідомлення занадто коротке');\n}\n\n// Перша строка: \"Хол.цех 23.6\"\nconst header = lines[0];\n\nconst headerMatch = header.match(/^(.+?)\\s+(\\d{1,2})[.,](\\d{1,2})$/);\n\nif (!headerMatch) {\n  throw new Error('Не вдалося розпізнати перший рядок. Формат: Хол.цех 23.6');\n}\n\nconst department = headerMatch[1].trim();\nconst day = headerMatch[2].padStart(2, '0');\nconst month = headerMatch[3].padStart(2, '0');\n\nconst currentYear = new Date().getFullYear();\nconst inventoryDate = `${currentYear}-${month}-${day}`;\n\nconst result = [];\n\nfor (let i = 1; i < lines.length; i++) {\n  const line = lines[i];\n\n  // Шукаємо останнє число в рядку\n  const match = line.match(/^(.+?)\\s+(\\d+(?:[.,]\\d+)?)$/);\n\n  if (!match) {\n    result.push({\n      json: {\n        department,\n        inventory_date: inventoryDate,\n        product_name_raw: line,\n        qty: null,\n        status: 'parse_error',\n        raw_line: line,\n        user_name: userName,\n        chat_id: chatId\n      }\n    });\n    continue;\n  }\n\n  const productName = match[1].trim();\n  const qty = Number(match[2].replace(',', '.'));\n\n  result.push({\n    json: {\n      department,\n      inventory_date: inventoryDate,\n      product_name_raw: productName,\n      qty,\n      unit: 'кг',\n      status: 'parsed',\n      raw_line: line,\n      user_name: userName,\n      chat_id: chatId\n    }\n  });\n}\n\nreturn result;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -112,
+        -48
+      ],
+      "id": "2a32e2f5-cc91-40f7-9c40-520c8a946720",
+      "name": "Parse Inventory Message"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.text }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        512,
+        -48
+      ],
+      "id": "e147ebd7-0756-4fed-8df2-c3d05a83edf0",
+      "name": "Send a text message",
+      "webhookId": "fe04e12a-50be-47f7-81f0-d97e418ff061",
+      "credentials": {
+        "telegramApi": {
+          "id": "HdYtgfV1noTqi1CX",
+          "name": "My_ai"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Parse Inventory Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Build Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Inventory Message": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Summary": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "Telegram Trigger": [
+      {
+        "json": {
+          "update_id": 162439011,
+          "message": {
+            "message_id": 68,
+            "from": {
+              "id": 1679040654,
+              "is_bot": false,
+              "first_name": "Сергей",
+              "last_name": "Буц",
+              "username": "But_ss",
+              "language_code": "ru"
+            },
+            "chat": {
+              "id": 1679040654,
+              "first_name": "Сергей",
+              "last_name": "Буц",
+              "username": "But_ss",
+              "type": "private"
+            },
+            "date": 1782642777,
+            "forward_origin": {
+              "type": "user",
+              "sender_user": {
+                "id": 553813843,
+                "is_bot": false,
+                "first_name": "Ілля",
+                "username": "kilyaigon"
+              },
+              "date": 1782204308
+            },
+            "forward_from": {
+              "id": 553813843,
+              "is_bot": false,
+              "first_name": "Ілля",
+              "username": "kilyaigon"
+            },
+            "forward_date": 1782204308,
+            "text": "Хол.цех 23.6\nАртишок 0,69\nВяленые помидоры 0,05\nПерец маринованный 0,25\nОливки маринованные 1,8\nТартар смесь пф 0,58\nПрошуто крудо 0,08\nАскалано 0,04\nЛонцо 0,12\nВителло мясо пф 0,96\nСальса смесь пф 0,28\nПаштет из артишоков пф 1,05\nГорох бланш 0,140\nФета 0,28\nМизуна 0,03\nДорадо 0,35\nКабачок 0,2\nШпинат 0,05\nМангольд 0,05\nДрессинг 0,83\nГорчица маринованная 0,22\nКсантан вода 0,43\nТомат вода 0,2\nПонзу соус пф 1,3\nТунец консервированный 0,56\nБелый гриб маринованный 0,3\nЦезарь соус 1,25\nВителло соус 1,8\nТоматы 0,4\nТарамасалата 0,69\nПекарино 0,12\nПармезан 0,33\nБри фаршированный 1,7\nРадиччио 0,28\nПесто черемша 0,28\nВителло соус нью пф 0,4\nЭмульсия желтка пф 0,18\nЛим фреш пф 0,26\nВорсестер 1,07\nЗел масло пф 0,12\nВителло соус 0,25\nТомат соус на Дорадо 0,38\nРамен 0,28\nМикс салата 0,4\nАйраунд 3,75\nСтрачетелла 0,56\nАйсберг 0,34\nРуккола 0,04\nГорох 0,2\nКабачок 0,29\nОгурец 0,1\nСухари 0,45\nГаспачо 3,2\nСемечка жареная пф 0,08\nСоевый соус 0,4\nМёд трюфель 0,5\nВинный уксус 0,75\nяблочный уксус 0,8\nКаперсы 0,7\nУксус 9% 0,24\nУксус рисовый 0,2\nТерияки 0,68\nМирин 1\nАнчоус 0,72\nБальзамик крем 0,5",
+            "entities": [
+              {
+                "offset": 0,
+                "length": 12,
+                "type": "bold"
+              }
+            ]
+          }
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "versionId": "8bb35ad1-7eb8-4f1f-b235-0de0e2473fc9",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-06-28T10:24:39.618Z",
+      "createdAt": "2026-06-28T10:24:39.618Z",
+      "role": "workflow:owner",
+      "workflowId": "iRrJfUTQcukok4KF",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
