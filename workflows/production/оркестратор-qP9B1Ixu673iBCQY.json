@@ -1,0 +1,48 @@
+{
+  "updatedAt": "2026-06-01T15:33:48.297Z",
+  "createdAt": "2026-06-01T15:33:27.237Z",
+  "id": "qP9B1Ixu673iBCQY",
+  "name": "Оркестратор",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "c958eac5-9c87-4eac-a29c-3c439c07814e",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "5333f0cb-8a32-4a1c-a72c-540b65669e13",
+      "name": "Webhook",
+      "webhookId": "c958eac5-9c87-4eac-a29c-3c439c07814e"
+    }
+  ],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "d1760015-b05d-4ba6-a975-f967834d614c",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-06-01T15:33:27.241Z",
+      "createdAt": "2026-06-01T15:33:27.241Z",
+      "role": "workflow:owner",
+      "workflowId": "qP9B1Ixu673iBCQY",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
