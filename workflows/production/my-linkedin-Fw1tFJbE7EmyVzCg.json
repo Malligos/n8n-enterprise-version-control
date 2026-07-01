@@ -1,0 +1,532 @@
+{
+  "updatedAt": "2026-05-26T18:48:22.280Z",
+  "createdAt": "2026-05-26T17:46:39.884Z",
+  "id": "Fw1tFJbE7EmyVzCg",
+  "name": "My_linkedin",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message",
+          "callback_query"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -960,
+        -16
+      ],
+      "id": "90848585-0f15-4818-b40f-d05d568e1f63",
+      "name": "Telegram Trigger",
+      "webhookId": "d814db3b-4a8d-4c4b-a199-513371f808b3",
+      "credentials": {
+        "telegramApi": {
+          "id": "hdmpdLRak2SZIxBW",
+          "name": "MyLinkedIn"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=Ты LinkedIn-копирайтер для junior AI Automation специалиста.\n\nСделай из идеи пользователя LinkedIn-пост.\n\nСтиль:\n- живой\n- простой\n- без пафоса\n- от первого лица\n- русский язык\n- 700–1200 символов\n- структура: hook → проблема → решение → результат → вывод\n- добавь 3–6 релевантных хэштегов\n- Язык : Украиский\n\nНе выдумывай факты, которых нет в сообщении.\n\nИдея пользователя:\n{{ $json.message.text }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        -480,
+        -160
+      ],
+      "id": "761f815c-6adb-4373-86ef-ccc83991b40a",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "wmMo2Lknq3Hi5ts2",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=📝 Готовый пост для LinkedIn:  {{ $('Edit Fields').item.json.post_text }}",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "✅ Опубликовать",
+                    "additionalFields": {
+                      "callback_data": "publish_linkedin"
+                    }
+                  },
+                  {
+                    "text": "❌ Отмена",
+                    "additionalFields": {
+                      "callback_data": "cancel_linkedin"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        384,
+        -160
+      ],
+      "id": "40f61c63-6f1c-4eb5-9f90-0cf76d7912aa",
+      "name": "Send a text message",
+      "webhookId": "4df86cfb-2c7c-4d73-9272-8cae83fd234a",
+      "credentials": {
+        "telegramApi": {
+          "id": "hdmpdLRak2SZIxBW",
+          "name": "MyLinkedIn"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1ec4c8f8-a83b-44e9-83a6-173c9842e3cb",
+              "leftValue": "={{ $json.callback_query.data }}",
+              "rightValue": "publish_linkedin",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -368,
+        128
+      ],
+      "id": "8bf629ce-9a71-4e36-9515-48724a2835dc",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "564b4c09-54fe-46d8-b466-ed708f23a801",
+              "name": "chat_id",
+              "value": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+              "type": "string"
+            },
+            {
+              "id": "9a23d460-cf61-4e8d-a7fa-736539ac0795",
+              "name": "post_text",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            },
+            {
+              "id": "3d44edbd-9c6f-429f-8c86-8e51b0607add",
+              "name": "status",
+              "value": "pending",
+              "type": "string"
+            },
+            {
+              "id": "e5dad256-a00a-47d9-a652-572546c13160",
+              "name": "created_at",
+              "value": "={{ $now }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -96,
+        -160
+      ],
+      "id": "ea78973d-d70c-4b72-b629-b896176c221d",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "VWkbXTM60pmoN0eM",
+          "mode": "list",
+          "cachedResultName": "user_modes",
+          "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/VWkbXTM60pmoN0eM"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chat_id": "={{ $json.chat_id }}",
+            "post_text": "={{ $json.post_text }}",
+            "status": "={{ $json.status }}",
+            "created_at": "={{ $json.created_at }}",
+            "telegram_message_id": "={{ $('Telegram Trigger').item.json.message.chat.id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "telegram_message_id",
+              "displayName": "telegram_message_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "post_text",
+              "displayName": "post_text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "published_at",
+              "displayName": "published_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        112,
+        -160
+      ],
+      "id": "c78a9961-cce6-48ac-9bcd-38e0472585b8",
+      "name": "Insert row"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "1af785ea-fe28-4a57-9853-14b1cc17b7e2"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "53d18e14-2a0d-46bf-bd59-694985105aa5",
+                    "leftValue": "={{ $json.callback_query.data }}",
+                    "rightValue": "publish_linkedin",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "publish_linkedin"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "fe47bef2-f5ec-41bd-b2e6-660fe8a27e97",
+                    "leftValue": "={{ $json.callback_query.data }}",
+                    "rightValue": "cancel_linkedin",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "cancel_linkedin"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -752,
+        -32
+      ],
+      "id": "a761e43e-6571-417a-9994-971c7677b9ad",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "VWkbXTM60pmoN0eM",
+          "mode": "list",
+          "cachedResultName": "user_modes",
+          "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/VWkbXTM60pmoN0eM"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "chat_id",
+              "keyValue": "={{ $json.callback_query.message.chat.id }}"
+            },
+            {
+              "keyName": "status",
+              "keyValue": "pending"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -416,
+        -16
+      ],
+      "id": "3035bdfb-5607-423f-a414-0a4591c67bfc",
+      "name": "Get row(s)"
+    },
+    {
+      "parameters": {
+        "url": "https://api.linkedin.com/v2/me",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "linkedInOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -208,
+        -16
+      ],
+      "id": "546314b1-ca79-49e3-b16c-1ad2c1888817",
+      "name": "HTTP Request",
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "wB5xyzXrdpKmmn22",
+          "name": "LinkedIn OAuth2 API"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Insert row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert row": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Get row(s)": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "dd19f5c7-ea17-4ab5-ad47-45e177858be2",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-26T17:46:39.887Z",
+      "createdAt": "2026-05-26T17:46:39.887Z",
+      "role": "workflow:owner",
+      "workflowId": "Fw1tFJbE7EmyVzCg",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
