@@ -1,0 +1,3327 @@
+{
+  "updatedAt": "2026-05-14T17:37:02.169Z",
+  "createdAt": "2026-05-14T14:25:23.424Z",
+  "id": "MuMNUIexb8lVTzP7",
+  "name": "Tatoo",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message",
+          "callback_query"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -496,
+        -32
+      ],
+      "id": "c6b7020b-fc93-489b-8094-1ffa03c18f78",
+      "name": "Telegram Trigger",
+      "webhookId": "de4b43dd-2ffc-4d54-8316-5b49a8ed79ae",
+      "credentials": {
+        "telegramApi": {
+          "id": "811xelgy0N2viS8z",
+          "name": "Tattoo"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "bbff753c-b096-4f77-b984-f9214017b7a2",
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "/start",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "start"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.callback_data || $json.text }}",
+                    "rightValue": "new_order",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "4453cdb1-4674-4eee-ae20-dc366d9206d1"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "new_order"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "e646d3cb-c390-4e6c-9d4b-92a73d7c3e0f",
+                    "leftValue": "={{ $json.text }}",
+                    "rightValue": "hours",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Hours"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "fb481b94-eacd-4f5a-a693-a5b92f53a85d",
+                    "leftValue": "={{ $json.callback_data || $json.text }}",
+                    "rightValue": "type",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "type"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "12a9c31c-1a76-4faf-a86c-0f00c5d220ba",
+                    "leftValue": "={{ $json.callback_data || $json.text }}",
+                    "rightValue": "complexity_",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "complexity"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c1228bbf-5889-4be9-a37b-69dd8f4983e5",
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "settings",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "settings"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -48,
+        -96
+      ],
+      "id": "ac9f6bdb-774d-4f76-ad06-04fad2dde198",
+      "name": "Action Router"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "💉 Оберіть дію:",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "🆕 Новий розрахунок",
+                    "additionalFields": {
+                      "callback_data": "new_order"
+                    }
+                  },
+                  {
+                    "text": "⚙️ Налаштування",
+                    "additionalFields": {
+                      "callback_data": "settings"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        352,
+        -624
+      ],
+      "id": "aa4edff9-b1e9-40af-90f9-8370306aab56",
+      "name": "Send a text message",
+      "webhookId": "78c7a3fb-4f49-49c8-a2b1-1ed38e54b9d4",
+      "credentials": {
+        "telegramApi": {
+          "id": "811xelgy0N2viS8z",
+          "name": "Tattoo"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "🎨 Оберіть тип татуювання:",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "⚫ Black",
+                    "additionalFields": {
+                      "callback_data": "type_black"
+                    }
+                  },
+                  {
+                    "text": "🌈 Color",
+                    "additionalFields": {
+                      "callback_data": "type_color"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        576,
+        -432
+      ],
+      "id": "a81874fe-99c7-42eb-a196-4aaaa80485bd",
+      "name": "Ask Type",
+      "webhookId": "2d8295f7-3919-4e60-8ddb-77556f5cedb8",
+      "credentials": {
+        "telegramApi": {
+          "id": "811xelgy0N2viS8z",
+          "name": "Tattoo"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "🔥 Оберіть складність:",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "🟢 Easy",
+                    "additionalFields": {
+                      "callback_data": "complexity_easy"
+                    }
+                  },
+                  {
+                    "text": "🟡 Medium",
+                    "additionalFields": {
+                      "callback_data": "complexity_medium"
+                    }
+                  },
+                  {
+                    "text": "🔴 Hard",
+                    "additionalFields": {
+                      "callback_data": "complexity_hard"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        800,
+        -48
+      ],
+      "id": "0599afb6-1bd3-4ace-bb0f-425aed71a148",
+      "name": "Ask Complexity",
+      "webhookId": "2d8295f7-3919-4e60-8ddb-77556f5cedb8",
+      "credentials": {
+        "telegramApi": {
+          "id": "811xelgy0N2viS8z",
+          "name": "Tattoo"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit?gid=402387704#gid=402387704",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 402387704,
+          "mode": "list",
+          "cachedResultName": "Sessions",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit#gid=402387704"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chat_id": "={{ $json.chat_id }}",
+            "step": "waiting_type"
+          },
+          "matchingColumns": [
+            "chat_id"
+          ],
+          "schema": [
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "step",
+              "displayName": "step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "complexity",
+              "displayName": "complexity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "hours",
+              "displayName": "hours",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        352,
+        -432
+      ],
+      "id": "53072a05-d9dd-40f1-87b2-a5d1b35f220d",
+      "name": "Save New Session",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const type = $json.callback_data.replace('type_', '');\n\nreturn [\n  {\n    json: {\n      chat_id: $json.chat_id,\n      type\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        352,
+        -48
+      ],
+      "id": "61139ae3-e4ae-4d79-9016-7793c6806d8a",
+      "name": "Parse Type"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit?gid=402387704#gid=402387704",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 402387704,
+          "mode": "list",
+          "cachedResultName": "Sessions",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit#gid=402387704"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chat_id": "={{ $json.chat_id }}",
+            "type": "={{ $json.type }}",
+            "step": "waiting_complexity"
+          },
+          "matchingColumns": [
+            "chat_id"
+          ],
+          "schema": [
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "step",
+              "displayName": "step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "complexity",
+              "displayName": "complexity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "hours",
+              "displayName": "hours",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        576,
+        -48
+      ],
+      "id": "9d05332d-c90d-4d2e-afb9-17d4786f3364",
+      "name": "Update Session Type",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const complexity = $json.callback_data.replace('complexity_', '');\n\nreturn [\n  {\n    json: {\n      chat_id: $json.chat_id,\n      complexity\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        352,
+        144
+      ],
+      "id": "2112ce3e-8503-4775-ba8a-f0a0e3617079",
+      "name": "Parse Complexity"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit?gid=402387704#gid=402387704",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 402387704,
+          "mode": "list",
+          "cachedResultName": "Sessions",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit#gid=402387704"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "complexity": "={{ $json.complexity }}",
+            "chat_id": "={{ $json.chat_id }}",
+            "step": "waiting_hours"
+          },
+          "matchingColumns": [
+            "chat_id"
+          ],
+          "schema": [
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "step",
+              "displayName": "step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "complexity",
+              "displayName": "complexity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "hours",
+              "displayName": "hours",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        576,
+        144
+      ],
+      "id": "1ce4e200-c733-4ffd-b956-db17b038985f",
+      "name": "Update Session Complexity",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit?gid=402387704#gid=402387704",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 402387704,
+          "mode": "list",
+          "cachedResultName": "Sessions",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit#gid=402387704"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "chat_id",
+              "lookupValue": "={{ $json.chat_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        352,
+        -240
+      ],
+      "id": "7c013e90-4917-4732-bd74-b08b9e32a6e3",
+      "name": "Get Session",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit?gid=402387704#gid=402387704",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 252442203,
+          "mode": "list",
+          "cachedResultName": "Settings",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit#gid=252442203"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        576,
+        -240
+      ],
+      "id": "2ed1192a-1daa-4b02-91dc-3814c31ad1de",
+      "name": "Get Settings",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit?gid=402387704#gid=402387704",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Consumables",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        800,
+        -240
+      ],
+      "id": "29faad95-2a77-497b-aaf3-d6e435c0a965",
+      "name": "Get Consumables",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit?gid=402387704#gid=402387704",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1259929488,
+          "mode": "list",
+          "cachedResultName": "Usage_Norms",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit#gid=1259929488"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1024,
+        -240
+      ],
+      "id": "aa241b6c-d891-4ef0-a323-ccb2e4c4ed9b",
+      "name": "Get Usage Norms",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $('Action Router').first().json;\nconst session = $('Get Session').first().json;\n\nconst hours = Number(String(input.text || '').replace(',', '.'));\n\nif (!hours || hours <= 0) {\n  return [{\n    json: {\n      success: false,\n      chat_id: input.chat_id,\n      message: '❌ Введіть коректну кількість годин. Наприклад: 4 або 2.5'\n    }\n  }];\n}\n\nif (!session || session.step !== 'waiting_hours') {\n  return [{\n    json: {\n      success: false,\n      chat_id: input.chat_id,\n      message: '❌ Спочатку натисніть 🆕 Новий розрахунок'\n    }\n  }];\n}\n\nconst settingsRows = $('Get Settings').all().map(i => i.json);\nconst consumablesRows = $('Get Consumables').all().map(i => i.json);\nconst normsRows = $('Get Usage Norms').all().map(i => i.json);\n\nfunction n(value) {\n  return Number(value || 0);\n}\n\nfunction r(value) {\n  return Math.round(value);\n}\n\nfunction pick(row, keys) {\n  for (const key of keys) {\n    if (row[key] !== undefined && row[key] !== null && row[key] !== '') {\n      return row[key];\n    }\n  }\n  return 0;\n}\n\nconst settings = {};\n\nfor (const row of settingsRows) {\n  settings[row.key] = n(row.value);\n}\n\nconst prices = {};\n\nfor (const row of consumablesRows) {\n  const name = String(row['назва'] || '').trim();\n  const price = n(row['ціна_за_одиницю']);\n  if (name) {\n    prices[name] = price;\n  }\n}\n\nconst type = String(session.type || '').toLowerCase().trim();\nconst complexity = String(session.complexity || '').toLowerCase().trim();\n\nconst norm = normsRows.find(row =>\n  String(row['тип'] || '').toLowerCase().trim() === type &&\n  String(row['складність'] || '').toLowerCase().trim() === complexity\n);\n\nif (!norm) {\n  return [{\n    json: {\n      success: false,\n      chat_id: input.chat_id,\n      message: `❌ Не знайдено норму витрат для ${type} / ${complexity}`\n    }\n  }];\n}\n\nconst details = {\n  голки: n(norm['голки']) * n(prices['Голка']),\n  картриджі: n(norm['картриджі']) * n(prices['Картридж']),\n  фарба_чорна: n(norm['фарба_чорна_мл']) * n(prices['Фарба чорна']),\n  фарба_кольорова: n(norm['фарба_кольорова_мл']) * n(prices['Фарба кольорова']),\n  рукавички: n(norm['рукавички_пари']) * n(prices['Рукавички']),\n  плівка: n(norm['плівка_м']) * n(prices['Плівка']),\n  ковпачки: n(norm['ковпачки']) * n(prices['Ковпачки']),\n  серветки: n(norm['серветки']) * n(prices['Серветки']),\n  вазелін: n(norm['вазелін_г']) * n(prices['Вазелін']),\n  дезінфектор: n(norm['дезінфектор_мл']) * n(prices['Дезінфектор']),\n  пелюшки: n(norm['пелюшки']) * n(prices['Одноразова пелюшка']),\n  барерний_захист: n(pick(norm, ['барерний_захист', 'барєрний_захист', 'бар’єрний_захист'])) * n(prices['Бар’єрний захист'])\n};\n\nconst consumablesTotal = Object.values(details).reduce((sum, value) => sum + value, 0);\n\nconst fixedCostsMonth =\n  n(settings.rent_month) +\n  n(settings.utilities_month) +\n  n(settings.ads_month) +\n  n(settings.equipment_month);\n\nconst workHoursMonth = n(settings.work_hours_month) || 120;\nconst masterRateHour = n(settings.master_rate_hour) || 700;\nconst profitMargin = n(settings.profit_margin) || 20;\n\nconst studioCost = fixedCostsMonth / workHoursMonth * hours;\nconst masterPay = masterRateHour * hours;\n\nconst costPrice = consumablesTotal + studioCost + masterPay;\nconst finalPrice = costPrice * (1 + profitMargin / 100);\nconst profit = finalPrice - costPrice;\n\nreturn [{\n  json: {\n    success: true,\n\n    дата: new Date().toISOString().split('T')[0],\n    chat_id: input.chat_id,\n    username: input.username || '',\n    години: hours,\n    тип: type,\n    складність: complexity,\n\n    картриджі: r(details.картриджі),\n    фарба_чорна: r(details.фарба_чорна),\n    фарба_кольорова: r(details.фарба_кольорова),\n    рукавички: r(details.рукавички),\n    плівка: r(details.плівка),\n    ковпачки: r(details.ковпачки),\n    серветки: r(details.серветки),\n    вазелін: r(details.вазелін),\n    дезінфектор: r(details.дезінфектор),\n    пелюшки: r(details.пелюшки),\n\n    барерний_захист: r(details.барерний_захист),\n    барєрний_захист: r(details.барерний_захист),\n\n    витратники_всього: r(consumablesTotal),\n    студійні_витрати: r(studioCost),\n    оплата_майстра: r(masterPay),\n    собівартість: r(costPrice),\n    фінальна_ціна: r(finalPrice),\n    прибуток: r(profit)\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1248,
+        -240
+      ],
+      "id": "f0a8d57a-9d23-40d5-9cb7-546311c77cff",
+      "name": "Calculate Cost"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "aed1fa4e-42e8-4251-bebd-6b5cdfa7595a",
+              "leftValue": "={{ $json.success }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1472,
+        -240
+      ],
+      "id": "f2356c09-2acc-4a51-bb4d-fac181935fb2",
+      "name": "Check Success"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "={{ $json.message }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1696,
+        -144
+      ],
+      "id": "6dec5db7-fd3d-42e0-ba5b-880d04aa7c2c",
+      "name": "Send a text message1",
+      "webhookId": "b87e6aa4-e8c2-428b-be97-d8677a0f6856",
+      "credentials": {
+        "telegramApi": {
+          "id": "811xelgy0N2viS8z",
+          "name": "Tattoo"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit?gid=402387704#gid=402387704",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1495283551,
+          "mode": "list",
+          "cachedResultName": "Orders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit#gid=1495283551"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "дата": "={{ $json.дата }}",
+            "chat_id": "={{ $json.chat_id }}",
+            "username": "={{ $json.username }}",
+            "години": "={{ $json.години }}",
+            "тип": "={{ $json.тип }}",
+            "складність": "={{ $json['складність'] }}",
+            "голки": "={{ $json['голки'] }}",
+            "картриджі": "={{ $json['картриджі'] }}",
+            "фарба_чорна": "={{ $json['фарба_чорна'] }}",
+            "фарба_кольорова": "={{ $json['фарба_кольорова'] }}",
+            "рукавички": "={{ $json['рукавички'] }}",
+            "плівка": "={{ $json['плівка'] }}",
+            "ковпачки": "={{ $json['ковпачки'] }}",
+            "серветки": "={{ $json['серветки'] }}",
+            "вазелін": "={{ $json['вазелін'] }}",
+            "дезінфектор": "={{ $json['дезінфектор'] }}",
+            "пелюшки": "={{ $json['пелюшки'] }}",
+            "барєрний_захист": "={{ $json['барерний_захист'] }}",
+            "витратники_всього": "={{ $json['витратники_всього'] }}",
+            "студійні_витрати": "={{ $json['студійні_витрати'] }}",
+            "оплата_майстра": "={{ $json['оплата_майстра'] }}",
+            "собівартість": "={{ $json['собівартість'] }}",
+            "фінальна_ціна": "={{ $json['фінальна_ціна'] }}",
+            "прибуток": "={{ $json['прибуток'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "дата",
+              "displayName": "дата",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "username",
+              "displayName": "username",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "години",
+              "displayName": "години",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "тип",
+              "displayName": "тип",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "складність",
+              "displayName": "складність",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "голки",
+              "displayName": "голки",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "картриджі",
+              "displayName": "картриджі",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "фарба_чорна",
+              "displayName": "фарба_чорна",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "фарба_кольорова",
+              "displayName": "фарба_кольорова",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "рукавички",
+              "displayName": "рукавички",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "плівка",
+              "displayName": "плівка",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ковпачки",
+              "displayName": "ковпачки",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "серветки",
+              "displayName": "серветки",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "вазелін",
+              "displayName": "вазелін",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "дезінфектор",
+              "displayName": "дезінфектор",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "пелюшки",
+              "displayName": "пелюшки",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "барєрний_захист",
+              "displayName": "барєрний_захист",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "витратники_всього",
+              "displayName": "витратники_всього",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "студійні_витрати",
+              "displayName": "студійні_витрати",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "оплата_майстра",
+              "displayName": "оплата_майстра",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "собівартість",
+              "displayName": "собівартість",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "фінальна_ціна",
+              "displayName": "фінальна_ціна",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "прибуток",
+              "displayName": "прибуток",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1696,
+        -336
+      ],
+      "id": "23c07b08-8877-4ee1-aaec-fb35b09ff1ed",
+      "name": "Save Order",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "🕒 Введіть кількість годин.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        800,
+        144
+      ],
+      "id": "f1a155f5-6a21-4752-a280-bf73f5e823bb",
+      "name": "Ask Hours",
+      "webhookId": "2d8295f7-3919-4e60-8ddb-77556f5cedb8",
+      "credentials": {
+        "telegramApi": {
+          "id": "811xelgy0N2viS8z",
+          "name": "Tattoo"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Calculate Cost').first().json.chat_id }}",
+        "text": "=💉 Розрахунок татуювання\n\n🕒 Години: {{ $('Calculate Cost').first().json.години }}\n🎨 Тип: {{ $('Calculate Cost').first().json.тип }}\n🔥 Складність: {{ $('Calculate Cost').first().json.складність }}\n\n━━━━━━━━━━━━━━\n📦 Витратники:\n\n🪡 Голки: {{ $('Calculate Cost').first().json.голки }} грн\n🧴 Картриджі: {{ $('Calculate Cost').first().json.картриджі }} грн\n🎨 Фарба чорна: {{ $('Calculate Cost').first().json.фарба_чорна }} грн\n🌈 Фарба кольорова: {{ $('Calculate Cost').first().json.фарба_кольорова }} грн\n🧤 Рукавички: {{ $('Calculate Cost').first().json.рукавички }} грн\n🧻 Серветки: {{ $('Calculate Cost').first().json.серветки }} грн\n🧴 Вазелін: {{ $('Calculate Cost').first().json.вазелін }} грн\n🧼 Дезінфектор: {{ $('Calculate Cost').first().json.дезінфектор }} грн\n🛏 Пелюшки: {{ $('Calculate Cost').first().json.пелюшки }} грн\n🛡 Бар’єрний захист: {{ $('Calculate Cost').first().json.барєрний_захист }} грн\n\n📦 Всього витратники: {{ $('Calculate Cost').first().json.витратники_всього }} грн\n\n━━━━━━━━━━━━━━\n🏠 Студійні витрати: {{ $('Calculate Cost').first().json.студійні_витрати }} грн\n👨‍🎨 Оплата майстра: {{ $('Calculate Cost').first().json.оплата_майстра }} грн\n\n💸 Собівартість: {{ $('Calculate Cost').first().json.собівартість }} грн\n✅ Рекомендована ціна: {{ $('Calculate Cost').first().json.фінальна_ціна }} грн\n📈 Прибуток: {{ $('Calculate Cost').first().json.прибуток }} грн",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1920,
+        -336
+      ],
+      "id": "e674de19-eec4-4ffb-9160-e99313f27bd1",
+      "name": "Send Result",
+      "webhookId": "b87e6aa4-e8c2-428b-be97-d8677a0f6856",
+      "credentials": {
+        "telegramApi": {
+          "id": "811xelgy0N2viS8z",
+          "name": "Tattoo"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit?gid=1495283551#gid=1495283551",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 402387704,
+          "mode": "list",
+          "cachedResultName": "Sessions",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit#gid=402387704"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chat_id": "={{ $('Calculate Cost').first().json.chat_id }}",
+            "step": "done"
+          },
+          "matchingColumns": [
+            "chat_id"
+          ],
+          "schema": [
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "step",
+              "displayName": "step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "complexity",
+              "displayName": "complexity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "hours",
+              "displayName": "hours",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2144,
+        -336
+      ],
+      "id": "04e96706-bcc3-454c-871f-ca431afef91b",
+      "name": "Clear Session",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = $('Get Settings For Menu').all().map(i => i.json);\nconst input = $('Normalize Input').first().json;\n\nconst settings = {};\n\nfor (const row of rows) {\n  settings[row.key] = row.value;\n}\n\nconst text = `⚙️ Налаштування калькулятора\n\n🏠 Оренда: ${settings.rent_month || 0} грн/міс\n⚡ Комунальні: ${settings.utilities_month || 0} грн/міс\n📢 Реклама: ${settings.ads_month || 0} грн/міс\n🛠 Обладнання: ${settings.equipment_month || 0} грн/міс\n\n🕒 Робочих годин/міс: ${settings.work_hours_month || 0}\n👨‍🎨 Ставка майстра: ${settings.master_rate_hour || 0} грн/год\n📈 Маржа: ${settings.profit_margin || 0}%\n\nЩоб змінити налаштування — поки редагуй лист Settings у Google Sheets.`;\n\nreturn [{\n  json: {\n    chat_id: input.chat_id,\n    message: text\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        592,
+        288
+      ],
+      "id": "6d9a468e-97ac-4725-a3e9-1bba0346bd41",
+      "name": "Format Settings Message"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "={{ $json.message }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        800,
+        288
+      ],
+      "id": "2bb3e6be-d871-4255-842d-517648888ca5",
+      "name": "Send Settings",
+      "webhookId": "4a8a73dc-a85e-48b9-8262-a4dab8879747",
+      "credentials": {
+        "telegramApi": {
+          "id": "811xelgy0N2viS8z",
+          "name": "Tattoo"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit?gid=1495283551#gid=1495283551",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 252442203,
+          "mode": "list",
+          "cachedResultName": "Settings",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit#gid=252442203"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        352,
+        288
+      ],
+      "id": "d4535475-e252-4676-ac40-5d29a56c7dc2",
+      "name": "Get Settings For Menu",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let chat_id;\nlet text = '';\nlet callback_data = '';\n\nif ($json.message) {\n  chat_id = $json.message.chat.id;\n  text = String($json.message.text || '').trim();\n}\n\nif ($json.callback_query) {\n  chat_id = $json.callback_query.message.chat.id;\n  callback_data = String($json.callback_query.data || '').trim();\n}\n\nreturn [{\n  json: {\n    chat_id,\n    text,\n    callback_data,\n    action: callback_data || text\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -272,
+        -32
+      ],
+      "id": "6a3c402b-052e-41f9-8077-df32f4794d60",
+      "name": "Normalize Input"
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Normalize Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Action Router": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Save New Session",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Session",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Parse Type",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Parse Complexity",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Settings For Menu",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ask Type": {
+      "main": [
+        []
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        []
+      ]
+    },
+    "Ask Complexity": {
+      "main": [
+        []
+      ]
+    },
+    "Save New Session": {
+      "main": [
+        [
+          {
+            "node": "Ask Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Type": {
+      "main": [
+        [
+          {
+            "node": "Update Session Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Session Type": {
+      "main": [
+        [
+          {
+            "node": "Ask Complexity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Complexity": {
+      "main": [
+        [
+          {
+            "node": "Update Session Complexity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Session Complexity": {
+      "main": [
+        [
+          {
+            "node": "Ask Hours",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Session": {
+      "main": [
+        [
+          {
+            "node": "Get Settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Settings": {
+      "main": [
+        [
+          {
+            "node": "Get Consumables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Consumables": {
+      "main": [
+        [
+          {
+            "node": "Get Usage Norms",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Usage Norms": {
+      "main": [
+        [
+          {
+            "node": "Calculate Cost",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Cost": {
+      "main": [
+        [
+          {
+            "node": "Check Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Success": {
+      "main": [
+        [
+          {
+            "node": "Save Order",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ask Hours": {
+      "main": [
+        []
+      ]
+    },
+    "Save Order": {
+      "main": [
+        [
+          {
+            "node": "Send Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Result": {
+      "main": [
+        [
+          {
+            "node": "Clear Session",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Settings Message": {
+      "main": [
+        [
+          {
+            "node": "Send Settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Settings For Menu": {
+      "main": [
+        [
+          {
+            "node": "Format Settings Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Input": {
+      "main": [
+        [
+          {
+            "node": "Action Router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "0107b87f-0116-483d-9a06-79ba64ef0b78",
+  "activeVersionId": "0107b87f-0116-483d-9a06-79ba64ef0b78",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-05-14T14:25:23.428Z",
+      "createdAt": "2026-05-14T14:25:23.428Z",
+      "role": "workflow:owner",
+      "workflowId": "MuMNUIexb8lVTzP7",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-05-14T17:40:33.000Z",
+    "createdAt": "2026-05-14T17:37:02.170Z",
+    "versionId": "0107b87f-0116-483d-9a06-79ba64ef0b78",
+    "workflowId": "MuMNUIexb8lVTzP7",
+    "nodes": [
+      {
+        "parameters": {
+          "updates": [
+            "message",
+            "callback_query"
+          ],
+          "additionalFields": {}
+        },
+        "type": "n8n-nodes-base.telegramTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          -496,
+          -32
+        ],
+        "id": "c6b7020b-fc93-489b-8094-1ffa03c18f78",
+        "name": "Telegram Trigger",
+        "webhookId": "de4b43dd-2ffc-4d54-8316-5b49a8ed79ae",
+        "credentials": {
+          "telegramApi": {
+            "id": "811xelgy0N2viS8z",
+            "name": "Tattoo"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "id": "bbff753c-b096-4f77-b984-f9214017b7a2",
+                      "leftValue": "={{ $json.action }}",
+                      "rightValue": "/start",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "start"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.callback_data || $json.text }}",
+                      "rightValue": "new_order",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      },
+                      "id": "4453cdb1-4674-4eee-ae20-dc366d9206d1"
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "new_order"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "id": "e646d3cb-c390-4e6c-9d4b-92a73d7c3e0f",
+                      "leftValue": "={{ $json.text }}",
+                      "rightValue": "hours",
+                      "operator": {
+                        "type": "string",
+                        "operation": "notEmpty",
+                        "singleValue": true
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "Hours"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "id": "fb481b94-eacd-4f5a-a693-a5b92f53a85d",
+                      "leftValue": "={{ $json.callback_data || $json.text }}",
+                      "rightValue": "type",
+                      "operator": {
+                        "type": "string",
+                        "operation": "startsWith"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "type"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "id": "12a9c31c-1a76-4faf-a86c-0f00c5d220ba",
+                      "leftValue": "={{ $json.callback_data || $json.text }}",
+                      "rightValue": "complexity_",
+                      "operator": {
+                        "type": "string",
+                        "operation": "startsWith"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "complexity"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "id": "c1228bbf-5889-4be9-a37b-69dd8f4983e5",
+                      "leftValue": "={{ $json.action }}",
+                      "rightValue": "settings",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "settings"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3.4,
+        "position": [
+          -48,
+          -96
+        ],
+        "id": "ac9f6bdb-774d-4f76-ad06-04fad2dde198",
+        "name": "Action Router"
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $json.chat_id }}",
+          "text": "💉 Оберіть дію:",
+          "replyMarkup": "inlineKeyboard",
+          "inlineKeyboard": {
+            "rows": [
+              {
+                "row": {
+                  "buttons": [
+                    {
+                      "text": "🆕 Новий розрахунок",
+                      "additionalFields": {
+                        "callback_data": "new_order"
+                      }
+                    },
+                    {
+                      "text": "⚙️ Налаштування",
+                      "additionalFields": {
+                        "callback_data": "settings"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          352,
+          -624
+        ],
+        "id": "aa4edff9-b1e9-40af-90f9-8370306aab56",
+        "name": "Send a text message",
+        "webhookId": "78c7a3fb-4f49-49c8-a2b1-1ed38e54b9d4",
+        "credentials": {
+          "telegramApi": {
+            "id": "811xelgy0N2viS8z",
+            "name": "Tattoo"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $json.chat_id }}",
+          "text": "🎨 Оберіть тип татуювання:",
+          "replyMarkup": "inlineKeyboard",
+          "inlineKeyboard": {
+            "rows": [
+              {
+                "row": {
+                  "buttons": [
+                    {
+                      "text": "⚫ Black",
+                      "additionalFields": {
+                        "callback_data": "type_black"
+                      }
+                    },
+                    {
+                      "text": "🌈 Color",
+                      "additionalFields": {
+                        "callback_data": "type_color"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          576,
+          -432
+        ],
+        "id": "a81874fe-99c7-42eb-a196-4aaaa80485bd",
+        "name": "Ask Type",
+        "webhookId": "2d8295f7-3919-4e60-8ddb-77556f5cedb8",
+        "credentials": {
+          "telegramApi": {
+            "id": "811xelgy0N2viS8z",
+            "name": "Tattoo"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $json.chat_id }}",
+          "text": "🔥 Оберіть складність:",
+          "replyMarkup": "inlineKeyboard",
+          "inlineKeyboard": {
+            "rows": [
+              {
+                "row": {
+                  "buttons": [
+                    {
+                      "text": "🟢 Easy",
+                      "additionalFields": {
+                        "callback_data": "complexity_easy"
+                      }
+                    },
+                    {
+                      "text": "🟡 Medium",
+                      "additionalFields": {
+                        "callback_data": "complexity_medium"
+                      }
+                    },
+                    {
+                      "text": "🔴 Hard",
+                      "additionalFields": {
+                        "callback_data": "complexity_hard"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          800,
+          -48
+        ],
+        "id": "0599afb6-1bd3-4ace-bb0f-425aed71a148",
+        "name": "Ask Complexity",
+        "webhookId": "2d8295f7-3919-4e60-8ddb-77556f5cedb8",
+        "credentials": {
+          "telegramApi": {
+            "id": "811xelgy0N2viS8z",
+            "name": "Tattoo"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "appendOrUpdate",
+          "documentId": {
+            "__rl": true,
+            "value": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit?gid=402387704#gid=402387704",
+            "mode": "url"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 402387704,
+            "mode": "list",
+            "cachedResultName": "Sessions",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit#gid=402387704"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "chat_id": "={{ $json.chat_id }}",
+              "step": "waiting_type"
+            },
+            "matchingColumns": [
+              "chat_id"
+            ],
+            "schema": [
+              {
+                "id": "chat_id",
+                "displayName": "chat_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "step",
+                "displayName": "step",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "type",
+                "displayName": "type",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "complexity",
+                "displayName": "complexity",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "hours",
+                "displayName": "hours",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          352,
+          -432
+        ],
+        "id": "53072a05-d9dd-40f1-87b2-a5d1b35f220d",
+        "name": "Save New Session",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "0Gdvf3Mhmj7whXEv",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const type = $json.callback_data.replace('type_', '');\n\nreturn [\n  {\n    json: {\n      chat_id: $json.chat_id,\n      type\n    }\n  }\n];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          352,
+          -48
+        ],
+        "id": "61139ae3-e4ae-4d79-9016-7793c6806d8a",
+        "name": "Parse Type"
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "documentId": {
+            "__rl": true,
+            "value": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit?gid=402387704#gid=402387704",
+            "mode": "url"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 402387704,
+            "mode": "list",
+            "cachedResultName": "Sessions",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit#gid=402387704"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "chat_id": "={{ $json.chat_id }}",
+              "type": "={{ $json.type }}",
+              "step": "waiting_complexity"
+            },
+            "matchingColumns": [
+              "chat_id"
+            ],
+            "schema": [
+              {
+                "id": "chat_id",
+                "displayName": "chat_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "step",
+                "displayName": "step",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "type",
+                "displayName": "type",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "complexity",
+                "displayName": "complexity",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "hours",
+                "displayName": "hours",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "row_number",
+                "displayName": "row_number",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "readOnly": true,
+                "removed": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          576,
+          -48
+        ],
+        "id": "9d05332d-c90d-4d2e-afb9-17d4786f3364",
+        "name": "Update Session Type",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "0Gdvf3Mhmj7whXEv",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const complexity = $json.callback_data.replace('complexity_', '');\n\nreturn [\n  {\n    json: {\n      chat_id: $json.chat_id,\n      complexity\n    }\n  }\n];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          352,
+          144
+        ],
+        "id": "2112ce3e-8503-4775-ba8a-f0a0e3617079",
+        "name": "Parse Complexity"
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "documentId": {
+            "__rl": true,
+            "value": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit?gid=402387704#gid=402387704",
+            "mode": "url"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 402387704,
+            "mode": "list",
+            "cachedResultName": "Sessions",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit#gid=402387704"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "complexity": "={{ $json.complexity }}",
+              "chat_id": "={{ $json.chat_id }}",
+              "step": "waiting_hours"
+            },
+            "matchingColumns": [
+              "chat_id"
+            ],
+            "schema": [
+              {
+                "id": "chat_id",
+                "displayName": "chat_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "step",
+                "displayName": "step",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "type",
+                "displayName": "type",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "complexity",
+                "displayName": "complexity",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "hours",
+                "displayName": "hours",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "row_number",
+                "displayName": "row_number",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "readOnly": true,
+                "removed": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          576,
+          144
+        ],
+        "id": "1ce4e200-c733-4ffd-b956-db17b038985f",
+        "name": "Update Session Complexity",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "0Gdvf3Mhmj7whXEv",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit?gid=402387704#gid=402387704",
+            "mode": "url"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 402387704,
+            "mode": "list",
+            "cachedResultName": "Sessions",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit#gid=402387704"
+          },
+          "filtersUI": {
+            "values": [
+              {
+                "lookupColumn": "chat_id",
+                "lookupValue": "={{ $json.chat_id }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          352,
+          -240
+        ],
+        "id": "7c013e90-4917-4732-bd74-b08b9e32a6e3",
+        "name": "Get Session",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "0Gdvf3Mhmj7whXEv",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit?gid=402387704#gid=402387704",
+            "mode": "url"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 252442203,
+            "mode": "list",
+            "cachedResultName": "Settings",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit#gid=252442203"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          576,
+          -240
+        ],
+        "id": "2ed1192a-1daa-4b02-91dc-3814c31ad1de",
+        "name": "Get Settings",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "0Gdvf3Mhmj7whXEv",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit?gid=402387704#gid=402387704",
+            "mode": "url"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Consumables",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit#gid=0"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          800,
+          -240
+        ],
+        "id": "29faad95-2a77-497b-aaf3-d6e435c0a965",
+        "name": "Get Consumables",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "0Gdvf3Mhmj7whXEv",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit?gid=402387704#gid=402387704",
+            "mode": "url"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 1259929488,
+            "mode": "list",
+            "cachedResultName": "Usage_Norms",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit#gid=1259929488"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          1024,
+          -240
+        ],
+        "id": "aa241b6c-d891-4ef0-a323-ccb2e4c4ed9b",
+        "name": "Get Usage Norms",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "0Gdvf3Mhmj7whXEv",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const input = $('Action Router').first().json;\nconst session = $('Get Session').first().json;\n\nconst hours = Number(String(input.text || '').replace(',', '.'));\n\nif (!hours || hours <= 0) {\n  return [{\n    json: {\n      success: false,\n      chat_id: input.chat_id,\n      message: '❌ Введіть коректну кількість годин. Наприклад: 4 або 2.5'\n    }\n  }];\n}\n\nif (!session || session.step !== 'waiting_hours') {\n  return [{\n    json: {\n      success: false,\n      chat_id: input.chat_id,\n      message: '❌ Спочатку натисніть 🆕 Новий розрахунок'\n    }\n  }];\n}\n\nconst settingsRows = $('Get Settings').all().map(i => i.json);\nconst consumablesRows = $('Get Consumables').all().map(i => i.json);\nconst normsRows = $('Get Usage Norms').all().map(i => i.json);\n\nfunction n(value) {\n  return Number(value || 0);\n}\n\nfunction r(value) {\n  return Math.round(value);\n}\n\nfunction pick(row, keys) {\n  for (const key of keys) {\n    if (row[key] !== undefined && row[key] !== null && row[key] !== '') {\n      return row[key];\n    }\n  }\n  return 0;\n}\n\nconst settings = {};\n\nfor (const row of settingsRows) {\n  settings[row.key] = n(row.value);\n}\n\nconst prices = {};\n\nfor (const row of consumablesRows) {\n  const name = String(row['назва'] || '').trim();\n  const price = n(row['ціна_за_одиницю']);\n  if (name) {\n    prices[name] = price;\n  }\n}\n\nconst type = String(session.type || '').toLowerCase().trim();\nconst complexity = String(session.complexity || '').toLowerCase().trim();\n\nconst norm = normsRows.find(row =>\n  String(row['тип'] || '').toLowerCase().trim() === type &&\n  String(row['складність'] || '').toLowerCase().trim() === complexity\n);\n\nif (!norm) {\n  return [{\n    json: {\n      success: false,\n      chat_id: input.chat_id,\n      message: `❌ Не знайдено норму витрат для ${type} / ${complexity}`\n    }\n  }];\n}\n\nconst details = {\n  голки: n(norm['голки']) * n(prices['Голка']),\n  картриджі: n(norm['картриджі']) * n(prices['Картридж']),\n  фарба_чорна: n(norm['фарба_чорна_мл']) * n(prices['Фарба чорна']),\n  фарба_кольорова: n(norm['фарба_кольорова_мл']) * n(prices['Фарба кольорова']),\n  рукавички: n(norm['рукавички_пари']) * n(prices['Рукавички']),\n  плівка: n(norm['плівка_м']) * n(prices['Плівка']),\n  ковпачки: n(norm['ковпачки']) * n(prices['Ковпачки']),\n  серветки: n(norm['серветки']) * n(prices['Серветки']),\n  вазелін: n(norm['вазелін_г']) * n(prices['Вазелін']),\n  дезінфектор: n(norm['дезінфектор_мл']) * n(prices['Дезінфектор']),\n  пелюшки: n(norm['пелюшки']) * n(prices['Одноразова пелюшка']),\n  барерний_захист: n(pick(norm, ['барерний_захист', 'барєрний_захист', 'бар’єрний_захист'])) * n(prices['Бар’єрний захист'])\n};\n\nconst consumablesTotal = Object.values(details).reduce((sum, value) => sum + value, 0);\n\nconst fixedCostsMonth =\n  n(settings.rent_month) +\n  n(settings.utilities_month) +\n  n(settings.ads_month) +\n  n(settings.equipment_month);\n\nconst workHoursMonth = n(settings.work_hours_month) || 120;\nconst masterRateHour = n(settings.master_rate_hour) || 700;\nconst profitMargin = n(settings.profit_margin) || 20;\n\nconst studioCost = fixedCostsMonth / workHoursMonth * hours;\nconst masterPay = masterRateHour * hours;\n\nconst costPrice = consumablesTotal + studioCost + masterPay;\nconst finalPrice = costPrice * (1 + profitMargin / 100);\nconst profit = finalPrice - costPrice;\n\nreturn [{\n  json: {\n    success: true,\n\n    дата: new Date().toISOString().split('T')[0],\n    chat_id: input.chat_id,\n    username: input.username || '',\n    години: hours,\n    тип: type,\n    складність: complexity,\n\n    картриджі: r(details.картриджі),\n    фарба_чорна: r(details.фарба_чорна),\n    фарба_кольорова: r(details.фарба_кольорова),\n    рукавички: r(details.рукавички),\n    плівка: r(details.плівка),\n    ковпачки: r(details.ковпачки),\n    серветки: r(details.серветки),\n    вазелін: r(details.вазелін),\n    дезінфектор: r(details.дезінфектор),\n    пелюшки: r(details.пелюшки),\n\n    барерний_захист: r(details.барерний_захист),\n    барєрний_захист: r(details.барерний_захист),\n\n    витратники_всього: r(consumablesTotal),\n    студійні_витрати: r(studioCost),\n    оплата_майстра: r(masterPay),\n    собівартість: r(costPrice),\n    фінальна_ціна: r(finalPrice),\n    прибуток: r(profit)\n  }\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1248,
+          -240
+        ],
+        "id": "f0a8d57a-9d23-40d5-9cb7-546311c77cff",
+        "name": "Calculate Cost"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "aed1fa4e-42e8-4251-bebd-6b5cdfa7595a",
+                "leftValue": "={{ $json.success }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          1472,
+          -240
+        ],
+        "id": "f2356c09-2acc-4a51-bb4d-fac181935fb2",
+        "name": "Check Success"
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $json.chat_id }}",
+          "text": "={{ $json.message }}",
+          "additionalFields": {}
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          1696,
+          -144
+        ],
+        "id": "6dec5db7-fd3d-42e0-ba5b-880d04aa7c2c",
+        "name": "Send a text message1",
+        "webhookId": "b87e6aa4-e8c2-428b-be97-d8677a0f6856",
+        "credentials": {
+          "telegramApi": {
+            "id": "811xelgy0N2viS8z",
+            "name": "Tattoo"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit?gid=402387704#gid=402387704",
+            "mode": "url"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 1495283551,
+            "mode": "list",
+            "cachedResultName": "Orders",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit#gid=1495283551"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "дата": "={{ $json.дата }}",
+              "chat_id": "={{ $json.chat_id }}",
+              "username": "={{ $json.username }}",
+              "години": "={{ $json.години }}",
+              "тип": "={{ $json.тип }}",
+              "складність": "={{ $json['складність'] }}",
+              "голки": "={{ $json['голки'] }}",
+              "картриджі": "={{ $json['картриджі'] }}",
+              "фарба_чорна": "={{ $json['фарба_чорна'] }}",
+              "фарба_кольорова": "={{ $json['фарба_кольорова'] }}",
+              "рукавички": "={{ $json['рукавички'] }}",
+              "плівка": "={{ $json['плівка'] }}",
+              "ковпачки": "={{ $json['ковпачки'] }}",
+              "серветки": "={{ $json['серветки'] }}",
+              "вазелін": "={{ $json['вазелін'] }}",
+              "дезінфектор": "={{ $json['дезінфектор'] }}",
+              "пелюшки": "={{ $json['пелюшки'] }}",
+              "барєрний_захист": "={{ $json['барерний_захист'] }}",
+              "витратники_всього": "={{ $json['витратники_всього'] }}",
+              "студійні_витрати": "={{ $json['студійні_витрати'] }}",
+              "оплата_майстра": "={{ $json['оплата_майстра'] }}",
+              "собівартість": "={{ $json['собівартість'] }}",
+              "фінальна_ціна": "={{ $json['фінальна_ціна'] }}",
+              "прибуток": "={{ $json['прибуток'] }}"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "дата",
+                "displayName": "дата",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "chat_id",
+                "displayName": "chat_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "username",
+                "displayName": "username",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "години",
+                "displayName": "години",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "тип",
+                "displayName": "тип",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "складність",
+                "displayName": "складність",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "голки",
+                "displayName": "голки",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "картриджі",
+                "displayName": "картриджі",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "фарба_чорна",
+                "displayName": "фарба_чорна",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "фарба_кольорова",
+                "displayName": "фарба_кольорова",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "рукавички",
+                "displayName": "рукавички",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "плівка",
+                "displayName": "плівка",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "ковпачки",
+                "displayName": "ковпачки",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "серветки",
+                "displayName": "серветки",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "вазелін",
+                "displayName": "вазелін",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "дезінфектор",
+                "displayName": "дезінфектор",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "пелюшки",
+                "displayName": "пелюшки",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "барєрний_захист",
+                "displayName": "барєрний_захист",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "витратники_всього",
+                "displayName": "витратники_всього",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "студійні_витрати",
+                "displayName": "студійні_витрати",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "оплата_майстра",
+                "displayName": "оплата_майстра",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "собівартість",
+                "displayName": "собівартість",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "фінальна_ціна",
+                "displayName": "фінальна_ціна",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "прибуток",
+                "displayName": "прибуток",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          1696,
+          -336
+        ],
+        "id": "23c07b08-8877-4ee1-aaec-fb35b09ff1ed",
+        "name": "Save Order",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "0Gdvf3Mhmj7whXEv",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $json.chat_id }}",
+          "text": "🕒 Введіть кількість годин.",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          800,
+          144
+        ],
+        "id": "f1a155f5-6a21-4752-a280-bf73f5e823bb",
+        "name": "Ask Hours",
+        "webhookId": "2d8295f7-3919-4e60-8ddb-77556f5cedb8",
+        "credentials": {
+          "telegramApi": {
+            "id": "811xelgy0N2viS8z",
+            "name": "Tattoo"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Calculate Cost').first().json.chat_id }}",
+          "text": "=💉 Розрахунок татуювання\n\n🕒 Години: {{ $('Calculate Cost').first().json.години }}\n🎨 Тип: {{ $('Calculate Cost').first().json.тип }}\n🔥 Складність: {{ $('Calculate Cost').first().json.складність }}\n\n━━━━━━━━━━━━━━\n📦 Витратники:\n\n🪡 Голки: {{ $('Calculate Cost').first().json.голки }} грн\n🧴 Картриджі: {{ $('Calculate Cost').first().json.картриджі }} грн\n🎨 Фарба чорна: {{ $('Calculate Cost').first().json.фарба_чорна }} грн\n🌈 Фарба кольорова: {{ $('Calculate Cost').first().json.фарба_кольорова }} грн\n🧤 Рукавички: {{ $('Calculate Cost').first().json.рукавички }} грн\n🧻 Серветки: {{ $('Calculate Cost').first().json.серветки }} грн\n🧴 Вазелін: {{ $('Calculate Cost').first().json.вазелін }} грн\n🧼 Дезінфектор: {{ $('Calculate Cost').first().json.дезінфектор }} грн\n🛏 Пелюшки: {{ $('Calculate Cost').first().json.пелюшки }} грн\n🛡 Бар’єрний захист: {{ $('Calculate Cost').first().json.барєрний_захист }} грн\n\n📦 Всього витратники: {{ $('Calculate Cost').first().json.витратники_всього }} грн\n\n━━━━━━━━━━━━━━\n🏠 Студійні витрати: {{ $('Calculate Cost').first().json.студійні_витрати }} грн\n👨‍🎨 Оплата майстра: {{ $('Calculate Cost').first().json.оплата_майстра }} грн\n\n💸 Собівартість: {{ $('Calculate Cost').first().json.собівартість }} грн\n✅ Рекомендована ціна: {{ $('Calculate Cost').first().json.фінальна_ціна }} грн\n📈 Прибуток: {{ $('Calculate Cost').first().json.прибуток }} грн",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          1920,
+          -336
+        ],
+        "id": "e674de19-eec4-4ffb-9160-e99313f27bd1",
+        "name": "Send Result",
+        "webhookId": "b87e6aa4-e8c2-428b-be97-d8677a0f6856",
+        "credentials": {
+          "telegramApi": {
+            "id": "811xelgy0N2viS8z",
+            "name": "Tattoo"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "documentId": {
+            "__rl": true,
+            "value": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit?gid=1495283551#gid=1495283551",
+            "mode": "url"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 402387704,
+            "mode": "list",
+            "cachedResultName": "Sessions",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit#gid=402387704"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "chat_id": "={{ $('Calculate Cost').first().json.chat_id }}",
+              "step": "done"
+            },
+            "matchingColumns": [
+              "chat_id"
+            ],
+            "schema": [
+              {
+                "id": "chat_id",
+                "displayName": "chat_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "step",
+                "displayName": "step",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "type",
+                "displayName": "type",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "complexity",
+                "displayName": "complexity",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "hours",
+                "displayName": "hours",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "row_number",
+                "displayName": "row_number",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "readOnly": true,
+                "removed": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          2144,
+          -336
+        ],
+        "id": "04e96706-bcc3-454c-871f-ca431afef91b",
+        "name": "Clear Session",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "0Gdvf3Mhmj7whXEv",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const rows = $('Get Settings For Menu').all().map(i => i.json);\nconst input = $('Normalize Input').first().json;\n\nconst settings = {};\n\nfor (const row of rows) {\n  settings[row.key] = row.value;\n}\n\nconst text = `⚙️ Налаштування калькулятора\n\n🏠 Оренда: ${settings.rent_month || 0} грн/міс\n⚡ Комунальні: ${settings.utilities_month || 0} грн/міс\n📢 Реклама: ${settings.ads_month || 0} грн/міс\n🛠 Обладнання: ${settings.equipment_month || 0} грн/міс\n\n🕒 Робочих годин/міс: ${settings.work_hours_month || 0}\n👨‍🎨 Ставка майстра: ${settings.master_rate_hour || 0} грн/год\n📈 Маржа: ${settings.profit_margin || 0}%\n\nЩоб змінити налаштування — поки редагуй лист Settings у Google Sheets.`;\n\nreturn [{\n  json: {\n    chat_id: input.chat_id,\n    message: text\n  }\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          592,
+          288
+        ],
+        "id": "6d9a468e-97ac-4725-a3e9-1bba0346bd41",
+        "name": "Format Settings Message"
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $json.chat_id }}",
+          "text": "={{ $json.message }}",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          800,
+          288
+        ],
+        "id": "2bb3e6be-d871-4255-842d-517648888ca5",
+        "name": "Send Settings",
+        "webhookId": "4a8a73dc-a85e-48b9-8262-a4dab8879747",
+        "credentials": {
+          "telegramApi": {
+            "id": "811xelgy0N2viS8z",
+            "name": "Tattoo"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit?gid=1495283551#gid=1495283551",
+            "mode": "url"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 252442203,
+            "mode": "list",
+            "cachedResultName": "Settings",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit#gid=252442203"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          352,
+          288
+        ],
+        "id": "d4535475-e252-4676-ac40-5d29a56c7dc2",
+        "name": "Get Settings For Menu",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "0Gdvf3Mhmj7whXEv",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "let chat_id;\nlet text = '';\nlet callback_data = '';\n\nif ($json.message) {\n  chat_id = $json.message.chat.id;\n  text = String($json.message.text || '').trim();\n}\n\nif ($json.callback_query) {\n  chat_id = $json.callback_query.message.chat.id;\n  callback_data = String($json.callback_query.data || '').trim();\n}\n\nreturn [{\n  json: {\n    chat_id,\n    text,\n    callback_data,\n    action: callback_data || text\n  }\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -272,
+          -32
+        ],
+        "id": "6a3c402b-052e-41f9-8077-df32f4794d60",
+        "name": "Normalize Input"
+      }
+    ],
+    "connections": {
+      "Telegram Trigger": {
+        "main": [
+          [
+            {
+              "node": "Normalize Input",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Action Router": {
+        "main": [
+          [
+            {
+              "node": "Send a text message",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Save New Session",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Get Session",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Parse Type",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Parse Complexity",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Get Settings For Menu",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Ask Type": {
+        "main": [
+          []
+        ]
+      },
+      "Send a text message": {
+        "main": [
+          []
+        ]
+      },
+      "Ask Complexity": {
+        "main": [
+          []
+        ]
+      },
+      "Save New Session": {
+        "main": [
+          [
+            {
+              "node": "Ask Type",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Parse Type": {
+        "main": [
+          [
+            {
+              "node": "Update Session Type",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Update Session Type": {
+        "main": [
+          [
+            {
+              "node": "Ask Complexity",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Parse Complexity": {
+        "main": [
+          [
+            {
+              "node": "Update Session Complexity",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Update Session Complexity": {
+        "main": [
+          [
+            {
+              "node": "Ask Hours",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Session": {
+        "main": [
+          [
+            {
+              "node": "Get Settings",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Settings": {
+        "main": [
+          [
+            {
+              "node": "Get Consumables",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Consumables": {
+        "main": [
+          [
+            {
+              "node": "Get Usage Norms",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Usage Norms": {
+        "main": [
+          [
+            {
+              "node": "Calculate Cost",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Calculate Cost": {
+        "main": [
+          [
+            {
+              "node": "Check Success",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Check Success": {
+        "main": [
+          [
+            {
+              "node": "Save Order",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Send a text message1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Ask Hours": {
+        "main": [
+          []
+        ]
+      },
+      "Save Order": {
+        "main": [
+          [
+            {
+              "node": "Send Result",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Send Result": {
+        "main": [
+          [
+            {
+              "node": "Clear Session",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Format Settings Message": {
+        "main": [
+          [
+            {
+              "node": "Send Settings",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Settings For Menu": {
+        "main": [
+          [
+            {
+              "node": "Format Settings Message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Normalize Input": {
+        "main": [
+          [
+            {
+              "node": "Action Router",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Buts Sergei",
+    "name": "Version 0107b87f",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
