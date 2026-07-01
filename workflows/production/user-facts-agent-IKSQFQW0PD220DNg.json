@@ -1,0 +1,344 @@
+{
+  "updatedAt": "2026-04-15T11:56:07.290Z",
+  "createdAt": "2026-04-15T09:48:19.204Z",
+  "id": "IKSQFQW0PD220DNg",
+  "name": "User facts agent",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -832,
+        -224
+      ],
+      "id": "de85b5b4-6cfb-49ee-a1c2-0712747fc3e8",
+      "name": "When chat message received",
+      "webhookId": "b72d98ee-4bd4-4187-be57-54c3dbec1ed5"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=Ти — AI агент для керування задачами.\n\nПроаналізуй повідомлення користувача і використовуючи Get_fact перевірь наявність інформації про користувача, Якщо у користувача вже є задача і в неї статус - ні\nто за допомогою Add_fact створи новий рядок з новою задачею, Якщо користувач хоче оновити статус задачі на виконана, роби за допомогою complete_task\n\nПід час кожного повідомлення ти намагаєшся витягнути та зберегти наступні факти:\n\n- name - ім'я користувача\n- task_text - текст задання\n- status - виконано або ні\n\n\nПравила:\n- Якщо користувач хоче побачити список задач — intent = \"get_tasks\"\n- Якщо користувач хоче додати задачу — intent = \"add_task\"\n- Якщо користувач хочу додати нову задачу не виконавши попередню ти створюещь новий дядок з завданням — intent = \"add_task\" \n- Якщо користувач хоче позначити задачу як виконану — intent = \"complete_task\"\n- Якщо намір незрозумілий — intent = \"unknown\"\n\n\nВитягуй task_text тільки якщо користувач згадує конкретну задачу.\nЯкщо задачі немає — став порожній рядок.\n\n\nПочаткова дата: {{ $now }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -624,
+        -224
+      ],
+      "id": "4876d4ed-b88d-4723-948d-e1c79c745555",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {
+          "maxRetries": 4
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -768,
+        -16
+      ],
+      "id": "5c533a85-5c4d-4404-bae7-28d46fc30fc8",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "wmMo2Lknq3Hi5ts2",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -624,
+        -16
+      ],
+      "id": "23395f73-e80c-4bb0-b8e1-e86539d824c3",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "description": "Call this tool to add fact about user",
+        "workflowId": {
+          "__rl": true,
+          "value": "kQNI3zGO3nBXDhJw",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/kQNI3zGO3nBXDhJw",
+          "cachedResultName": "Add_fact"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "fact_content": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fact_content', ``, 'string') }}",
+            "fact_type": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fact_type', ``, 'string') }}",
+            "task_text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('task_text', ``, 'string') }}",
+            "status": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('status', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "fact_content",
+              "displayName": "fact_content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "fact_type",
+              "displayName": "fact_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "task_text",
+              "displayName": "task_text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -480,
+        -16
+      ],
+      "id": "18316de3-66a0-43a9-bd6b-68f8c5274729",
+      "name": "Call 'Add_fact'"
+    },
+    {
+      "parameters": {
+        "description": "Call this tools to get fact user",
+        "workflowId": {
+          "__rl": true,
+          "value": "YL7pSBng3Kc6ldB8",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/YL7pSBng3Kc6ldB8",
+          "cachedResultName": "Get_fact"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -368,
+        -16
+      ],
+      "id": "f6cdf4e1-e786-4fad-9d85-b5312223ccf4",
+      "name": "Call 'Get_fact'"
+    },
+    {
+      "parameters": {
+        "description": "call this tool if you need to renew the term",
+        "workflowId": {
+          "__rl": true,
+          "value": "YsTEyM5Eqpt7jJiq",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/YsTEyM5Eqpt7jJiq",
+          "cachedResultName": "complete_task"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "fact_type": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fact_type', ``, 'string') }}",
+            "fact_content": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fact_content', ``, 'string') }}",
+            "task_text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('task_text', ``, 'string') }}",
+            "status": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('status', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "fact_type",
+              "displayName": "fact_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "fact_content",
+              "displayName": "fact_content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "task_text",
+              "displayName": "task_text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -224,
+        -16
+      ],
+      "id": "9c34aa96-b754-478b-871c-e1cbc62ed251",
+      "name": "Call 'complete_task'"
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Add_fact'": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Get_fact'": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'complete_task'": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "6c8766af-87aa-407b-b3d6-ba5cf633e3db",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-04-15T09:48:19.205Z",
+      "createdAt": "2026-04-15T09:48:19.205Z",
+      "role": "workflow:owner",
+      "workflowId": "IKSQFQW0PD220DNg",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
