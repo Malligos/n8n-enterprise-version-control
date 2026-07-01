@@ -1,0 +1,273 @@
+{
+  "updatedAt": "2026-04-15T11:23:40.758Z",
+  "createdAt": "2026-04-14T16:43:57.392Z",
+  "id": "kQNI3zGO3nBXDhJw",
+  "name": "Add_fact",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "VoGjGXfjo5ItE3v1",
+          "mode": "list",
+          "cachedResultName": "User_facts",
+          "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/VoGjGXfjo5ItE3v1"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "fact_content": "={{ $('start').item.json.fact_content }}",
+            "fact_type": "={{ $('start').item.json.fact_type }}",
+            "task_text": "={{ $('start').item.json.task_text }}",
+            "status": "={{ $('start').item.json.status }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "fact_type",
+              "displayName": "fact_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "fact_content",
+              "displayName": "fact_content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "task_text",
+              "displayName": "task_text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "9995d9fc-4dea-4ab2-a6ab-2982aff834d9",
+      "name": "Save fact"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "fact_content"
+            },
+            {
+              "name": "fact_type"
+            },
+            {
+              "name": "task_text"
+            },
+            {
+              "name": "status"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "cc69309b-c5b3-458e-a1cc-7b1c18262e3a",
+      "name": "start"
+    }
+  ],
+  "connections": {
+    "start": {
+      "main": [
+        [
+          {
+            "node": "Save fact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "15dc97a5-cfda-4387-958f-7c2cd264549e",
+  "activeVersionId": "b4bcc985-d737-424a-b195-90ce292a35e5",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-04-14T16:43:57.393Z",
+      "createdAt": "2026-04-14T16:43:57.393Z",
+      "role": "workflow:owner",
+      "workflowId": "kQNI3zGO3nBXDhJw",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-04-15T11:13:02.000Z",
+    "createdAt": "2026-04-15T11:12:53.667Z",
+    "versionId": "b4bcc985-d737-424a-b195-90ce292a35e5",
+    "workflowId": "kQNI3zGO3nBXDhJw",
+    "nodes": [
+      {
+        "parameters": {
+          "dataTableId": {
+            "__rl": true,
+            "value": "VoGjGXfjo5ItE3v1",
+            "mode": "list",
+            "cachedResultName": "User_facts",
+            "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/VoGjGXfjo5ItE3v1"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "fact_content": "={{ $('start').item.json.fact_content }}",
+              "fact_type": "={{ $('start').item.json.fact_type }}",
+              "task_text": "={{ $('start').item.json.task_text }}",
+              "status": "={{ $('start').item.json.status }}"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "fact_type",
+                "displayName": "fact_type",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              },
+              {
+                "id": "fact_content",
+                "displayName": "fact_content",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              },
+              {
+                "id": "task_text",
+                "displayName": "task_text",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              },
+              {
+                "id": "status",
+                "displayName": "status",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.dataTable",
+        "typeVersion": 1.1,
+        "position": [
+          416,
+          0
+        ],
+        "id": "9995d9fc-4dea-4ab2-a6ab-2982aff834d9",
+        "name": "Save fact"
+      },
+      {
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "fact_content"
+              },
+              {
+                "name": "fact_type"
+              },
+              {
+                "name": "task_text"
+              },
+              {
+                "name": "status"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          0,
+          0
+        ],
+        "id": "cc69309b-c5b3-458e-a1cc-7b1c18262e3a",
+        "name": "start"
+      }
+    ],
+    "connections": {
+      "start": {
+        "main": [
+          [
+            {
+              "node": "Save fact",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Buts Sergei",
+    "name": "Version b4bcc985",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
