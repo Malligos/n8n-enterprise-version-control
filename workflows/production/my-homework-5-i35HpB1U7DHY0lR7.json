@@ -1,0 +1,31 @@
+{
+  "updatedAt": "2026-04-14T16:42:52.995Z",
+  "createdAt": "2026-04-14T16:42:52.995Z",
+  "id": "i35HpB1U7DHY0lR7",
+  "name": "My homework 5",
+  "active": false,
+  "isArchived": false,
+  "nodes": [],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "162a2144-adde-4e65-8505-07909eb53675",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-04-14T16:42:52.997Z",
+      "createdAt": "2026-04-14T16:42:52.997Z",
+      "role": "workflow:owner",
+      "workflowId": "i35HpB1U7DHY0lR7",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
