@@ -1,0 +1,675 @@
+{
+  "updatedAt": "2026-04-03T15:33:52.384Z",
+  "createdAt": "2026-04-02T13:11:33.537Z",
+  "id": "ZYXgl0Rer1Us44vv",
+  "name": "Homework 4",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            },
+            {}
+          ]
+        },
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -1376,
+        -176
+      ],
+      "id": "3257674f-72d9-4de0-9e82-f707d5f22672",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ixxxIk9O8nJTHaVD",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "66f1a4e5-8168-496c-8846-2fb44e3ab6d1",
+              "name": "text",
+              "value": "={{ $json.snippet }}",
+              "type": "string"
+            },
+            {
+              "id": "b9c03425-140a-441d-a35b-1648d1d06a70",
+              "name": "address",
+              "value": "={{ $json.From }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1168,
+        -176
+      ],
+      "id": "c42851db-6977-4e7d-b36d-090ef48e0212",
+      "name": "parse email"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-5.1",
+          "mode": "list",
+          "cachedResultName": "GPT-5.1"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=Ти — AI-асистент кондитерської, яка продає торти на замовлення.\n\nТвоє завдання: проаналізувати вхідний email і:{{ $json.text }}\n1) визначити категорію\n2) визначити чи це потенційний клієнт (lead)\n3) витягнути ключову інформацію\n\n---\n\nВИДИ КАТЕГОРІЙ (обери ОДНУ головну):\n1. ORDER — замовлення торта\n2. QUESTION — уточнення / питання без чіткого замовлення\n3. JOB — резюме / пошук роботи\n4. SUPPLIER — постачальники / співпраця / B2B\n5. SPAM — реклама / нерелевантне\n6. MIXED — якщо в листі кілька намірів\n\n---\n\nВИЗНАЧЕННЯ LEAD:\nlead = true, якщо:\n- є намір замовити торт\n- або висока ймовірність замовлення (є дата / кількість людей / подія)\n\nlead = false, якщо:\n- це робота / постачальники / спам\n- або просто загальне питання без наміру купити\n\n---\n\nПРАВИЛА:\n- Якщо є замовлення + щось інше → MIXED, але lead = true\n- Якщо просто “яка ціна?” без деталей → lead = false\n- Якщо терміновість або конкретика → lead = true\n\n---\n\nВИТЯГНИ ДАНІ (якщо є):\n- name\n- product\n- occasion\n- servings\n- date\n- design\n- dietary\n- urgency (true/false)\n\n---\n\nВИХІД ТІЛЬКИ В JSON:\n{\n  \"category\": \"...\",\n  \"lead\": true/false,\n  \"confidence\": 0.0-1.0,\n  \"data\": {\n    \"quantity\": \"{{ String($json.quantity) }}\",\n    \"product\": \"...\",\n    \"occasion\": \"...\",\n    \"servings\": \"...\",\n    \"date\": \"...\",\n    \"design\": \"...\",\n    \"dietary\": \"...\",\n    \"urgency\": false\n  },\n  \"extra_intents\": [\"...\"],\n  \"summary\": \"коротко суть листа\"\n}\n\n---\n\nEMAIL:\n{{ $json[\"text\"] }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "textFormat": {
+            "textOptions": {
+              "type": "json_object"
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        -960,
+        -176
+      ],
+      "id": "3031ce4d-7602-49dd-87eb-25964e94fb49",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "wmMo2Lknq3Hi5ts2",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bb90f1d5-0909-44f1-9258-e871204886d9",
+              "name": "output[0].content[0].text.lead",
+              "value": "={{ $json.output[0].content[0].text.lead }}",
+              "type": "boolean"
+            },
+            {
+              "id": "10401600-2a8e-4042-9419-eda277cbb593",
+              "name": "output[0].content[0].text.data.product",
+              "value": "={{ $json.output[0].content[0].text.data.product }}",
+              "type": "string"
+            },
+            {
+              "id": "d99aa967-b24b-4b49-8991-93e11d3b8ab1",
+              "name": "output[0].content[0].text.data.servings",
+              "value": "={{ $json.output[0].content[0].text.data.servings }}",
+              "type": "string"
+            },
+            {
+              "id": "49d47a65-c3c8-40f3-92fc-fbccbebfd841",
+              "name": "output[0].content[0].text.data.date",
+              "value": "={{ $json.output[0].content[0].text.data.date }}",
+              "type": "string"
+            },
+            {
+              "id": "064c99d6-0142-475d-af9c-469b13a0cf9b",
+              "name": "output[0].content[0].text.data.design",
+              "value": "={{ $json.output[0].content[0].text.data.design }}",
+              "type": "string"
+            },
+            {
+              "id": "8adc2405-f26e-48fc-ba8a-782e6e894e02",
+              "name": "output[0].content[0].text.data.dietary",
+              "value": "={{ $json.output[0].content[0].text.data.dietary }}",
+              "type": "string"
+            },
+            {
+              "id": "268b5751-b10a-42b9-a981-be4eac3c46a2",
+              "name": "output[0].content[0].text.extra_intents",
+              "value": "={{ $json.output[0].content[0].text.extra_intents }}",
+              "type": "array"
+            },
+            {
+              "id": "ea25ebe3-8f77-4a70-b79d-8186299b64d7",
+              "name": "output[0].content[0].text.summary",
+              "value": "={{ $json.output[0].content[0].text.summary }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -608,
+        -176
+      ],
+      "id": "26498656-2041-4b28-bf9e-e98abdd94b72",
+      "name": "classified email"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "651ff43a-d23f-49a2-ad3a-c12a3d9d7896",
+              "leftValue": "={{ $json.output[0].content[0].text.lead }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -400,
+        -176
+      ],
+      "id": "013c5f89-6fe3-4abb-ad06-d12b54b4be10",
+      "name": "is lead"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1W_gJKTq-FQvxPpntnTbJ9cu-2HUZ_tbnuWIiFxw1-Go/edit?hl=ru&gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1W_gJKTq-FQvxPpntnTbJ9cu-2HUZ_tbnuWIiFxw1-Go/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "created at": "={{ $now.toLocal().toString()}}",
+            "email id": "={{ $('Gmail Trigger').item.json.id }}",
+            "email text": "={{ $('Gmail Trigger').item.json.snippet }}",
+            "request items": "={{ $json.output[0].content[0].text.summary }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "created at",
+              "displayName": "created at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email id",
+              "displayName": "email id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email text",
+              "displayName": "email text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "request items",
+              "displayName": "request items",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -192,
+        -272
+      ],
+      "id": "9e8b0df1-412e-42bd-951c-2d0b0120ef46",
+      "name": "save lead to google sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "copy",
+        "fileId": {
+          "__rl": true,
+          "value": "1Xn7lEja39P-cI6zJoCQVOKmesusLk4hjvK6zClB-ppg",
+          "mode": "id"
+        },
+        "name": "=Answer for  {{ $('is lead').item.json.output[0].content[0].text.data.product }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        16,
+        -272
+      ],
+      "id": "ad6d6636-40f2-4a55-8ce9-e7ff6bc11307",
+      "name": "Copy answer templete",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "qRRESWy20XGpuBxE",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1W_gJKTq-FQvxPpntnTbJ9cu-2HUZ_tbnuWIiFxw1-Go/edit?hl=ru&gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1W_gJKTq-FQvxPpntnTbJ9cu-2HUZ_tbnuWIiFxw1-Go/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "email id": "={{ $('Gmail Trigger').item.json.id }}",
+            "Answer tamplete": "=https://docs.google.com/document/d/{{ $('Copy answer templete').item.json.id }}"
+          },
+          "matchingColumns": [
+            "email id"
+          ],
+          "schema": [
+            {
+              "id": "created at",
+              "displayName": "created at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "email id",
+              "displayName": "email id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "email text",
+              "displayName": "email text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "request items",
+              "displayName": "request items",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Answer tamplete",
+              "displayName": "Answer tamplete",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        -272
+      ],
+      "id": "99a7e3c2-93f1-43da-86fa-fa9a809764ad",
+      "name": "add templete link to sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $('Copy answer templete').item.json.id }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "replaceAll",
+              "text": "{{quantity}}",
+              "replaceText": "={{ $('Message a model').item.json.output[0].content[0].text.data.quantity }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{total_price}}",
+              "replaceText": "={{String($json.output[0].content[0].text.total_price) }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        672,
+        -560
+      ],
+      "id": "57e04698-efa9-45ae-89af-a8e5a0736b13",
+      "name": "fix the template",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "kuk9aofKowkbFT2I",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-5.1",
+          "mode": "list",
+          "cachedResultName": "GPT-5.1"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=total_price ={{ String(( $('Message a model').item.json.output[0].content[0].text.data.quantity || 1 ) * 1000) }}\n"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "textFormat": {
+            "textOptions": {
+              "type": "json_object"
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        368,
+        -576
+      ],
+      "id": "0ad6e109-b380-4449-ac22-1fa509b54f9a",
+      "name": "Message a model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "wmMo2Lknq3Hi5ts2",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Gmail Trigger').item.json.From }}",
+        "subject": "=Замовлення",
+        "message": "={{ $json.content }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1200,
+        -560
+      ],
+      "id": "3ecda9c2-e1dd-47ad-971c-9781ef01580e",
+      "name": "Send a message",
+      "webhookId": "dc029476-990d-4bc9-aa5a-03218ae00270",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ixxxIk9O8nJTHaVD",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "={{ $('Copy answer templete').item.json.id }}"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        880,
+        -560
+      ],
+      "id": "81d8906a-24c6-4998-b4fc-19323a760822",
+      "name": "fix the template1",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "kuk9aofKowkbFT2I",
+          "name": "Google Docs account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "parse email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "parse email": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "classified email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "classified email": {
+      "main": [
+        [
+          {
+            "node": "is lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "is lead": {
+      "main": [
+        [
+          {
+            "node": "save lead to google sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "save lead to google sheets": {
+      "main": [
+        [
+          {
+            "node": "Copy answer templete",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Copy answer templete": {
+      "main": [
+        [
+          {
+            "node": "add templete link to sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "add templete link to sheet": {
+      "main": [
+        [
+          {
+            "node": "Message a model1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model1": {
+      "main": [
+        [
+          {
+            "node": "fix the template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "fix the template": {
+      "main": [
+        [
+          {
+            "node": "fix the template1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "fix the template1": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": {
+    "node:Gmail Trigger": {
+      "Gmail Trigger": {
+        "lastTimeChecked": 1775230408
+      }
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "2ca3b2bd-21e3-4b20-8f00-6d84110883df",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-04-02T13:11:33.540Z",
+      "createdAt": "2026-04-02T13:11:33.540Z",
+      "role": "workflow:owner",
+      "workflowId": "ZYXgl0Rer1Us44vv",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
