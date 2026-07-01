@@ -1,0 +1,495 @@
+{
+  "updatedAt": "2026-04-14T16:22:31.974Z",
+  "createdAt": "2026-04-14T14:09:42.431Z",
+  "id": "szhNZOMMQcMYGinK",
+  "name": "Search Google drive Docs Tool",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "query"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -720,
+        -112
+      ],
+      "id": "db07f36d-c500-4fcb-9e02-bb9a528bb916",
+      "name": "start"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "returnAll": true,
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "https://drive.google.com/drive/folders/16bOO07VfzH053aEHLHqIV59mmS_aHcBx?hl=ru",
+            "mode": "url"
+          }
+        },
+        "options": {
+          "fields": [
+            "id",
+            "mimeType",
+            "name"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -512,
+        -112
+      ],
+      "id": "8b5b02e1-c621-44a7-8967-5850847edb61",
+      "name": "Search files and folders",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "qRRESWy20XGpuBxE",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "75338d55-21be-4548-9e24-aeb79f35f5cc",
+              "leftValue": "={{ $json.mimeType }}",
+              "rightValue": "application/vnd.google-apps.document",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        -304,
+        -112
+      ],
+      "id": "562bc63e-4dfb-4318-84b2-9b3fc92ef423",
+      "name": "only google docs"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "={{ $json.id }}"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        -96,
+        -112
+      ],
+      "id": "76d7777a-4f17-4789-8682-70313a95e3cb",
+      "name": "Get a document",
+      "alwaysOutputData": false,
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "kuk9aofKowkbFT2I",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5cf8a8df-a4ab-4fa5-a1d7-45757b678c18",
+              "name": "text",
+              "value": "={{ $json.content.toLowerCase() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        112,
+        -112
+      ],
+      "id": "931efcbb-0fc0-43c6-b2c4-ea1f1499565c",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b96776ea-4451-48db-b146-7a8212c55fe7",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "={{ $('start').item.json.query.toLowerCase() }}",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        320,
+        -112
+      ],
+      "id": "66ffe70f-221e-4632-abcd-080038f58da4",
+      "name": "Filter",
+      "alwaysOutputData": true
+    }
+  ],
+  "connections": {
+    "start": {
+      "main": [
+        [
+          {
+            "node": "Search files and folders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search files and folders": {
+      "main": [
+        [
+          {
+            "node": "only google docs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "only google docs": {
+      "main": [
+        [
+          {
+            "node": "Get a document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a document": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "start": [
+      {
+        "json": {
+          "query": "Медовик"
+        }
+      }
+    ]
+  },
+  "versionId": "44c56770-f81d-4298-8cdf-b470f3e45a4a",
+  "activeVersionId": "44c56770-f81d-4298-8cdf-b470f3e45a4a",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-04-14T14:09:42.433Z",
+      "createdAt": "2026-04-14T14:09:42.433Z",
+      "role": "workflow:owner",
+      "workflowId": "szhNZOMMQcMYGinK",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-04-14T14:55:52.000Z",
+    "createdAt": "2026-04-14T14:55:32.795Z",
+    "versionId": "44c56770-f81d-4298-8cdf-b470f3e45a4a",
+    "workflowId": "szhNZOMMQcMYGinK",
+    "nodes": [
+      {
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "query"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          -720,
+          -112
+        ],
+        "id": "db07f36d-c500-4fcb-9e02-bb9a528bb916",
+        "name": "start"
+      },
+      {
+        "parameters": {
+          "resource": "fileFolder",
+          "returnAll": true,
+          "filter": {
+            "folderId": {
+              "__rl": true,
+              "value": "https://drive.google.com/drive/folders/16bOO07VfzH053aEHLHqIV59mmS_aHcBx?hl=ru",
+              "mode": "url"
+            }
+          },
+          "options": {
+            "fields": [
+              "id",
+              "mimeType",
+              "name"
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.googleDrive",
+        "typeVersion": 3,
+        "position": [
+          -512,
+          -112
+        ],
+        "id": "8b5b02e1-c621-44a7-8967-5850847edb61",
+        "name": "Search files and folders",
+        "credentials": {
+          "googleDriveOAuth2Api": {
+            "id": "qRRESWy20XGpuBxE",
+            "name": "Google Drive account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "75338d55-21be-4548-9e24-aeb79f35f5cc",
+                "leftValue": "={{ $json.mimeType }}",
+                "rightValue": "application/vnd.google-apps.document",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.filter",
+        "typeVersion": 2.3,
+        "position": [
+          -304,
+          -112
+        ],
+        "id": "562bc63e-4dfb-4318-84b2-9b3fc92ef423",
+        "name": "only google docs"
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "documentURL": "={{ $json.id }}"
+        },
+        "type": "n8n-nodes-base.googleDocs",
+        "typeVersion": 2,
+        "position": [
+          -96,
+          -112
+        ],
+        "id": "76d7777a-4f17-4789-8682-70313a95e3cb",
+        "name": "Get a document",
+        "alwaysOutputData": false,
+        "credentials": {
+          "googleDocsOAuth2Api": {
+            "id": "kuk9aofKowkbFT2I",
+            "name": "Google Docs account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "5cf8a8df-a4ab-4fa5-a1d7-45757b678c18",
+                "name": "text",
+                "value": "={{ $json.content.toLowerCase() }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          112,
+          -112
+        ],
+        "id": "931efcbb-0fc0-43c6-b2c4-ea1f1499565c",
+        "name": "Edit Fields"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "b96776ea-4451-48db-b146-7a8212c55fe7",
+                "leftValue": "={{ $json.text }}",
+                "rightValue": "={{ $('start').item.json.query.toLowerCase() }}",
+                "operator": {
+                  "type": "string",
+                  "operation": "contains"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.filter",
+        "typeVersion": 2.3,
+        "position": [
+          320,
+          -112
+        ],
+        "id": "66ffe70f-221e-4632-abcd-080038f58da4",
+        "name": "Filter",
+        "alwaysOutputData": true
+      }
+    ],
+    "connections": {
+      "start": {
+        "main": [
+          [
+            {
+              "node": "Search files and folders",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Search files and folders": {
+        "main": [
+          [
+            {
+              "node": "only google docs",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "only google docs": {
+        "main": [
+          [
+            {
+              "node": "Get a document",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get a document": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields": {
+        "main": [
+          [
+            {
+              "node": "Filter",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Buts Sergei",
+    "name": "Version 44c56770",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
