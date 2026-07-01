@@ -1,0 +1,176 @@
+{
+  "updatedAt": "2026-06-22T08:19:39.802Z",
+  "createdAt": "2026-06-01T18:55:26.100Z",
+  "id": "6uUjPPNn9AlhGLkd",
+  "name": "Калькулятор собівартості тату",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "id": "ae9d850b-768a-4188-bcbd-a11555b1978e",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        240,
+        304
+      ],
+      "webhookId": "a97d03cc-8b3b-406f-bcff-b7434154d57e",
+      "credentials": {
+        "telegramApi": {
+          "id": "LAKXnWIRDoCt8OvO",
+          "name": "Ai_assistent_Garmash"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Отримуємо текст повідомлення\nconst messageText = $input.item.json.message.text.toLowerCase();\n\n// Ініціалізуємо змінні\nlet materialsCost = 0;\nlet hours = 0;\nlet color = '';\n\n// Парсимо матеріали\nconst materialsMatch = messageText.match(/матеріал[иі]?\\s*(\\d+)/);\nif (materialsMatch) {\n  materialsCost = parseFloat(materialsMatch[1]);\n}\n\n// Парсимо години\nconst hoursMatch = messageText.match(/годин[иаі]?\\s*(\\d+\\.?\\d*)/);\nif (hoursMatch) {\n  hours = parseFloat(hoursMatch[1]);\n}\n\n// Парсимо колір\nif (messageText.includes('кольор') || messageText.includes('колір')) {\n  if (messageText.includes('чорн')) {\n    color = 'чорний';\n  } else if (messageText.includes('кольор')) {\n    color = 'кольорове';\n  }\n}\n\n// Розрахунок собівартості\nconst hourlyRate = 800; // грн за годину\nconst colorMultiplier = color === 'кольорове' ? 1.3 : 1.0;\n\nconst laborCost = hours * hourlyRate;\nconst totalCost = (materialsCost + laborCost) * colorMultiplier;\n\nreturn {\n  materialsCost: materialsCost,\n  hours: hours,\n  color: color || 'не вказано',\n  hourlyRate: hourlyRate,\n  laborCost: laborCost,\n  colorMultiplier: colorMultiplier,\n  totalCost: Math.round(totalCost),\n  chatId: $input.item.json.message.chat.id\n};"
+      },
+      "id": "c67e464d-e5ae-45be-91f6-6e85520929e9",
+      "name": "Розрахунок собівартості",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        464,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chatId }}",
+        "text": "=💰 Розрахунок собівартості тату:\n\n📦 Матеріали: {{ $json.materialsCost }} грн\n⏱ Години роботи: {{ $json.hours }} год × {{ $json.hourlyRate }} грн/год = {{ $json.laborCost }} грн\n🎨 Колір: {{ $json.color }}\n📊 Коефіцієнт кольору: {{ $json.colorMultiplier }}\n\n✅ Загальна собівартість: {{ $json.totalCost }} грн",
+        "additionalFields": {
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "48c068ca-4467-464e-8ba1-74455f829a64",
+      "name": "Відправити результат",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        688,
+        304
+      ],
+      "webhookId": "709735f1-c270-4859-a649-048ed8481888",
+      "credentials": {
+        "telegramApi": {
+          "id": "LAKXnWIRDoCt8OvO",
+          "name": "Ai_assistent_Garmash"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Розрахунок собівартості",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Розрахунок собівартості": {
+      "main": [
+        [
+          {
+            "node": "Відправити результат",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "10d01083-c200-49bf-8485-584936c1826d",
+  "activeVersionId": "81e0ee5b-770a-4705-80fa-2b87c3e6d0e8",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-06-01T18:55:26.102Z",
+      "createdAt": "2026-06-01T18:55:26.102Z",
+      "role": "workflow:owner",
+      "workflowId": "6uUjPPNn9AlhGLkd",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-06-01T19:04:51.000Z",
+    "createdAt": "2026-06-01T19:04:49.422Z",
+    "versionId": "81e0ee5b-770a-4705-80fa-2b87c3e6d0e8",
+    "workflowId": "6uUjPPNn9AlhGLkd",
+    "nodes": [
+      {
+        "parameters": {
+          "path": "whatsapp",
+          "responseMode": "responseNode",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          0,
+          0
+        ],
+        "id": "13cd1a9a-2f94-42db-8fb6-9c53c960265b",
+        "name": "Webhook",
+        "webhookId": "4244aa57-3e91-47d9-a2ae-1b482e72b577"
+      },
+      {
+        "parameters": {
+          "respondWith": "text",
+          "responseBody": "={{ $json.query[\"hub.challenge\"] }}",
+          "options": {
+            "responseCode": 200
+          }
+        },
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.5,
+        "position": [
+          208,
+          0
+        ],
+        "id": "3212b6a7-49da-4cc5-949b-134a03d6ed50",
+        "name": "Respond to Webhook"
+      }
+    ],
+    "connections": {
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Respond to Webhook",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Buts Sergei",
+    "name": "Version 81e0ee5b",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
