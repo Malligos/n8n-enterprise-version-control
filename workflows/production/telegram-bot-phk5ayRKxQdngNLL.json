@@ -1,0 +1,389 @@
+{
+  "updatedAt": "2026-04-20T19:35:23.577Z",
+  "createdAt": "2026-03-28T11:50:43.008Z",
+  "id": "phk5ayRKxQdngNLL",
+  "name": "Telegram bot",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -944,
+        0
+      ],
+      "id": "2160321b-892c-45b2-a820-67d118a3dfa8",
+      "name": "Translator",
+      "webhookId": "2f5ee5cd-35ef-4f32-a191-f100284328cd",
+      "credentials": {
+        "telegramApi": {
+          "id": "wIxKfjFCXEi8oTjZ",
+          "name": "HomeworkBot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "876db3bd-b551-4301-9c23-bb0230e7ea2f",
+              "name": "message",
+              "value": "={{ $json.message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -736,
+        0
+      ],
+      "id": "5353d07c-d35d-4f6b-969d-fb3c6038ef6c",
+      "name": "Extract message"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Translator').item.json.message.from.id }}",
+        "text": "={{ $json.output }}",
+        "replyMarkup": "=",
+        "forceReply": {},
+        "replyKeyboardOptions": {},
+        "replyKeyboardRemove": {},
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        592,
+        64
+      ],
+      "id": "0436d475-4cbd-4d2e-87b1-6f01ac74612d",
+      "name": "Send a text message",
+      "webhookId": "0ce79d46-dddf-477f-9873-9081e8ed26b8",
+      "credentials": {
+        "telegramApi": {
+          "id": "wIxKfjFCXEi8oTjZ",
+          "name": "HomeworkBot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message }}",
+        "options": {
+          "systemMessage": "=Ти кваліфікований переладач, тобі потрібно перекласти текст який будет у {{ $json.message }}  на мову яка буде вказана у тексті, якщо мова не вказана, тобі потрібно перекласти на англійску мову\nПочинай текс з фрази \"Ось переклад\" "
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -80,
+        48
+      ],
+      "id": "e52d7511-34eb-471d-a9d9-a63975767acf",
+      "name": "translator bot"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Translator').item.json.message.chat.id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        48,
+        288
+      ],
+      "id": "f7227ba0-bfa9-49ad-8aad-23114dc41a06",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -80,
+        320
+      ],
+      "id": "9497a2c9-be9b-413b-8f9d-fb0e899a0ca0",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "wmMo2Lknq3Hi5ts2",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message }}",
+                    "rightValue": "/start",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "98df38a7-41fc-43b5-ae15-83a952659d44"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": "=/start"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "9283e9fc-c155-406a-a5bf-4f0aa0ed9b4c",
+                    "leftValue": "={{ $json.message }}",
+                    "rightValue": "/help",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "/help"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -528,
+        -16
+      ],
+      "id": "2816e81a-42fa-4775-959c-87aa7a8ae0d0",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "171cfb3c-5628-4261-8590-912e5ee051cc",
+              "name": "output",
+              "value": "Привіт! 👋  Я бот-перекладач,  📌 Як я працюю:  Ти обираєш мову,  Просто надсилаєш будь-який текст Я перекладаю його для тебе  🌍 Підтримую популярні мови: English, Deutsch, Polski, Español та інші  👉 Напиши, яку мову ти хочеш вивчати (наприклад: English)",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -112,
+        -336
+      ],
+      "id": "2e0e0aec-0961-463a-befe-80774b1c12ea",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "171cfb3c-5628-4261-8590-912e5ee051cc",
+              "name": "output",
+              "value": "📖 Як користуватись ботом:\n\n1️⃣ Обери мову\n(якщо ще не обрав —  я перекладу на англійську)\n\n2️⃣ Надсилай будь-який текст — я перекладу його на обрану мову\n\n⚙️ Команди:\n/start — почати роботу з ботом\n/help — показати цю підказку",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -112,
+        -112
+      ],
+      "id": "5409ca8b-15d9-4f64-9007-37b5be359f20",
+      "name": "Edit help"
+    }
+  ],
+  "connections": {
+    "Translator": {
+      "main": [
+        [
+          {
+            "node": "Extract message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract message": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        []
+      ]
+    },
+    "translator bot": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "translator bot",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "translator bot",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit help",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "translator bot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit help": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "2GXvoy9yJP0etkSV",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "3f2c965a-c675-4550-b3e4-0624b55d29f2",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-03-28T11:50:43.010Z",
+      "createdAt": "2026-03-28T11:50:43.010Z",
+      "role": "workflow:owner",
+      "workflowId": "phk5ayRKxQdngNLL",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
