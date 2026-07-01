@@ -1,0 +1,137 @@
+{
+  "updatedAt": "2026-06-06T19:35:33.781Z",
+  "createdAt": "2026-06-06T19:34:34.369Z",
+  "id": "ZC70w09Auv6IQKOQ",
+  "name": "Error Handler — AI Assistant",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        -272,
+        -16
+      ],
+      "id": "a0dc75e1-2247-4116-9ad5-5cae4737a04f",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "chatId": "1679040654",
+        "text": "=🚨 Помилка в AI Assistant  Workflow: {{ $json.workflow.name }}  Node: {{ $json.execution.lastNodeExecuted }}  Error: {{ $json.execution.error.message }}  Execution ID: {{ $json.execution.id }}  Час: {{ $now }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -64,
+        -16
+      ],
+      "id": "6d30d4c5-d451-422d-a715-05fd01989e9f",
+      "name": "Send a text message",
+      "webhookId": "843f5f3f-5708-429c-a680-2a357b18786a",
+      "credentials": {
+        "telegramApi": {
+          "id": "LAKXnWIRDoCt8OvO",
+          "name": "Ai_assistent_Garmash"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "b72ad76c-bb90-41be-9898-e4d8c89c030f",
+  "activeVersionId": "b72ad76c-bb90-41be-9898-e4d8c89c030f",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-06-06T19:34:34.371Z",
+      "createdAt": "2026-06-06T19:34:34.371Z",
+      "role": "workflow:owner",
+      "workflowId": "ZC70w09Auv6IQKOQ",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-06-06T19:35:56.000Z",
+    "createdAt": "2026-06-06T19:35:33.782Z",
+    "versionId": "b72ad76c-bb90-41be-9898-e4d8c89c030f",
+    "workflowId": "ZC70w09Auv6IQKOQ",
+    "nodes": [
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.errorTrigger",
+        "typeVersion": 1,
+        "position": [
+          -272,
+          -16
+        ],
+        "id": "a0dc75e1-2247-4116-9ad5-5cae4737a04f",
+        "name": "Error Trigger"
+      },
+      {
+        "parameters": {
+          "chatId": "1679040654",
+          "text": "=🚨 Помилка в AI Assistant  Workflow: {{ $json.workflow.name }}  Node: {{ $json.execution.lastNodeExecuted }}  Error: {{ $json.execution.error.message }}  Execution ID: {{ $json.execution.id }}  Час: {{ $now }}",
+          "additionalFields": {}
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          -64,
+          -16
+        ],
+        "id": "6d30d4c5-d451-422d-a715-05fd01989e9f",
+        "name": "Send a text message",
+        "webhookId": "843f5f3f-5708-429c-a680-2a357b18786a",
+        "credentials": {
+          "telegramApi": {
+            "id": "LAKXnWIRDoCt8OvO",
+            "name": "Ai_assistent_Garmash"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Error Trigger": {
+        "main": [
+          [
+            {
+              "node": "Send a text message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Buts Sergei",
+    "name": "Version b72ad76c",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
