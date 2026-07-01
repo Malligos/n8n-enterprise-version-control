@@ -1,0 +1,122 @@
+{
+  "updatedAt": "2026-05-30T21:28:50.627Z",
+  "createdAt": "2026-05-30T20:37:26.192Z",
+  "id": "IRuRrMrsYuzFdPdK",
+  "name": "in time",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "Create_notes",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -304,
+        -48
+      ],
+      "id": "d88db3b6-a457-440f-a88d-4ebc45d6b028",
+      "name": "Webhook",
+      "webhookId": "9fc0ef76-add9-42c4-89f2-e861a18f4b2c"
+    },
+    {
+      "parameters": {
+        "resource": "lead",
+        "operation": "update",
+        "leadId": "={{ $json.body.lead_id }}",
+        "updateFields": {
+          "Description": "={{ $json.body.notes }} на дату {{ $json.body.date_of_visit }}"
+        }
+      },
+      "type": "n8n-nodes-base.zohoCrm",
+      "typeVersion": 1,
+      "position": [
+        -96,
+        -48
+      ],
+      "id": "85b9de02-3272-42d9-934b-f15c798f8307",
+      "name": "Update a lead",
+      "credentials": {
+        "zohoOAuth2Api": {
+          "id": "54SnRsgfMZ4wyzKL",
+          "name": "Zoho account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "1679040654",
+        "text": "=📞 *Новий дзвінок від клієнта*\n\n👤 *Клієнт:* {{ $('Webhook').item.json.body.client_name }}\n\n📱 *Телефон:*\n`{{ $('Webhook').item.json.body.phone_number }}`\n\n📅 *Дата візиту:*\n{{ $('Webhook').item.json.body.date_of_visit }}\n\n📝 *Коментар:*\n{{ $('Webhook').item.json.body.notes }}\n\n🆔 *Lead ID:*\n`{{ $('Webhook').item.json.body.lead_id }}`\n\n━━━━━━━━━━━━━━━\n\n⚡ Рекомендована дія:\nЗв'язатися з клієнтом для консультації та обговорення цінових пропозицій.",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        112,
+        -48
+      ],
+      "id": "48da8df3-24e5-489b-9180-09bd5dfb7905",
+      "name": "Send a text message",
+      "webhookId": "c243078c-0c83-4789-b434-1621aa521eec",
+      "credentials": {
+        "telegramApi": {
+          "id": "HdYtgfV1noTqi1CX",
+          "name": "My_ai"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Update a lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a lead": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "bebbfe1a-a869-4067-b544-315ee4d1dfdb",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-05-30T20:37:26.195Z",
+      "createdAt": "2026-05-30T20:37:26.195Z",
+      "role": "workflow:owner",
+      "workflowId": "IRuRrMrsYuzFdPdK",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
