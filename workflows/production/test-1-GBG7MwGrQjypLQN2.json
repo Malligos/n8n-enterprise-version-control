@@ -1,0 +1,121 @@
+{
+  "updatedAt": "2026-03-27T16:03:01.915Z",
+  "createdAt": "2026-03-27T15:44:43.382Z",
+  "id": "GBG7MwGrQjypLQN2",
+  "name": "Test_1",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "c8315eb8-1832-49c0-a296-37a08029002d",
+      "name": "Start"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4052b363-c4cb-49af-9f88-5cbfc5527d76",
+              "name": "a",
+              "value": 11,
+              "type": "number"
+            },
+            {
+              "id": "93fa6553-4784-4acb-bebe-455711fa8c3c",
+              "name": "b",
+              "value": 5,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "1c6b1245-873b-4c0c-95cb-663c30394dbc",
+      "name": "Set values"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6dde095a-8aa8-4e46-bd57-71c8754c60de",
+              "name": "sum",
+              "value": "={{ $json.a + $json.b}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "8fd88cc0-f660-48ba-a1e0-36e66c5efe40",
+      "name": "calculate"
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Set values",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set values": {
+      "main": [
+        [
+          {
+            "node": "calculate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "bfed1330-5a69-41bc-890a-5eb9578f90c5",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-03-27T15:44:43.384Z",
+      "createdAt": "2026-03-27T15:44:43.384Z",
+      "role": "workflow:owner",
+      "workflowId": "GBG7MwGrQjypLQN2",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
