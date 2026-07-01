@@ -1,0 +1,109 @@
+{
+  "updatedAt": "2026-05-30T21:06:39.432Z",
+  "createdAt": "2026-05-14T11:46:35.621Z",
+  "id": "ykJAUGaEIdS5SB7L",
+  "name": "init",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "init_data",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1072,
+        -96
+      ],
+      "id": "3c1d9ba5-be3d-442b-9d77-693f9066566b",
+      "name": "Webhook",
+      "webhookId": "320a77f0-fd4b-48d6-b6e6-5ec1fa752433"
+    },
+    {
+      "parameters": {
+        "url": "=https://www.zohoapis.eu/crm/v3/Leads/search?criteria=(Phone:equals:+{{ $json.body.phone_number }})",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "zohoOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -864,
+        -96
+      ],
+      "id": "aa4b9096-471d-4489-88b6-63c32085005c",
+      "name": "HTTP Request",
+      "credentials": {
+        "zohoOAuth2Api": {
+          "id": "54SnRsgfMZ4wyzKL",
+          "name": "Zoho account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  type: \"conversation_initiation_client_data\",\n  dynamic_variables: {\n    name:$input.first().json.data[0].First_Name,\n    surname: $input.first().json.data[0].Last_Name,\n    phone_number:$input.first().json.data[0].Phone,\n    email: $input.first().json.data[0].Modified_By.email,\n    lead_id:$input.first().json.data[0].id\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -656,
+        -96
+      ],
+      "id": "2387e7df-bf9a-4b4b-b520-6c5a617fe7bc",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "1d7422a4-f5f5-48b8-98f3-53fbfaa1919c",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-05-14T11:46:35.625Z",
+      "createdAt": "2026-05-14T11:46:35.625Z",
+      "role": "workflow:owner",
+      "workflowId": "ykJAUGaEIdS5SB7L",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
