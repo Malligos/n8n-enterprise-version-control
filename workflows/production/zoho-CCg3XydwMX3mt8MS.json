@@ -1,0 +1,81 @@
+{
+  "updatedAt": "2026-05-03T09:53:19.861Z",
+  "createdAt": "2026-05-03T09:31:07.751Z",
+  "id": "CCg3XydwMX3mt8MS",
+  "name": "Zoho",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "4eb4fe1d-478e-4d20-809a-fa0830bbcad8",
+      "name": "Start"
+    },
+    {
+      "parameters": {
+        "resource": "lead",
+        "Company": "-",
+        "lastName": "n8n Last Name",
+        "additionalFields": {
+          "Email": "butssergei7778@gmail.com"
+        }
+      },
+      "type": "n8n-nodes-base.zohoCrm",
+      "typeVersion": 1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "23309c1b-eb2a-4dc7-bb07-f1a0fbbf8215",
+      "name": "Create a lead",
+      "credentials": {
+        "zohoOAuth2Api": {
+          "id": "54SnRsgfMZ4wyzKL",
+          "name": "Zoho account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Create a lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "fc05d630-308a-49ba-9ae4-c5f873f18d34",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-03T09:31:07.755Z",
+      "createdAt": "2026-05-03T09:31:07.755Z",
+      "role": "workflow:owner",
+      "workflowId": "CCg3XydwMX3mt8MS",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
