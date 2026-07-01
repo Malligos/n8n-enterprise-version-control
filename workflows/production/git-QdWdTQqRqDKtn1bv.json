@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-01T17:28:12.384Z",
+  "updatedAt": "2026-07-01T17:33:42.880Z",
   "createdAt": "2026-07-01T16:27:14.369Z",
   "id": "QdWdTQqRqDKtn1bv",
   "name": "Git",
@@ -12,7 +12,7 @@
       "typeVersion": 1,
       "position": [
         -576,
-        -32
+        16
       ],
       "id": "164b5692-e133-40aa-a547-bb622c7838a2",
       "name": "When clicking ‘Execute workflow’"
@@ -36,8 +36,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        -368,
-        -32
+        -352,
+        16
       ],
       "id": "867dd2f2-2e7e-41d4-b2ac-285d791ada07",
       "name": "Get Workflows",
@@ -56,8 +56,8 @@
       "type": "n8n-nodes-base.splitOut",
       "typeVersion": 1,
       "position": [
-        -160,
-        -32
+        -128,
+        16
       ],
       "id": "d2e068bd-9546-48c5-a70c-361cc7fe7a1d",
       "name": "Split Out"
@@ -70,8 +70,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        48,
-        -32
+        96,
+        16
       ],
       "id": "6a5dd1f3-ac42-4773-b13f-53ba7c009bb3",
       "name": "Prepare GitHub file"
@@ -100,8 +100,8 @@
       "type": "n8n-nodes-base.github",
       "typeVersion": 1.1,
       "position": [
-        512,
-        32
+        544,
+        112
       ],
       "id": "5d84b187-1cf9-45ce-bee0-95ea2ad1e458",
       "name": "Create a file",
@@ -123,8 +123,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        256,
-        -32
+        320,
+        16
       ],
       "id": "7f4503ca-afda-4051-9105-40fa006b3915",
       "name": "Get GitHub File",
@@ -135,62 +135,6 @@
         }
       },
       "onError": "continueErrorOutput"
-    },
-    {
-      "parameters": {
-        "method": "PUT",
-        "url": "=https://api.github.com/repos/Malligos/n8n-enterprise-version-control/contents/{{$json.filePath}}",
-        "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "githubApi",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={\n  \"message\": \"{{$json.commitMessage}}\",\n  \"content\": \"{{$json.contentBase64}}\",\n  \"branch\": \"main\"\n}",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.4,
-      "position": [
-        480,
-        160
-      ],
-      "id": "1578f5f1-2730-45ba-a817-c10745136b30",
-      "name": "Create File",
-      "retryOnFail": true,
-      "waitBetweenTries": 2000,
-      "credentials": {
-        "githubApi": {
-          "id": "gELBCi5BQ6YeDjYN",
-          "name": "GitHub Enterprise Backup"
-        }
-      },
-      "onError": "continueErrorOutput"
-    },
-    {
-      "parameters": {
-        "method": "PUT",
-        "url": "=https://api.github.com/repos/Malligos/n8n-enterprise-version-control/contents/{{$json.path}}",
-        "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "githubApi",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={\n  \"message\": \"backup: {{ $('Prepare GitHub file').item.json.workflowName }}\",\n  \"content\": \"{{ $('Prepare GitHub file').item.json.contentBase64 }}\",\n  \"sha\": \"{{ $json.sha }}\",\n  \"branch\": \"main\"\n}",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.4,
-      "position": [
-        512,
-        -208
-      ],
-      "id": "788ffe4e-96ef-490d-9f3e-216dffa2a33b",
-      "name": "Update File",
-      "retryOnFail": true,
-      "credentials": {
-        "githubApi": {
-          "id": "gELBCi5BQ6YeDjYN",
-          "name": "GitHub Enterprise Backup"
-        }
-      }
     },
     {
       "parameters": {
@@ -217,7 +161,7 @@
       "type": "n8n-nodes-base.github",
       "typeVersion": 1.1,
       "position": [
-        512,
+        544,
         -80
       ],
       "id": "44eee0a1-a49e-4e66-9bc0-5b3c9608604b",
@@ -305,7 +249,7 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "c4180965-9123-4764-a7e9-1d37cc5705be",
+  "versionId": "dfe3924e-5740-4bbf-9036-6fe665d70015",
   "activeVersionId": null,
   "triggerCount": 0,
   "shared": [
