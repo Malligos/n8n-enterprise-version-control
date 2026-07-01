@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-01T17:25:43.506Z",
+  "updatedAt": "2026-07-01T17:28:12.384Z",
   "createdAt": "2026-07-01T16:27:14.369Z",
   "id": "QdWdTQqRqDKtn1bv",
   "name": "Git",
@@ -194,27 +194,34 @@
     },
     {
       "parameters": {
-        "resource": "review",
-        "operation": "update",
+        "resource": "file",
+        "operation": "edit",
         "owner": {
           "__rl": true,
+          "value": "Malligos",
           "mode": "list",
-          "value": ""
+          "cachedResultName": "Malligos",
+          "cachedResultUrl": "https://github.com/Malligos"
         },
         "repository": {
           "__rl": true,
+          "value": "n8n-enterprise-version-control",
           "mode": "list",
-          "value": ""
-        }
+          "cachedResultName": "n8n-enterprise-version-control",
+          "cachedResultUrl": "https://github.com/Malligos/n8n-enterprise-version-control"
+        },
+        "filePath": "={{$json.path}}",
+        "fileContent": "={{ $('Prepare GitHub file').item.json.content }}",
+        "commitMessage": "={{ $('Prepare GitHub file').item.json.workflowName }}"
       },
       "type": "n8n-nodes-base.github",
       "typeVersion": 1.1,
       "position": [
-        560,
-        -96
+        512,
+        -80
       ],
       "id": "44eee0a1-a49e-4e66-9bc0-5b3c9608604b",
-      "name": "Update a review",
+      "name": "Edit a file",
       "webhookId": "069dcb42-5685-47fb-9808-b5d3bcc59a01",
       "credentials": {
         "githubApi": {
@@ -271,7 +278,13 @@
     },
     "Get GitHub File": {
       "main": [
-        [],
+        [
+          {
+            "node": "Edit a file",
+            "type": "main",
+            "index": 0
+          }
+        ],
         [
           {
             "node": "Create a file",
@@ -292,7 +305,7 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "c31f1608-3730-46e2-a5e0-a0d7d696e664",
+  "versionId": "c4180965-9123-4764-a7e9-1d37cc5705be",
   "activeVersionId": null,
   "triggerCount": 0,
   "shared": [
