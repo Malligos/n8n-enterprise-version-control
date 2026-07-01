@@ -1,0 +1,2603 @@
+{
+  "updatedAt": "2026-05-09T17:01:33.056Z",
+  "createdAt": "2026-05-08T10:44:25.226Z",
+  "id": "r8cEp5yPPbztl64O",
+  "name": "Snigurka bot",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -2816,
+        -144
+      ],
+      "id": "38627222-6ad8-477d-8a87-6297cd19b02f",
+      "name": "Telegram Trigger",
+      "webhookId": "c4f8302d-195d-44cd-997d-88c81cede901",
+      "credentials": {
+        "telegramApi": {
+          "id": "6fyTsQdyJ0rtfZFs",
+          "name": "Snigurka"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "0efdd0dd-1224-4c4c-9f67-c855215d12b7",
+              "leftValue": "={{$json.action}}",
+              "rightValue": "update_price",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1248,
+        -48
+      ],
+      "id": "8e2388a2-09c6-415e-84ab-773a61137c6c",
+      "name": "Is Update Price?"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1VIdWymrcSkT1FFxrx1BK5R1UBENrda09Q3d8CbzXSmc",
+          "mode": "list",
+          "cachedResultName": "snigurka price",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VIdWymrcSkT1FFxrx1BK5R1UBENrda09Q3d8CbzXSmc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Ingredients",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VIdWymrcSkT1FFxrx1BK5R1UBENrda09Q3d8CbzXSmc/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Ingredient",
+              "lookupValue": "={{$json.ingredient}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -576,
+        -336
+      ],
+      "id": "b8fcb490-4c7f-4f59-9790-ddbcf243c373",
+      "name": "Find Ingredient",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1VIdWymrcSkT1FFxrx1BK5R1UBENrda09Q3d8CbzXSmc",
+          "mode": "list",
+          "cachedResultName": "snigurka price",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VIdWymrcSkT1FFxrx1BK5R1UBENrda09Q3d8CbzXSmc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Ingredients",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VIdWymrcSkT1FFxrx1BK5R1UBENrda09Q3d8CbzXSmc/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Price": "={{ $json.Price }}",
+            "Ingredient": "={{ $json.Ingredient }}",
+            "Weight": "={{ $json.Weight }}",
+            "Unit": "={{ $json.Unit }}",
+            "PricePerUnit": "={{ $json.PricePerUnit }}"
+          },
+          "matchingColumns": [
+            "Ingredient"
+          ],
+          "schema": [
+            {
+              "id": "Ingredient",
+              "displayName": "Ingredient",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Price",
+              "displayName": "Price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Weight",
+              "displayName": "Weight",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Unit",
+              "displayName": "Unit",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "PricePerUnit",
+              "displayName": "PricePerUnit",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        96,
+        -432
+      ],
+      "id": "28e4dc86-da8c-47f2-bd65-085bd3e77a6c",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = $json.message?.text?.trim() || '';\nconst chatId = $json.message?.chat?.id;\n\nconst lower = text.toLowerCase();\nconst cleanText = lower\n  .replace(/^\\/price\\s+/, '')\n  .replace(/^\\/cake\\s+/, '')\n  .trim();\n\nconst mode = String($('Get User Mode').first().json.mode || '').toLowerCase().trim();\n\nif (!text || !chatId) {\n  return [{\n    action: 'error',\n    chatId,\n    message: '❌ Не получил текст сообщения.'\n  }];\n}\n\n// =====================\n// PRICE MODE\n// Примеры:\n// молоко 90\n// молоко 90 1000мл\n// мука 65 1000г\n// яйца 120 10шт\n// молоко 90, мука 65 1000г, яйца 120 10шт\n// =====================\nif (mode === 'price') {\n  const lines = cleanText\n    .split(/\\n|,/)\n    .map(line => line.trim().replace(/\\s+/g, ' '))\n    .filter(Boolean);\n\n  const updates = [];\n\n  for (const line of lines) {\n    // Формат: ингредиент цена количество+единица\n    // молоко 90 1000мл\n    // мука 65 1000г\n    // яйца 120 10шт\n    const unitMatch = line.match(\n      /^(.+?)\\s+(\\d+(?:[.,]\\d+)?)\\s+(\\d+(?:[.,]\\d+)?)\\s*(г|гр|g|мл|ml|л|l|шт|pcs)$/i\n    );\n\n    if (unitMatch) {\n      let ingredient = unitMatch[1].trim();\n      let price = Number(unitMatch[2].replace(',', '.'));\n      let weight = Number(unitMatch[3].replace(',', '.'));\n      let unitRaw = unitMatch[4].toLowerCase();\n\n      let unit = unitRaw;\n\n      if (['г', 'гр', 'g'].includes(unitRaw)) {\n        unit = 'g';\n      }\n\n      if (['мл', 'ml'].includes(unitRaw)) {\n        unit = 'ml';\n      }\n\n      if (['л', 'l'].includes(unitRaw)) {\n        unit = 'ml';\n        weight = weight * 1000;\n      }\n\n      if (['шт', 'pcs'].includes(unitRaw)) {\n        unit = 'pcs';\n      }\n\n      updates.push({\n        action: 'update_price',\n        ingredient,\n        price,\n        weight,\n        unit,\n        chatId\n      });\n\n      continue;\n    }\n\n    // Формат: яйца 10шт 120\n    // количество+единица цена\n    const unitMatchAlt = line.match(\n      /^(.+?)\\s+(\\d+(?:[.,]\\d+)?)\\s*(г|гр|g|мл|ml|л|l|шт|pcs)\\s+(\\d+(?:[.,]\\d+)?)$/i\n    );\n\n    if (unitMatchAlt) {\n      let ingredient = unitMatchAlt[1].trim();\n      let weight = Number(unitMatchAlt[2].replace(',', '.'));\n      let unitRaw = unitMatchAlt[3].toLowerCase();\n      let price = Number(unitMatchAlt[4].replace(',', '.'));\n\n      let unit = unitRaw;\n\n      if (['г', 'гр', 'g'].includes(unitRaw)) {\n        unit = 'g';\n      }\n\n      if (['мл', 'ml'].includes(unitRaw)) {\n        unit = 'ml';\n      }\n\n      if (['л', 'l'].includes(unitRaw)) {\n        unit = 'ml';\n        weight = weight * 1000;\n      }\n\n      if (['шт', 'pcs'].includes(unitRaw)) {\n        unit = 'pcs';\n      }\n\n      updates.push({\n        action: 'update_price',\n        ingredient,\n        price,\n        weight,\n        unit,\n        chatId\n      });\n\n      continue;\n    }\n\n    // Старый простой формат:\n    // молоко 90\n    // по умолчанию считаем 1000 g\n    const normalMatch = line.match(\n      /^(.+?)\\s+(\\d+(?:[.,]\\d+)?)\\s*(гр|грн|uah)?$/i\n    );\n\n    if (normalMatch) {\n      updates.push({\n        action: 'update_price',\n        ingredient: normalMatch[1].trim(),\n        price: Number(normalMatch[2].replace(',', '.')),\n        weight: 1000,\n        unit: 'g',\n        chatId\n      });\n    }\n  }\n\n  if (updates.length > 0) {\n    return updates;\n  }\n}\n\n// =====================\n// CAKE MODE\n// Примеры:\n// Наполеон 2\n// наполеон 2\n// =====================\nif (mode === 'cake') {\n  const oneLine = cleanText.replace(/\\s+/g, ' ');\n\n  const match = oneLine.match(\n    /^(.+?)\\s+(\\d+(?:[.,]\\d+)?)\\s*(кг|kg)?$/i\n  );\n\n  if (match) {\n    return [{\n      action: 'calculate_cake',\n      cake: match[1].trim(),\n      weight: Number(match[2].replace(',', '.')),\n      chatId\n    }];\n  }\n}\n\nreturn [{\n  action: 'error',\n  chatId,\n  message: `❌ Неверный формат.\n\n🎂 Для торта:\nНаполеон 2\n\n💰 Для цены:\nМолоко 90\nМолоко 90 1000мл\nМука 65 1000г\nЯйца 120 10шт\n\nМожно несколько сразу:\nМолоко 90 1000мл\nМука 65 1000г\nЯйца 120 10шт`\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1472,
+        -48
+      ],
+      "id": "238afabe-81b2-4a44-a5c2-bdac8aa605ee",
+      "name": "Parse Message"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const row = $json;\n\nconst parsed = $('Parse Message').all()[$itemIndex].json;\n\nconst price = parsed.price;\nconst ingredient = parsed.ingredient;\nconst chatId = parsed.chatId;\n\nconst weight = Number(parsed.weight || 1000);\nconst unit = parsed.unit || 'g';\n\nconst pricePerUnit = price / weight;\n\nreturn {\n  row_number: row.row_number,\n  Ingredient: ingredient,\n  Price: price,\n  Weight: weight,\n  Unit: unit,\n  PricePerUnit: Number(pricePerUnit.toFixed(6)),\n  chatId\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -128,
+        -432
+      ],
+      "id": "ffaa6f78-785e-4fab-a7d7-1b68f9e0b956",
+      "name": "Prepare Ingredient Update"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "4d98a50c-5622-4bea-9ce2-e115a727920d",
+              "leftValue": "={{$json.action}}",
+              "rightValue": "calculate_cake",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1024,
+        144
+      ],
+      "id": "d25291f0-ec7a-4161-9360-7921dc2437c2",
+      "name": "Is Calculate Cake?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1bc9d59e-59b6-4034-8d56-14b597a81a04",
+              "leftValue": "={{$json.row_number}}",
+              "rightValue": "is not empty",
+              "operator": {
+                "type": "number",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -352,
+        -336
+      ],
+      "id": "8366beeb-2573-42ff-8135-6d274344e4cd",
+      "name": "Ingredient Found?"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=❌ Ингредиент не найден в таблице.  Ингредиент: {{ $('Parse Message').first().json.ingredient }}  Проверь название в листе Ingredients. Например: молоко, мука, масло.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        320,
+        -240
+      ],
+      "id": "471755d7-6120-473f-ad3d-a17a44906f23",
+      "name": "Send a text message",
+      "webhookId": "71e48215-9feb-4a7b-9bb9-2cef1b29946f",
+      "credentials": {
+        "telegramApi": {
+          "id": "6fyTsQdyJ0rtfZFs",
+          "name": "Snigurka"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=✅ Цена обновлена\n🥛 Ингредиент: {{$json.Ingredient}} \n💰 Новая цена: {{$json.Price}} грн \n⚖️ Вес/объём: {{ $json.Weight }} г/мл/шт 🧾 \nЦена за 1 г/мл/шт: {{ $json.PricePerUnit }} грн",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        320,
+        -432
+      ],
+      "id": "d7d14267-2815-4593-8283-6ff40c7ca296",
+      "name": "Send a text message1",
+      "webhookId": "88ca64d7-2ba6-4ae8-a5ab-a8791013c3ba",
+      "credentials": {
+        "telegramApi": {
+          "id": "6fyTsQdyJ0rtfZFs",
+          "name": "Snigurka"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1VIdWymrcSkT1FFxrx1BK5R1UBENrda09Q3d8CbzXSmc",
+          "mode": "list",
+          "cachedResultName": "snigurka price",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VIdWymrcSkT1FFxrx1BK5R1UBENrda09Q3d8CbzXSmc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 859614865,
+          "mode": "list",
+          "cachedResultName": "Recipes",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VIdWymrcSkT1FFxrx1BK5R1UBENrda09Q3d8CbzXSmc/edit#gid=859614865"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Cake",
+              "lookupValue": "={{$json.cake}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -800,
+        48
+      ],
+      "id": "f33d32b1-6d45-402a-a244-3314b4e11730",
+      "name": "Get Recipe",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ff6fbb14-80b1-45db-b499-fe9e9766b45c",
+              "leftValue": "={{ $items(\"Get Recipe\").length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -576,
+        48
+      ],
+      "id": "7e882a4e-113c-4a05-8f00-552577aa6432",
+      "name": "Recipe Found?"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=❌ Рецепт не найден.  Торт: {{ $('Parse Message').first().json.cake }}  Проверь название в листе Recipes. Например: /cake наполеон 2",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        320,
+        144
+      ],
+      "id": "5b3447c7-1d52-4454-a2d5-2782eeefebb1",
+      "name": "Send a text message2",
+      "webhookId": "38406ed0-fdc2-4a02-ba55-c486807345ae",
+      "credentials": {
+        "telegramApi": {
+          "id": "6fyTsQdyJ0rtfZFs",
+          "name": "Snigurka"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1VIdWymrcSkT1FFxrx1BK5R1UBENrda09Q3d8CbzXSmc",
+          "mode": "list",
+          "cachedResultName": "snigurka price",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VIdWymrcSkT1FFxrx1BK5R1UBENrda09Q3d8CbzXSmc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Ingredients",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VIdWymrcSkT1FFxrx1BK5R1UBENrda09Q3d8CbzXSmc/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -352,
+        -48
+      ],
+      "id": "bed3b1b4-2222-4e62-8e24-ce38960d289f",
+      "name": "Get Ingredients",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const recipeRows = $('Get Recipe').all();\nconst ingredientRows = $('Get Ingredients').all();\nconst settingsRows = $('Get Settings').all();\n\nconst weight = $('Parse Message').first().json.weight;\nconst cake = $('Parse Message').first().json.cake;\nconst chatId = $('Parse Message').first().json.chatId;\n\nlet ingredientsCost = 0;\nlet missingIngredients = [];\n\nfor (const recipe of recipeRows) {\n  const ingredientName = String(recipe.json.Ingredient).toLowerCase().trim();\n  const amount = Number(recipe.json.Amount);\n\n  const ingredient = ingredientRows.find(i =>\n    String(i.json.Ingredient).toLowerCase().trim() === ingredientName\n  );\n\n  if (!ingredient) {\n    missingIngredients.push(ingredientName);\n    continue;\n  }\n\nconst pricePerUnit = Number(ingredient.json.PricePerUnit);\n\nif (isNaN(pricePerUnit)) {\n  missingIngredients.push(`${ingredientName} — нет PricePerUnit`);\n  continue;\n}\n\ningredientsCost += amount * pricePerUnit * weight;\n}\n\nconst settings = {};\n\nfor (const row of settingsRows) {\n  settings[row.json.Setting] = Number(row.json.Value);\n}\n\nconst packaging = settings.Packaging || 0;\nconst labor = settings.Labor || 0;\nconst lossPercent = settings.LossPercent || 0;\nconst profitPercent = settings.ProfitPercent || 0;\n\nconst losses = ingredientsCost * lossPercent / 100;\n\nconst total =\n  ingredientsCost +\n  losses +\n  packaging +\n  labor;\n\nconst salePrice =\n  total * (1 + profitPercent / 100);\n\nreturn [{\n  cake,\n  weight,\n  ingredientsCost: Number(ingredientsCost.toFixed(2)),\n  losses: Number(losses.toFixed(2)),\n  packaging,\n  labor,\n  lossPercent,\n  profitPercent,\n  total: Number(total.toFixed(2)),\n  salePrice: Number(salePrice.toFixed(2)),\n  missingIngredients,\n  chatId\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        96,
+        -48
+      ],
+      "id": "003b1bba-143e-44fd-a1fe-37175201f74f",
+      "name": "Calculate Cake Cos"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=🎂 Себестоимость торта\n\nНазвание: {{$json.cake}}\nВес: {{$json.weight}} кг\n\n🥣 Ингредиенты:\n{{$json.ingredientsCost}} грн\n\n📦 Упаковка:\n{{$json.packaging}} грн\n\n👨‍🍳 Работа:\n{{$json.labor}} грн\n\n📉 Потери {{$json.lossPercent}}%:\n{{$json.losses}} грн\n\n━━━━━━━━━━━━\n\n🧾 Себестоимость:\n{{$json.total}} грн\n\n💵 Цена продажи +{{$json.profitPercent}}%:\n{{$json.salePrice}} грн\n\n{{ $json.missingIngredients.length ? \"⚠️ Не найдены ингредиенты: \" + $json.missingIngredients.join(\", \") : \"\" }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        320,
+        -48
+      ],
+      "id": "7c456087-6935-4646-8c18-1dfd4e1d1f6b",
+      "name": "Send a text message3",
+      "webhookId": "40f81f2a-ac19-493f-8200-90bd0210acc6",
+      "credentials": {
+        "telegramApi": {
+          "id": "6fyTsQdyJ0rtfZFs",
+          "name": "Snigurka"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1VIdWymrcSkT1FFxrx1BK5R1UBENrda09Q3d8CbzXSmc",
+          "mode": "list",
+          "cachedResultName": "snigurka price",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VIdWymrcSkT1FFxrx1BK5R1UBENrda09Q3d8CbzXSmc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1539717924,
+          "mode": "list",
+          "cachedResultName": "Settings",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VIdWymrcSkT1FFxrx1BK5R1UBENrda09Q3d8CbzXSmc/edit#gid=1539717924"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -128,
+        -48
+      ],
+      "id": "8130e049-364d-46ea-98fc-3a8adc0e7559",
+      "name": "Get Settings",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "aa38a822-ba84-4206-ab27-2f64b26cdb4f",
+              "leftValue": "={{$json.message.text}}",
+              "rightValue": "/start",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -2592,
+        -144
+      ],
+      "id": "9846f6a5-4ae5-47db-a826-bf049a5c9612",
+      "name": "Is Start?"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=👋 Привет!\n\nЯ помогу считать себестоимость тортов и обновлять цены ингредиентов.\n\n🎂 Посчитать торт:\n/cake наполеон 2\n\n💰 Обновить цену:\n/price молоко 99\n\nВыбери действие кнопкой ниже 👇",
+        "replyMarkup": "replyKeyboard",
+        "replyKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "/price",
+                    "additionalFields": {}
+                  },
+                  {
+                    "text": "/cake",
+                    "additionalFields": {}
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "replyKeyboardOptions": {
+          "resize_keyboard": true
+        },
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -2368,
+        -240
+      ],
+      "id": "73887500-54f1-400f-87f7-d7a30b2705d1",
+      "name": "Send a text message5",
+      "webhookId": "88ca64d7-2ba6-4ae8-a5ab-a8791013c3ba",
+      "credentials": {
+        "telegramApi": {
+          "id": "6fyTsQdyJ0rtfZFs",
+          "name": "Snigurka"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "450e92b9-0f7c-48ce-bbd5-450f623705b5",
+              "leftValue": "={{$json.message.text}}",
+              "rightValue": "/cake",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -2368,
+        -48
+      ],
+      "id": "1c5dc24c-b695-4a5c-9a06-754bb070a3ea",
+      "name": "Is Cake Button?"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "dataTableId": {
+          "__rl": true,
+          "value": "VWkbXTM60pmoN0eM",
+          "mode": "list",
+          "cachedResultName": "user_modes",
+          "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/VWkbXTM60pmoN0eM"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "chatId",
+              "keyValue": "={{$json.message.chat.id}}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chatId": "={{$json.message.chat.id}}",
+            "mode": "Cake"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "chatId",
+              "displayName": "chatId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "mode",
+              "displayName": "mode",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -2144,
+        -240
+      ],
+      "id": "099bbc5b-d387-4538-8bfd-1c1ac03e3703",
+      "name": "Save Mode Cake"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "dataTableId": {
+          "__rl": true,
+          "value": "VWkbXTM60pmoN0eM",
+          "mode": "list",
+          "cachedResultName": "user_modes",
+          "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/VWkbXTM60pmoN0eM"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "chatId",
+              "keyValue": "={{$json.message.chat.id}}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chatId": "={{$json.message.chat.id}}",
+            "mode": "price"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "chatId",
+              "displayName": "chatId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "mode",
+              "displayName": "mode",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -1920,
+        144
+      ],
+      "id": "a2ac9627-d0b7-4fd6-8b05-6fa5d47aa182",
+      "name": "Save Mode Price"
+    },
+    {
+      "parameters": {
+        "jsCode": "const mode = $('Get User Mode').first().json.mode;\n\nconst original = $('Telegram Trigger').first().json;\n\nconst text = original.message.text.trim();\nconst chatId = original.message.chat.id;\n\n// Если режим price\nif (mode === 'price') {\n  return [{\n    message: {\n      text: `/price ${text}`,\n      chat: {\n        id: chatId\n      }\n    }\n  }];\n}\n\n// Если режим cake\nif (mode === 'cake') {\n  return [{\n    message: {\n      text: `/cake ${text}`,\n      chat: {\n        id: chatId\n      }\n    }\n  }];\n}\n\n// Если режима нет\nreturn [{\n  message: {\n    text,\n    chat: {\n      id: chatId\n    }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1696,
+        -48
+      ],
+      "id": "43c16d71-47bd-4eb4-a579-1558b8683378",
+      "name": "Transform By Mode"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "🎂 Введите торт и вес\n\nПример:\nнаполеон 2",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -1920,
+        -240
+      ],
+      "id": "c04a036a-3255-44a2-a75d-06702c4121e8",
+      "name": "Send Cake Help",
+      "webhookId": "31ff7957-a1fa-4793-ab69-e9fb44e0440a",
+      "credentials": {
+        "telegramApi": {
+          "id": "6fyTsQdyJ0rtfZFs",
+          "name": "Snigurka"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "💰 Введите ингредиент и цену\n\n  Пример: молоко 99",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -1696,
+        144
+      ],
+      "id": "f161eb4e-1fe1-464e-b2f3-9c3168833bb8",
+      "name": "Send Price Help",
+      "webhookId": "31ff7957-a1fa-4793-ab69-e9fb44e0440a",
+      "credentials": {
+        "telegramApi": {
+          "id": "6fyTsQdyJ0rtfZFs",
+          "name": "Snigurka"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "VWkbXTM60pmoN0eM",
+          "mode": "list",
+          "cachedResultName": "user_modes",
+          "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/VWkbXTM60pmoN0eM"
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -1920,
+        -48
+      ],
+      "id": "39fb9c65-de01-4d23-b580-b859f88a868c",
+      "name": "Get User Mode"
+    },
+    {
+      "parameters": {
+        "operation": "deleteRows",
+        "dataTableId": {
+          "__rl": true,
+          "value": "VWkbXTM60pmoN0eM",
+          "mode": "list",
+          "cachedResultName": "user_modes",
+          "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/VWkbXTM60pmoN0eM"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "chatId",
+              "keyValue": "={{ $('Parse Message').first().json.chatId }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        544,
+        -144
+      ],
+      "id": "aceb4135-9a48-4f06-9fe7-fa1b59bed744",
+      "name": "Delete row(s)"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "e11a421a-1cc6-4e17-8ec4-8bdd7a8dc766",
+              "leftValue": "={{$json.message.text}}",
+              "rightValue": "/price",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -2144,
+        48
+      ],
+      "id": "86f073b2-eda3-4b8a-aa13-fbd579815972",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "Неверный формат",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -800,
+        240
+      ],
+      "id": "246bf3a6-1e3e-4fb7-9e2b-e5f854a0081c",
+      "name": "Send a text message4",
+      "webhookId": "3886dcd0-366c-4d07-99cc-03c178c87103",
+      "credentials": {
+        "telegramApi": {
+          "id": "6fyTsQdyJ0rtfZFs",
+          "name": "Snigurka"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Is Start?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Update Price?": {
+      "main": [
+        [
+          {
+            "node": "Find Ingredient",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Is Calculate Cake?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Ingredient": {
+      "main": [
+        [
+          {
+            "node": "Ingredient Found?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Message": {
+      "main": [
+        [
+          {
+            "node": "Is Update Price?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Ingredient Update": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ingredient Found?": {
+      "main": [
+        [
+          {
+            "node": "Prepare Ingredient Update",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Calculate Cake?": {
+      "main": [
+        [
+          {
+            "node": "Get Recipe",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Recipe": {
+      "main": [
+        [
+          {
+            "node": "Recipe Found?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recipe Found?": {
+      "main": [
+        [
+          {
+            "node": "Get Ingredients",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Ingredients": {
+      "main": [
+        [
+          {
+            "node": "Get Settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Cake Cos": {
+      "main": [
+        [
+          {
+            "node": "Send a text message3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Settings": {
+      "main": [
+        [
+          {
+            "node": "Calculate Cake Cos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Start?": {
+      "main": [
+        [
+          {
+            "node": "Send a text message5",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Is Cake Button?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Cake Button?": {
+      "main": [
+        [
+          {
+            "node": "Save Mode Cake",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Mode Cake": {
+      "main": [
+        [
+          {
+            "node": "Send Cake Help",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Mode Price": {
+      "main": [
+        [
+          {
+            "node": "Send Price Help",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform By Mode": {
+      "main": [
+        [
+          {
+            "node": "Parse Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Cake Help": {
+      "main": [
+        []
+      ]
+    },
+    "Send Price Help": {
+      "main": [
+        []
+      ]
+    },
+    "Get User Mode": {
+      "main": [
+        [
+          {
+            "node": "Transform By Mode",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Save Mode Price",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get User Mode",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message1": {
+      "main": [
+        [
+          {
+            "node": "Delete row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message3": {
+      "main": [
+        [
+          {
+            "node": "Delete row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message2": {
+      "main": [
+        [
+          {
+            "node": "Delete row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        [
+          {
+            "node": "Delete row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "5d23dd30-ffa8-42da-b559-cda0dd56fbef",
+  "activeVersionId": "5d23dd30-ffa8-42da-b559-cda0dd56fbef",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-05-08T10:44:25.229Z",
+      "createdAt": "2026-05-08T10:44:25.229Z",
+      "role": "workflow:owner",
+      "workflowId": "r8cEp5yPPbztl64O",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-05-09T17:04:52.000Z",
+    "createdAt": "2026-05-09T17:01:33.058Z",
+    "versionId": "5d23dd30-ffa8-42da-b559-cda0dd56fbef",
+    "workflowId": "r8cEp5yPPbztl64O",
+    "nodes": [
+      {
+        "parameters": {
+          "updates": [
+            "message"
+          ],
+          "additionalFields": {}
+        },
+        "type": "n8n-nodes-base.telegramTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          -2816,
+          -144
+        ],
+        "id": "38627222-6ad8-477d-8a87-6297cd19b02f",
+        "name": "Telegram Trigger",
+        "webhookId": "c4f8302d-195d-44cd-997d-88c81cede901",
+        "credentials": {
+          "telegramApi": {
+            "id": "6fyTsQdyJ0rtfZFs",
+            "name": "Snigurka"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "0efdd0dd-1224-4c4c-9f67-c855215d12b7",
+                "leftValue": "={{$json.action}}",
+                "rightValue": "update_price",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          -1248,
+          -48
+        ],
+        "id": "8e2388a2-09c6-415e-84ab-773a61137c6c",
+        "name": "Is Update Price?"
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1VIdWymrcSkT1FFxrx1BK5R1UBENrda09Q3d8CbzXSmc",
+            "mode": "list",
+            "cachedResultName": "snigurka price",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VIdWymrcSkT1FFxrx1BK5R1UBENrda09Q3d8CbzXSmc/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Ingredients",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VIdWymrcSkT1FFxrx1BK5R1UBENrda09Q3d8CbzXSmc/edit#gid=0"
+          },
+          "filtersUI": {
+            "values": [
+              {
+                "lookupColumn": "Ingredient",
+                "lookupValue": "={{$json.ingredient}}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          -576,
+          -336
+        ],
+        "id": "b8fcb490-4c7f-4f59-9790-ddbcf243c373",
+        "name": "Find Ingredient",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "0Gdvf3Mhmj7whXEv",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "documentId": {
+            "__rl": true,
+            "value": "1VIdWymrcSkT1FFxrx1BK5R1UBENrda09Q3d8CbzXSmc",
+            "mode": "list",
+            "cachedResultName": "snigurka price",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VIdWymrcSkT1FFxrx1BK5R1UBENrda09Q3d8CbzXSmc/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Ingredients",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VIdWymrcSkT1FFxrx1BK5R1UBENrda09Q3d8CbzXSmc/edit#gid=0"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "Price": "={{ $json.Price }}",
+              "Ingredient": "={{ $json.Ingredient }}",
+              "Weight": "={{ $json.Weight }}",
+              "Unit": "={{ $json.Unit }}",
+              "PricePerUnit": "={{ $json.PricePerUnit }}"
+            },
+            "matchingColumns": [
+              "Ingredient"
+            ],
+            "schema": [
+              {
+                "id": "Ingredient",
+                "displayName": "Ingredient",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Price",
+                "displayName": "Price",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Weight",
+                "displayName": "Weight",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Unit",
+                "displayName": "Unit",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "PricePerUnit",
+                "displayName": "PricePerUnit",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "row_number",
+                "displayName": "row_number",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "readOnly": true,
+                "removed": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          96,
+          -432
+        ],
+        "id": "28e4dc86-da8c-47f2-bd65-085bd3e77a6c",
+        "name": "Update row in sheet",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "0Gdvf3Mhmj7whXEv",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const text = $json.message?.text?.trim() || '';\nconst chatId = $json.message?.chat?.id;\n\nconst lower = text.toLowerCase();\nconst cleanText = lower\n  .replace(/^\\/price\\s+/, '')\n  .replace(/^\\/cake\\s+/, '')\n  .trim();\n\nconst mode = String($('Get User Mode').first().json.mode || '').toLowerCase().trim();\n\nif (!text || !chatId) {\n  return [{\n    action: 'error',\n    chatId,\n    message: '❌ Не получил текст сообщения.'\n  }];\n}\n\n// =====================\n// PRICE MODE\n// Примеры:\n// молоко 90\n// молоко 90 1000мл\n// мука 65 1000г\n// яйца 120 10шт\n// молоко 90, мука 65 1000г, яйца 120 10шт\n// =====================\nif (mode === 'price') {\n  const lines = cleanText\n    .split(/\\n|,/)\n    .map(line => line.trim().replace(/\\s+/g, ' '))\n    .filter(Boolean);\n\n  const updates = [];\n\n  for (const line of lines) {\n    // Формат: ингредиент цена количество+единица\n    // молоко 90 1000мл\n    // мука 65 1000г\n    // яйца 120 10шт\n    const unitMatch = line.match(\n      /^(.+?)\\s+(\\d+(?:[.,]\\d+)?)\\s+(\\d+(?:[.,]\\d+)?)\\s*(г|гр|g|мл|ml|л|l|шт|pcs)$/i\n    );\n\n    if (unitMatch) {\n      let ingredient = unitMatch[1].trim();\n      let price = Number(unitMatch[2].replace(',', '.'));\n      let weight = Number(unitMatch[3].replace(',', '.'));\n      let unitRaw = unitMatch[4].toLowerCase();\n\n      let unit = unitRaw;\n\n      if (['г', 'гр', 'g'].includes(unitRaw)) {\n        unit = 'g';\n      }\n\n      if (['мл', 'ml'].includes(unitRaw)) {\n        unit = 'ml';\n      }\n\n      if (['л', 'l'].includes(unitRaw)) {\n        unit = 'ml';\n        weight = weight * 1000;\n      }\n\n      if (['шт', 'pcs'].includes(unitRaw)) {\n        unit = 'pcs';\n      }\n\n      updates.push({\n        action: 'update_price',\n        ingredient,\n        price,\n        weight,\n        unit,\n        chatId\n      });\n\n      continue;\n    }\n\n    // Формат: яйца 10шт 120\n    // количество+единица цена\n    const unitMatchAlt = line.match(\n      /^(.+?)\\s+(\\d+(?:[.,]\\d+)?)\\s*(г|гр|g|мл|ml|л|l|шт|pcs)\\s+(\\d+(?:[.,]\\d+)?)$/i\n    );\n\n    if (unitMatchAlt) {\n      let ingredient = unitMatchAlt[1].trim();\n      let weight = Number(unitMatchAlt[2].replace(',', '.'));\n      let unitRaw = unitMatchAlt[3].toLowerCase();\n      let price = Number(unitMatchAlt[4].replace(',', '.'));\n\n      let unit = unitRaw;\n\n      if (['г', 'гр', 'g'].includes(unitRaw)) {\n        unit = 'g';\n      }\n\n      if (['мл', 'ml'].includes(unitRaw)) {\n        unit = 'ml';\n      }\n\n      if (['л', 'l'].includes(unitRaw)) {\n        unit = 'ml';\n        weight = weight * 1000;\n      }\n\n      if (['шт', 'pcs'].includes(unitRaw)) {\n        unit = 'pcs';\n      }\n\n      updates.push({\n        action: 'update_price',\n        ingredient,\n        price,\n        weight,\n        unit,\n        chatId\n      });\n\n      continue;\n    }\n\n    // Старый простой формат:\n    // молоко 90\n    // по умолчанию считаем 1000 g\n    const normalMatch = line.match(\n      /^(.+?)\\s+(\\d+(?:[.,]\\d+)?)\\s*(гр|грн|uah)?$/i\n    );\n\n    if (normalMatch) {\n      updates.push({\n        action: 'update_price',\n        ingredient: normalMatch[1].trim(),\n        price: Number(normalMatch[2].replace(',', '.')),\n        weight: 1000,\n        unit: 'g',\n        chatId\n      });\n    }\n  }\n\n  if (updates.length > 0) {\n    return updates;\n  }\n}\n\n// =====================\n// CAKE MODE\n// Примеры:\n// Наполеон 2\n// наполеон 2\n// =====================\nif (mode === 'cake') {\n  const oneLine = cleanText.replace(/\\s+/g, ' ');\n\n  const match = oneLine.match(\n    /^(.+?)\\s+(\\d+(?:[.,]\\d+)?)\\s*(кг|kg)?$/i\n  );\n\n  if (match) {\n    return [{\n      action: 'calculate_cake',\n      cake: match[1].trim(),\n      weight: Number(match[2].replace(',', '.')),\n      chatId\n    }];\n  }\n}\n\nreturn [{\n  action: 'error',\n  chatId,\n  message: `❌ Неверный формат.\n\n🎂 Для торта:\nНаполеон 2\n\n💰 Для цены:\nМолоко 90\nМолоко 90 1000мл\nМука 65 1000г\nЯйца 120 10шт\n\nМожно несколько сразу:\nМолоко 90 1000мл\nМука 65 1000г\nЯйца 120 10шт`\n}];\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -1472,
+          -48
+        ],
+        "id": "238afabe-81b2-4a44-a5c2-bdac8aa605ee",
+        "name": "Parse Message"
+      },
+      {
+        "parameters": {
+          "mode": "runOnceForEachItem",
+          "jsCode": "const row = $json;\n\nconst parsed = $('Parse Message').all()[$itemIndex].json;\n\nconst price = parsed.price;\nconst ingredient = parsed.ingredient;\nconst chatId = parsed.chatId;\n\nconst weight = Number(parsed.weight || 1000);\nconst unit = parsed.unit || 'g';\n\nconst pricePerUnit = price / weight;\n\nreturn {\n  row_number: row.row_number,\n  Ingredient: ingredient,\n  Price: price,\n  Weight: weight,\n  Unit: unit,\n  PricePerUnit: Number(pricePerUnit.toFixed(6)),\n  chatId\n};"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -128,
+          -432
+        ],
+        "id": "ffaa6f78-785e-4fab-a7d7-1b68f9e0b956",
+        "name": "Prepare Ingredient Update"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "4d98a50c-5622-4bea-9ce2-e115a727920d",
+                "leftValue": "={{$json.action}}",
+                "rightValue": "calculate_cake",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals",
+                  "name": "filter.operator.equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          -1024,
+          144
+        ],
+        "id": "d25291f0-ec7a-4161-9360-7921dc2437c2",
+        "name": "Is Calculate Cake?"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "1bc9d59e-59b6-4034-8d56-14b597a81a04",
+                "leftValue": "={{$json.row_number}}",
+                "rightValue": "is not empty",
+                "operator": {
+                  "type": "number",
+                  "operation": "exists",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          -352,
+          -336
+        ],
+        "id": "8366beeb-2573-42ff-8135-6d274344e4cd",
+        "name": "Ingredient Found?"
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+          "text": "=❌ Ингредиент не найден в таблице.  Ингредиент: {{ $('Parse Message').first().json.ingredient }}  Проверь название в листе Ingredients. Например: молоко, мука, масло.",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          320,
+          -240
+        ],
+        "id": "471755d7-6120-473f-ad3d-a17a44906f23",
+        "name": "Send a text message",
+        "webhookId": "71e48215-9feb-4a7b-9bb9-2cef1b29946f",
+        "credentials": {
+          "telegramApi": {
+            "id": "6fyTsQdyJ0rtfZFs",
+            "name": "Snigurka"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+          "text": "=✅ Цена обновлена\n🥛 Ингредиент: {{$json.Ingredient}} \n💰 Новая цена: {{$json.Price}} грн \n⚖️ Вес/объём: {{ $json.Weight }} г/мл/шт 🧾 \nЦена за 1 г/мл/шт: {{ $json.PricePerUnit }} грн",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          320,
+          -432
+        ],
+        "id": "d7d14267-2815-4593-8283-6ff40c7ca296",
+        "name": "Send a text message1",
+        "webhookId": "88ca64d7-2ba6-4ae8-a5ab-a8791013c3ba",
+        "credentials": {
+          "telegramApi": {
+            "id": "6fyTsQdyJ0rtfZFs",
+            "name": "Snigurka"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1VIdWymrcSkT1FFxrx1BK5R1UBENrda09Q3d8CbzXSmc",
+            "mode": "list",
+            "cachedResultName": "snigurka price",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VIdWymrcSkT1FFxrx1BK5R1UBENrda09Q3d8CbzXSmc/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 859614865,
+            "mode": "list",
+            "cachedResultName": "Recipes",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VIdWymrcSkT1FFxrx1BK5R1UBENrda09Q3d8CbzXSmc/edit#gid=859614865"
+          },
+          "filtersUI": {
+            "values": [
+              {
+                "lookupColumn": "Cake",
+                "lookupValue": "={{$json.cake}}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          -800,
+          48
+        ],
+        "id": "f33d32b1-6d45-402a-a244-3314b4e11730",
+        "name": "Get Recipe",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "0Gdvf3Mhmj7whXEv",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "ff6fbb14-80b1-45db-b499-fe9e9766b45c",
+                "leftValue": "={{ $items(\"Get Recipe\").length }}",
+                "rightValue": 0,
+                "operator": {
+                  "type": "number",
+                  "operation": "gt"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          -576,
+          48
+        ],
+        "id": "7e882a4e-113c-4a05-8f00-552577aa6432",
+        "name": "Recipe Found?"
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+          "text": "=❌ Рецепт не найден.  Торт: {{ $('Parse Message').first().json.cake }}  Проверь название в листе Recipes. Например: /cake наполеон 2",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          320,
+          144
+        ],
+        "id": "5b3447c7-1d52-4454-a2d5-2782eeefebb1",
+        "name": "Send a text message2",
+        "webhookId": "38406ed0-fdc2-4a02-ba55-c486807345ae",
+        "credentials": {
+          "telegramApi": {
+            "id": "6fyTsQdyJ0rtfZFs",
+            "name": "Snigurka"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1VIdWymrcSkT1FFxrx1BK5R1UBENrda09Q3d8CbzXSmc",
+            "mode": "list",
+            "cachedResultName": "snigurka price",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VIdWymrcSkT1FFxrx1BK5R1UBENrda09Q3d8CbzXSmc/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Ingredients",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VIdWymrcSkT1FFxrx1BK5R1UBENrda09Q3d8CbzXSmc/edit#gid=0"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          -352,
+          -48
+        ],
+        "id": "bed3b1b4-2222-4e62-8e24-ce38960d289f",
+        "name": "Get Ingredients",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "0Gdvf3Mhmj7whXEv",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const recipeRows = $('Get Recipe').all();\nconst ingredientRows = $('Get Ingredients').all();\nconst settingsRows = $('Get Settings').all();\n\nconst weight = $('Parse Message').first().json.weight;\nconst cake = $('Parse Message').first().json.cake;\nconst chatId = $('Parse Message').first().json.chatId;\n\nlet ingredientsCost = 0;\nlet missingIngredients = [];\n\nfor (const recipe of recipeRows) {\n  const ingredientName = String(recipe.json.Ingredient).toLowerCase().trim();\n  const amount = Number(recipe.json.Amount);\n\n  const ingredient = ingredientRows.find(i =>\n    String(i.json.Ingredient).toLowerCase().trim() === ingredientName\n  );\n\n  if (!ingredient) {\n    missingIngredients.push(ingredientName);\n    continue;\n  }\n\nconst pricePerUnit = Number(ingredient.json.PricePerUnit);\n\nif (isNaN(pricePerUnit)) {\n  missingIngredients.push(`${ingredientName} — нет PricePerUnit`);\n  continue;\n}\n\ningredientsCost += amount * pricePerUnit * weight;\n}\n\nconst settings = {};\n\nfor (const row of settingsRows) {\n  settings[row.json.Setting] = Number(row.json.Value);\n}\n\nconst packaging = settings.Packaging || 0;\nconst labor = settings.Labor || 0;\nconst lossPercent = settings.LossPercent || 0;\nconst profitPercent = settings.ProfitPercent || 0;\n\nconst losses = ingredientsCost * lossPercent / 100;\n\nconst total =\n  ingredientsCost +\n  losses +\n  packaging +\n  labor;\n\nconst salePrice =\n  total * (1 + profitPercent / 100);\n\nreturn [{\n  cake,\n  weight,\n  ingredientsCost: Number(ingredientsCost.toFixed(2)),\n  losses: Number(losses.toFixed(2)),\n  packaging,\n  labor,\n  lossPercent,\n  profitPercent,\n  total: Number(total.toFixed(2)),\n  salePrice: Number(salePrice.toFixed(2)),\n  missingIngredients,\n  chatId\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          96,
+          -48
+        ],
+        "id": "003b1bba-143e-44fd-a1fe-37175201f74f",
+        "name": "Calculate Cake Cos"
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+          "text": "=🎂 Себестоимость торта\n\nНазвание: {{$json.cake}}\nВес: {{$json.weight}} кг\n\n🥣 Ингредиенты:\n{{$json.ingredientsCost}} грн\n\n📦 Упаковка:\n{{$json.packaging}} грн\n\n👨‍🍳 Работа:\n{{$json.labor}} грн\n\n📉 Потери {{$json.lossPercent}}%:\n{{$json.losses}} грн\n\n━━━━━━━━━━━━\n\n🧾 Себестоимость:\n{{$json.total}} грн\n\n💵 Цена продажи +{{$json.profitPercent}}%:\n{{$json.salePrice}} грн\n\n{{ $json.missingIngredients.length ? \"⚠️ Не найдены ингредиенты: \" + $json.missingIngredients.join(\", \") : \"\" }}",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          320,
+          -48
+        ],
+        "id": "7c456087-6935-4646-8c18-1dfd4e1d1f6b",
+        "name": "Send a text message3",
+        "webhookId": "40f81f2a-ac19-493f-8200-90bd0210acc6",
+        "credentials": {
+          "telegramApi": {
+            "id": "6fyTsQdyJ0rtfZFs",
+            "name": "Snigurka"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1VIdWymrcSkT1FFxrx1BK5R1UBENrda09Q3d8CbzXSmc",
+            "mode": "list",
+            "cachedResultName": "snigurka price",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VIdWymrcSkT1FFxrx1BK5R1UBENrda09Q3d8CbzXSmc/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 1539717924,
+            "mode": "list",
+            "cachedResultName": "Settings",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VIdWymrcSkT1FFxrx1BK5R1UBENrda09Q3d8CbzXSmc/edit#gid=1539717924"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          -128,
+          -48
+        ],
+        "id": "8130e049-364d-46ea-98fc-3a8adc0e7559",
+        "name": "Get Settings",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "0Gdvf3Mhmj7whXEv",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "aa38a822-ba84-4206-ab27-2f64b26cdb4f",
+                "leftValue": "={{$json.message.text}}",
+                "rightValue": "/start",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals",
+                  "name": "filter.operator.equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          -2592,
+          -144
+        ],
+        "id": "9846f6a5-4ae5-47db-a826-bf049a5c9612",
+        "name": "Is Start?"
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+          "text": "=👋 Привет!\n\nЯ помогу считать себестоимость тортов и обновлять цены ингредиентов.\n\n🎂 Посчитать торт:\n/cake наполеон 2\n\n💰 Обновить цену:\n/price молоко 99\n\nВыбери действие кнопкой ниже 👇",
+          "replyMarkup": "replyKeyboard",
+          "replyKeyboard": {
+            "rows": [
+              {
+                "row": {
+                  "buttons": [
+                    {
+                      "text": "/price",
+                      "additionalFields": {}
+                    },
+                    {
+                      "text": "/cake",
+                      "additionalFields": {}
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "replyKeyboardOptions": {
+            "resize_keyboard": true
+          },
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          -2368,
+          -240
+        ],
+        "id": "73887500-54f1-400f-87f7-d7a30b2705d1",
+        "name": "Send a text message5",
+        "webhookId": "88ca64d7-2ba6-4ae8-a5ab-a8791013c3ba",
+        "credentials": {
+          "telegramApi": {
+            "id": "6fyTsQdyJ0rtfZFs",
+            "name": "Snigurka"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "450e92b9-0f7c-48ce-bbd5-450f623705b5",
+                "leftValue": "={{$json.message.text}}",
+                "rightValue": "/cake",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals",
+                  "name": "filter.operator.equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          -2368,
+          -48
+        ],
+        "id": "1c5dc24c-b695-4a5c-9a06-754bb070a3ea",
+        "name": "Is Cake Button?"
+      },
+      {
+        "parameters": {
+          "operation": "upsert",
+          "dataTableId": {
+            "__rl": true,
+            "value": "VWkbXTM60pmoN0eM",
+            "mode": "list",
+            "cachedResultName": "user_modes",
+            "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/VWkbXTM60pmoN0eM"
+          },
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "chatId",
+                "keyValue": "={{$json.message.chat.id}}"
+              }
+            ]
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "chatId": "={{$json.message.chat.id}}",
+              "mode": "Cake"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "chatId",
+                "displayName": "chatId",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              },
+              {
+                "id": "mode",
+                "displayName": "mode",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.dataTable",
+        "typeVersion": 1.1,
+        "position": [
+          -2144,
+          -240
+        ],
+        "id": "099bbc5b-d387-4538-8bfd-1c1ac03e3703",
+        "name": "Save Mode Cake"
+      },
+      {
+        "parameters": {
+          "operation": "upsert",
+          "dataTableId": {
+            "__rl": true,
+            "value": "VWkbXTM60pmoN0eM",
+            "mode": "list",
+            "cachedResultName": "user_modes",
+            "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/VWkbXTM60pmoN0eM"
+          },
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "chatId",
+                "keyValue": "={{$json.message.chat.id}}"
+              }
+            ]
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "chatId": "={{$json.message.chat.id}}",
+              "mode": "price"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "chatId",
+                "displayName": "chatId",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              },
+              {
+                "id": "mode",
+                "displayName": "mode",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.dataTable",
+        "typeVersion": 1.1,
+        "position": [
+          -1920,
+          144
+        ],
+        "id": "a2ac9627-d0b7-4fd6-8b05-6fa5d47aa182",
+        "name": "Save Mode Price"
+      },
+      {
+        "parameters": {
+          "jsCode": "const mode = $('Get User Mode').first().json.mode;\n\nconst original = $('Telegram Trigger').first().json;\n\nconst text = original.message.text.trim();\nconst chatId = original.message.chat.id;\n\n// Если режим price\nif (mode === 'price') {\n  return [{\n    message: {\n      text: `/price ${text}`,\n      chat: {\n        id: chatId\n      }\n    }\n  }];\n}\n\n// Если режим cake\nif (mode === 'cake') {\n  return [{\n    message: {\n      text: `/cake ${text}`,\n      chat: {\n        id: chatId\n      }\n    }\n  }];\n}\n\n// Если режима нет\nreturn [{\n  message: {\n    text,\n    chat: {\n      id: chatId\n    }\n  }\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -1696,
+          -48
+        ],
+        "id": "43c16d71-47bd-4eb4-a579-1558b8683378",
+        "name": "Transform By Mode"
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+          "text": "🎂 Введите торт и вес\n\nПример:\nнаполеон 2",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          -1920,
+          -240
+        ],
+        "id": "c04a036a-3255-44a2-a75d-06702c4121e8",
+        "name": "Send Cake Help",
+        "webhookId": "31ff7957-a1fa-4793-ab69-e9fb44e0440a",
+        "credentials": {
+          "telegramApi": {
+            "id": "6fyTsQdyJ0rtfZFs",
+            "name": "Snigurka"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+          "text": "💰 Введите ингредиент и цену\n\n  Пример: молоко 99",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          -1696,
+          144
+        ],
+        "id": "f161eb4e-1fe1-464e-b2f3-9c3168833bb8",
+        "name": "Send Price Help",
+        "webhookId": "31ff7957-a1fa-4793-ab69-e9fb44e0440a",
+        "credentials": {
+          "telegramApi": {
+            "id": "6fyTsQdyJ0rtfZFs",
+            "name": "Snigurka"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "dataTableId": {
+            "__rl": true,
+            "value": "VWkbXTM60pmoN0eM",
+            "mode": "list",
+            "cachedResultName": "user_modes",
+            "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/VWkbXTM60pmoN0eM"
+          }
+        },
+        "type": "n8n-nodes-base.dataTable",
+        "typeVersion": 1.1,
+        "position": [
+          -1920,
+          -48
+        ],
+        "id": "39fb9c65-de01-4d23-b580-b859f88a868c",
+        "name": "Get User Mode"
+      },
+      {
+        "parameters": {
+          "operation": "deleteRows",
+          "dataTableId": {
+            "__rl": true,
+            "value": "VWkbXTM60pmoN0eM",
+            "mode": "list",
+            "cachedResultName": "user_modes",
+            "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/VWkbXTM60pmoN0eM"
+          },
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "chatId",
+                "keyValue": "={{ $('Parse Message').first().json.chatId }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.dataTable",
+        "typeVersion": 1.1,
+        "position": [
+          544,
+          -144
+        ],
+        "id": "aceb4135-9a48-4f06-9fe7-fa1b59bed744",
+        "name": "Delete row(s)"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "e11a421a-1cc6-4e17-8ec4-8bdd7a8dc766",
+                "leftValue": "={{$json.message.text}}",
+                "rightValue": "/price",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals",
+                  "name": "filter.operator.equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          -2144,
+          48
+        ],
+        "id": "86f073b2-eda3-4b8a-aa13-fbd579815972",
+        "name": "If"
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+          "text": "Неверный формат",
+          "additionalFields": {}
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          -800,
+          240
+        ],
+        "id": "246bf3a6-1e3e-4fb7-9e2b-e5f854a0081c",
+        "name": "Send a text message4",
+        "webhookId": "3886dcd0-366c-4d07-99cc-03c178c87103",
+        "credentials": {
+          "telegramApi": {
+            "id": "6fyTsQdyJ0rtfZFs",
+            "name": "Snigurka"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Telegram Trigger": {
+        "main": [
+          [
+            {
+              "node": "Is Start?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Is Update Price?": {
+        "main": [
+          [
+            {
+              "node": "Find Ingredient",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Is Calculate Cake?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Find Ingredient": {
+        "main": [
+          [
+            {
+              "node": "Ingredient Found?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Parse Message": {
+        "main": [
+          [
+            {
+              "node": "Is Update Price?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Prepare Ingredient Update": {
+        "main": [
+          [
+            {
+              "node": "Update row in sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Ingredient Found?": {
+        "main": [
+          [
+            {
+              "node": "Prepare Ingredient Update",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Send a text message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Update row in sheet": {
+        "main": [
+          [
+            {
+              "node": "Send a text message1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Is Calculate Cake?": {
+        "main": [
+          [
+            {
+              "node": "Get Recipe",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Send a text message4",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Recipe": {
+        "main": [
+          [
+            {
+              "node": "Recipe Found?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Recipe Found?": {
+        "main": [
+          [
+            {
+              "node": "Get Ingredients",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Send a text message2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Ingredients": {
+        "main": [
+          [
+            {
+              "node": "Get Settings",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Calculate Cake Cos": {
+        "main": [
+          [
+            {
+              "node": "Send a text message3",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Settings": {
+        "main": [
+          [
+            {
+              "node": "Calculate Cake Cos",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Is Start?": {
+        "main": [
+          [
+            {
+              "node": "Send a text message5",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Is Cake Button?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Is Cake Button?": {
+        "main": [
+          [
+            {
+              "node": "Save Mode Cake",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "If",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Save Mode Cake": {
+        "main": [
+          [
+            {
+              "node": "Send Cake Help",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Save Mode Price": {
+        "main": [
+          [
+            {
+              "node": "Send Price Help",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Transform By Mode": {
+        "main": [
+          [
+            {
+              "node": "Parse Message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Send Cake Help": {
+        "main": [
+          []
+        ]
+      },
+      "Send Price Help": {
+        "main": [
+          []
+        ]
+      },
+      "Get User Mode": {
+        "main": [
+          [
+            {
+              "node": "Transform By Mode",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If": {
+        "main": [
+          [
+            {
+              "node": "Save Mode Price",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Get User Mode",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Send a text message1": {
+        "main": [
+          [
+            {
+              "node": "Delete row(s)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Send a text message3": {
+        "main": [
+          [
+            {
+              "node": "Delete row(s)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Send a text message2": {
+        "main": [
+          [
+            {
+              "node": "Delete row(s)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Send a text message": {
+        "main": [
+          [
+            {
+              "node": "Delete row(s)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Buts Sergei",
+    "name": "Version 5d23dd30",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
