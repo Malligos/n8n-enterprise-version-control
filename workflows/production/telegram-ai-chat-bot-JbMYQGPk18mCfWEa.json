@@ -1,0 +1,814 @@
+{
+  "updatedAt": "2026-05-03T09:41:52.728Z",
+  "createdAt": "2026-04-28T19:28:44.561Z",
+  "id": "JbMYQGPk18mCfWEa",
+  "name": "Telegram Ai chat bot",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -2432,
+        -144
+      ],
+      "id": "f0ccd9cc-f1f7-48f5-8931-09ba47e042e5",
+      "name": "Telegram Trigger",
+      "webhookId": "4273b1f5-5e5c-4b93-b5fd-e4c91363de72",
+      "credentials": {
+        "telegramApi": {
+          "id": "wIxKfjFCXEi8oTjZ",
+          "name": "HomeworkBot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f08f755c-8eb6-4629-9b57-81dfc8f49243",
+              "name": "message.text",
+              "value": "={{ $json.message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2224,
+        -144
+      ],
+      "id": "a0f653d2-efc5-40c0-9f5b-b89ce49f7464",
+      "name": "PreProcessing"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c6c970ab-6cb4-402b-a9e8-eb6009fea7a1",
+              "name": "model_temperature",
+              "value": 0.8,
+              "type": "number"
+            },
+            {
+              "id": "21675279-e7ff-459e-9fab-77b646611e3a",
+              "name": "token_lenght",
+              "value": 500,
+              "type": "number"
+            },
+            {
+              "id": "94424ed5-6a4b-4cec-8c52-4aab7c7ca33c",
+              "name": "system_command",
+              "value": "=You are a friendly chatbot. User name is  {{ $('Telegram Trigger').item.json.message.from.first_name }}. User system launguage is {{ $('Telegram Trigger').item.json.message.from.language_code }}. First, delect user text language. Next, provide your reply in the same language. Include several suitable emoiis in vour answer. fb and insta is a photo option, don't draw a logo",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2016,
+        -144
+      ],
+      "id": "fbb9468c-519d-4954-80b9-763490abd3b5",
+      "name": "Prompt"
+    },
+    {
+      "parameters": {
+        "operation": "sendChatAction",
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -1728,
+        -32
+      ],
+      "id": "7e6be6d8-bb71-4180-8b8f-6f47cafd2b4c",
+      "name": "Send a chat action",
+      "webhookId": "702599e6-a555-4b07-bada-076afd3f389d",
+      "credentials": {
+        "telegramApi": {
+          "id": "wIxKfjFCXEi8oTjZ",
+          "name": "HomeworkBot"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -1504,
+        -144
+      ],
+      "id": "26291d1c-4889-4cd9-90b9-26fcacc7f875",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('PreProcessing').item.json.message.text }}",
+                    "rightValue": "/start",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    },
+                    "id": "83fab019-3a5c-42cc-a375-be1c1e360f6c"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "0"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "07126d45-9615-4c05-a452-1f450feba4ec",
+                    "leftValue": "={{ $('PreProcessing').item.json.message.text }}",
+                    "rightValue": "insta",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "1"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "2263df58-51ab-48c4-a11d-6dc56dcc0bd4",
+                    "leftValue": "={{ $('PreProcessing').item.json.message.text }}",
+                    "rightValue": "fb",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "2"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "668f195e-67f3-4ef8-9b9a-5c43a69039c1",
+                    "leftValue": "",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": 3,
+          "ignoreCase": true
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -1264,
+        -176
+      ],
+      "id": "896b86ad-84bc-43b5-9a89-569c73bbcacc",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "={{ $('Prompt').item.json.system_command }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        -960,
+        -400
+      ],
+      "id": "f699a663-b021-48bb-833c-411fae326b9d",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "wmMo2Lknq3Hi5ts2",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output[0].content[0].text }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -608,
+        -400
+      ],
+      "id": "a33def18-74e1-474d-870c-d0b7da49ef87",
+      "name": "Send a text message",
+      "webhookId": "89e53a86-d1e0-46c3-87ff-c771a8f97d3e",
+      "credentials": {
+        "telegramApi": {
+          "id": "wIxKfjFCXEi8oTjZ",
+          "name": "HomeworkBot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendPhoto",
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "file": "={{ $json.url }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -192,
+        -352
+      ],
+      "id": "43ca3d75-b749-46a2-bad9-f4c9d9fb6dab",
+      "name": "Send a photo message",
+      "webhookId": "64680e75-7365-4306-8f54-2c6d95e0b04e",
+      "credentials": {
+        "telegramApi": {
+          "id": "wIxKfjFCXEi8oTjZ",
+          "name": "HomeworkBot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4",
+          "mode": "list",
+          "cachedResultName": "GPT-4"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "=Create angaging post the telegram use language  {{ $('Telegram Trigger').item.json.message.from.language_code }} and task {{ $('Telegram Trigger').item.json.message.text }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        -304,
+        -80
+      ],
+      "id": "aef7f63d-379f-46b4-9ea4-8407fd7c8767",
+      "name": "Message a model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "wmMo2Lknq3Hi5ts2",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $items(\"Message a model1\")[0].json.output[0].content[0].text }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        80,
+        -80
+      ],
+      "id": "dc725a63-f19b-46a1-aedb-0fbc97f8989f",
+      "name": "Send a text message1",
+      "webhookId": "2d241ed4-f0fe-46be-8ed4-2d3ab5745f04",
+      "credentials": {
+        "telegramApi": {
+          "id": "wIxKfjFCXEi8oTjZ",
+          "name": "HomeworkBot"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        336,
+        -224
+      ],
+      "id": "48ef8d52-381b-424c-85da-3b025a15fc70",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "message": "Good?",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double"
+          }
+        },
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        544,
+        -224
+      ],
+      "id": "997836b5-d0d5-4bd5-b376-095637899189",
+      "name": "Send message and wait for response",
+      "webhookId": "c90db653-1db9-4cca-b6dc-6354cd5a3c5e",
+      "credentials": {
+        "telegramApi": {
+          "id": "wIxKfjFCXEi8oTjZ",
+          "name": "HomeworkBot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ba7964eb-3d5d-49ea-8391-bc2f1dd7e27c",
+              "leftValue": "={{$json.data.approved}}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        752,
+        -224
+      ],
+      "id": "e4c6ea72-ac29-43c8-80d3-02f9bb5bb020",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $items(\"Message a model1\")[0].json.output[0].content[0].text }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        976,
+        -240
+      ],
+      "id": "a3431018-a83c-476e-a99f-14f1c6222d8e",
+      "name": "in chat text",
+      "webhookId": "e84aab23-3744-4bd0-b7ca-4dd61f29c70c",
+      "credentials": {
+        "telegramApi": {
+          "id": "wIxKfjFCXEi8oTjZ",
+          "name": "HomeworkBot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "prompt": "={{ $('Telegram Trigger').item.json.message.text }}",
+        "options": {
+          "dalleQuality": "standard",
+          "size": "1024x1792",
+          "style": "natural",
+          "returnImageUrls": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        -944,
+        -240
+      ],
+      "id": "5649b564-caa6-4ff4-a1f6-f7712f391047",
+      "name": "Insta",
+      "credentials": {
+        "openAiApi": {
+          "id": "wmMo2Lknq3Hi5ts2",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "prompt": "={{ $('Telegram Trigger').item.json.message.text }}",
+        "options": {
+          "dalleQuality": "standard",
+          "size": "1792x1024",
+          "style": "natural",
+          "returnImageUrls": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        -928,
+        -48
+      ],
+      "id": "e46bde14-8722-4dca-9f98-1d181454de9c",
+      "name": "fb",
+      "credentials": {
+        "openAiApi": {
+          "id": "wmMo2Lknq3Hi5ts2",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendPhoto",
+        "chatId": "={{ $json.result.chat.id }}",
+        "binaryData": "={{ false }}",
+        "file": "={{\n  $if(\n    $(\"Insta\").isExecuted,\n    $items(\"Insta\")[0].json.url,\n    $if(\n      $(\"fb\").isExecuted,\n      $items(\"fb\")[0].json.url,\n      \"\"\n    )\n  )\n}}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1216,
+        -240
+      ],
+      "id": "c44d6a8e-9e76-4869-8a99-3cd84658212f",
+      "name": "Send a photo message1",
+      "webhookId": "ff314cdd-b865-4b09-8bd4-880e923ac12f",
+      "credentials": {
+        "telegramApi": {
+          "id": "wIxKfjFCXEi8oTjZ",
+          "name": "HomeworkBot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "Привіт! 👋 Я створюю зображення для Instagram та Facebook 🎨  Просто напиши, що ти хочеш побачити: — опис сцени — стиль (реалістичний, 3D, мінімалізм, аніме тощо) — текст на зображенні (якщо потрібен)  📌 Приклад: “Insta,Сучасний салон краси, ніжні кольори, багато світла, текст: Beauty starts here”  ⚡ Я згенерую зображення і одразу надішлю тобі",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -928,
+        160
+      ],
+      "id": "18dd7b8c-76fe-45d1-bd1d-3f08b92a32e0",
+      "name": "Send a text message2",
+      "webhookId": "3be55167-026e-4e05-96f8-5126544d02a8",
+      "credentials": {
+        "telegramApi": {
+          "id": "wIxKfjFCXEi8oTjZ",
+          "name": "HomeworkBot"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "PreProcessing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PreProcessing": {
+      "main": [
+        [
+          {
+            "node": "Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prompt": {
+      "main": [
+        [
+          {
+            "node": "Send a chat action",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a chat action": {
+      "main": [
+        []
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Insta",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "fb",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a photo message": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model1": {
+      "main": [
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message1": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Send message and wait for response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send message and wait for response": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "in chat text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insta": {
+      "main": [
+        [
+          {
+            "node": "Send a photo message",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Message a model1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "fb": {
+      "main": [
+        [
+          {
+            "node": "Send a photo message",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Message a model1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "in chat text": {
+      "main": [
+        [
+          {
+            "node": "Send a photo message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "d00c4d39-765b-4a8d-a28f-481fe7913423",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-04-28T19:28:44.564Z",
+      "createdAt": "2026-04-28T19:28:44.564Z",
+      "role": "workflow:owner",
+      "workflowId": "JbMYQGPk18mCfWEa",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
