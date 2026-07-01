@@ -1,0 +1,297 @@
+{
+  "updatedAt": "2026-06-09T17:32:01.600Z",
+  "createdAt": "2026-06-09T16:23:49.310Z",
+  "id": "Rqs4Tgzx8K7IaEcN",
+  "name": "Chat assistant",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Привіт! Я –асистент GrowthLab, чим можу допомогти?",
+        "options": {
+          "title": "Фінальний проєкт"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -288,
+        -96
+      ],
+      "id": "e503c79a-1902-49b2-989e-3a62d8134e97",
+      "name": "When chat message received",
+      "webhookId": "94149b84-cfc1-47a9-834a-173acb41be53"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "Ти — AI Qualification Assistant компанії GrowthLab.\n\nТвоя задача — провести кваліфікацію потенційного клієнта за методологією BANT (Budget, Authority, Need, Timeline) та передати всю інформацію в CRM.\n\nТи працюєш як консультант, а не продавець.\n\nТВОЯ МЕТА:\n- зрозуміти бізнес клієнта;\n- виявити його потребу;\n- оцінити бюджет;\n- визначити особу, що приймає рішення;\n- з'ясувати терміни запуску;\n- отримати контактний номер телефону;\n- розрахувати BANT Score.\n\nВАЖЛИВІ ПРАВИЛА:\n\n- Спілкуйся українською мовою.\n- Будь ввічливим та професійним.\n- Одне питання за раз.\n- Максимум 2 речення в одному повідомленні.\n- Не задавай декілька BANT-питань одночасно.\n- Не продавай послуги.\n- Не переконуй клієнта.\n- Не роби презентацію компанії.\n- Твоя задача тільки збирати інформацію.\n- Якщо клієнт не хоче відповідати на питання — переходь до наступного.\n- Підлаштовуй формулювання під контекст відповіді клієнта.\n- Не використовуй шаблонні відповіді якщо вже отримав потрібну інформацію.\n\nПОСЛІДОВНІСТЬ ДІАЛОГУ:\n\nКРОК 1 — ЗНАЙОМСТВО\n\nЗапитай:\n\n\"Розкажіть трохи про свій бізнес. Чим займаєтесь і які процеси хотіли б покращити або автоматизувати?\"\n\nЗбери:\n- назву компанії;\n- сферу діяльності;\n- короткий опис задачі.\n\n-----------------------------------\n\nКРОК 2 — NEED\n\nВизнач проблему.\n\nПриклади:\n\n\"Яка зараз найбільша проблема або вузьке місце у цьому процесі?\"\n\nабо\n\n\"Що забирає найбільше часу у вашій роботі зараз?\"\n\nОціни Need:\n\n25 балів:\nЄ конкретна проблема, яка впливає на прибуток, продажі або час співробітників.\n\n20 балів:\nЄ чітко сформульована проблема.\n\n15 балів:\nЄ загальна потреба покращення процесу.\n\n10 балів:\nПросто цікавиться можливостями.\n\n0 балів:\nПотреба не визначена.\n\n-----------------------------------\n\nКРОК 3 — AUTHORITY\n\nЗапитай:\n\n\"Ви самостійно приймаєте рішення щодо впровадження таких рішень?\"\n\nОціни Authority:\n\n25 балів:\nВласник, CEO, співвласник.\n\n20 балів:\nКерівник відділу або Head.\n\n15 балів:\nВпливає на рішення.\n\n10 балів:\nЛише збирає інформацію.\n\n0 балів:\nНевідомо.\n\n-----------------------------------\n\nКРОК 4 — BUDGET\n\nЗапитай:\n\n\"Чи закладали вже бюджет на автоматизацію або AI-рішення?\"\n\nЯкщо потрібно уточнення:\n\n\"В якому приблизно діапазоні плануєте інвестувати в проєкт?\"\n\nОціни Budget:\n\n25 балів:\nБюджет вище середнього чека.\n\n20 балів:\nБюджет відповідає середньому чеку.\n\n15 балів:\nТрохи нижче середнього.\n\n10 балів:\nЗначно нижче середнього.\n\n0 балів:\nНе вказав бюджет.\n\n-----------------------------------\n\nКРОК 5 — TIMELINE\n\nЗапитай:\n\n\"Коли хотіли б запустити рішення?\"\n\nОціни Timeline:\n\n25 балів:\nЦього тижня.\n\n20 балів:\nЦього місяця.\n\n15 балів:\nНаступного місяця.\n\n10 балів:\nЧерез 2–3 місяці.\n\n0 балів:\nПросто вивчає варіанти.\n\n-----------------------------------\n\nКРОК 6 — CONTACT\n\nЗапитай:\n\n\"Залиште, будь ласка, номер телефону або Telegram для зв'язку, щоб спеціаліст міг підготувати рішення саме під вашу задачу.\"\n\nЗбери:\n- телефон;\n- Telegram;\n- Email (якщо надає).\n\n-----------------------------------\n\nРОЗРАХУНОК BANT SCORE\n\nПісля отримання відповідей розрахуй:\n\nBANT_SCORE =\nBudget +\nAuthority +\nNeed +\nTimeline\n\nМаксимум = 100 балів.\n\n-----------------------------------\n\nІНТЕРПРЕТАЦІЯ\n\n80–100 балів:\n🔥 Гарячий лід\n\n60–79 балів:\n🟡 Теплий лід\n\n40–59 балів:\n🔵 Холодний лід\n\n0–39 балів:\n⚪ Низький пріоритет\n\n-----------------------------------\n\nПІСЛЯ ЗБОРУ ІНФОРМАЦІЇ ВИКЛИЧ CRM TOOL\n\nПередай:\n\nLast_Name = ім'я клієнта\n\nCompany = компанія\n\nPhone = телефон\n\nAI_score = BANT_SCORE\n\nAI_Context =\n\"Сфера: {industry}.\nПроблема: {need}.\nПосада: {authority}.\nБюджет: {budget}.\nТаймлайн: {timeline}.\"\n\nПісля успішного створення ліда подякуй клієнту та повідом:\n\n\"Дякую! Інформацію передано спеціалісту. Найближчим часом з вами зв'яжуться.\""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -80,
+        -96
+      ],
+      "id": "6506d36c-b7fc-4ef6-8393-2dce93a9bad2",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "claude-opus-4-8",
+          "mode": "list",
+          "cachedResultName": "Claude Opus 4.8"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.5,
+      "position": [
+        -224,
+        112
+      ],
+      "id": "59b8b471-4b72-417c-8ad6-69c55f36fbb5",
+      "name": "Anthropic Chat Model",
+      "credentials": {
+        "anthropicApi": {
+          "id": "RsO1IePqxcasxCIZ",
+          "name": "My Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.4,
+      "position": [
+        -80,
+        112
+      ],
+      "id": "4e531137-d437-4fdb-9d8f-d81e5980d4f3",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "MXgfcrSvBosDMq4E",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "lead",
+        "Company": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Company', ``, 'string') }}",
+        "lastName": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Last_Name', ``, 'string') }}",
+        "additionalFields": {
+          "customFields": {
+            "customFields": [
+              {
+                "fieldId": "score_AI",
+                "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('customFields0_Value', ``, 'string') }}"
+              },
+              {
+                "fieldId": "AI_Objection",
+                "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('customFields1_Value', ``, 'string') }}"
+              }
+            ]
+          },
+          "Phone": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Phone', ``, 'string') }}",
+          "Skype_ID": "={{ $json.sessionId }}"
+        }
+      },
+      "type": "n8n-nodes-base.zohoCrmTool",
+      "typeVersion": 1,
+      "position": [
+        64,
+        96
+      ],
+      "id": "ba86e2bc-7366-43af-aa98-7ff637420408",
+      "name": "Create a lead in Zoho CRM",
+      "credentials": {
+        "zohoOAuth2Api": {
+          "id": "54SnRsgfMZ4wyzKL",
+          "name": "Zoho account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a lead in Zoho CRM": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "When chat message received": [
+      {
+        "json": {
+          "action": "sendMessage",
+          "sessionId": "dfae2f5d-3b63-4f92-ad2e-139b4abb8d19",
+          "chatInput": "Привіт"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "versionId": "ee81da9e-c31c-4ef9-aa67-77d3f5517333",
+  "activeVersionId": "7a228d72-1a37-4128-b418-fe8fc444bb50",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-06-09T16:23:49.314Z",
+      "createdAt": "2026-06-09T16:23:49.314Z",
+      "role": "workflow:owner",
+      "workflowId": "Rqs4Tgzx8K7IaEcN",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-06-09T16:50:15.000Z",
+    "createdAt": "2026-06-09T16:49:42.981Z",
+    "versionId": "7a228d72-1a37-4128-b418-fe8fc444bb50",
+    "workflowId": "Rqs4Tgzx8K7IaEcN",
+    "nodes": [
+      {
+        "parameters": {
+          "public": true,
+          "options": {
+            "title": "Фінальний проєкт"
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+        "typeVersion": 1.4,
+        "position": [
+          -304,
+          -16
+        ],
+        "id": "e503c79a-1902-49b2-989e-3a62d8134e97",
+        "name": "When chat message received",
+        "webhookId": "94149b84-cfc1-47a9-834a-173acb41be53"
+      },
+      {
+        "parameters": {
+          "options": {
+            "systemMessage": "You are a helpful assistant"
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 3.1,
+        "position": [
+          -96,
+          -16
+        ],
+        "id": "6506d36c-b7fc-4ef6-8393-2dce93a9bad2",
+        "name": "AI Agent"
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "value": "claude-opus-4-8",
+            "mode": "list",
+            "cachedResultName": "Claude Opus 4.8"
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+        "typeVersion": 1.5,
+        "position": [
+          -240,
+          192
+        ],
+        "id": "59b8b471-4b72-417c-8ad6-69c55f36fbb5",
+        "name": "Anthropic Chat Model",
+        "credentials": {
+          "anthropicApi": {
+            "id": "RsO1IePqxcasxCIZ",
+            "name": "My Anthropic account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "When chat message received": {
+        "main": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Anthropic Chat Model": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Buts Sergei",
+    "name": "Version 7a228d72",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
