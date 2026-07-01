@@ -1,0 +1,117 @@
+{
+  "updatedAt": "2026-05-30T20:36:51.522Z",
+  "createdAt": "2026-05-27T18:08:21.814Z",
+  "id": "tFgUGjXvBR3UuuMJ",
+  "name": "post_call",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "75715f72-a978-4386-9772-bb67d22d050a",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -624,
+        -64
+      ],
+      "id": "fcd9c2be-b5f4-4c4d-8bc0-a1733fa71dfd",
+      "name": "Webhook",
+      "webhookId": "75715f72-a978-4386-9772-bb67d22d050a"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json.body.transcript;\n\nconst formatted = data\n  .filter(turn => turn.message && turn.message.trim() !== '...')\n  .map(turn => {\n    const role = turn.role === 'agent' ? ' Агент' : ' Клієнт';\n\n    const time = turn.time_in_call_secs || 0;\n    const mins = Math.floor(time / 60);\n    const secs = time % 60;\n\n    const timestamp =\n      `[${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}]`;\n\n    return `${timestamp} ${role}: ${turn.message}`;\n  })\n  .join('\\n');\n\nreturn [\n  {\n    json: {\n      transcript_text: formatted\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -416,
+        -64
+      ],
+      "id": "1709e45f-8e33-4f0a-a6dc-f16d5dfe2ff2",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "resource": "lead",
+        "operation": "update",
+        "leadId": "={{ $('Webhook').item.json.body.conversation_initiation_client_data.dynamic_variables.lead_id }}",
+        "updateFields": {
+          "customFields": {
+            "customFields": [
+              {
+                "fieldId": "Skore_Coment",
+                "value": "={{ $json.transcript_text }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.zohoCrm",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        -64
+      ],
+      "id": "d0c55278-3f00-4623-84e3-3e707ca3a288",
+      "name": "Update a lead",
+      "credentials": {
+        "zohoOAuth2Api": {
+          "id": "54SnRsgfMZ4wyzKL",
+          "name": "Zoho account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Update a lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "854c8b5d-6719-4677-bc46-033a0c6d9d1b",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-05-27T18:08:21.819Z",
+      "createdAt": "2026-05-27T18:08:21.819Z",
+      "role": "workflow:owner",
+      "workflowId": "tFgUGjXvBR3UuuMJ",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
