@@ -1,0 +1,309 @@
+{
+  "updatedAt": "2026-07-01T17:25:43.506Z",
+  "createdAt": "2026-07-01T16:27:14.369Z",
+  "id": "QdWdTQqRqDKtn1bv",
+  "name": "Git",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -576,
+        -32
+      ],
+      "id": "164b5692-e133-40aa-a547-bb622c7838a2",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://malligos.app.n8n.cloud/api/v1/workflows",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-N8N-API-KEY",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZTYyNTkzNy00MDI0LTQ4ZjctOWE3Ni0xYmNmMmVlMzM4OTEiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiZDIzYmI3ZjEtZTQ3Ny00NDQ2LWFkNWMtYjUzZGU0YzM2NDdiIiwiaWF0IjoxNzgyOTIzMTE3fQ.dFq_1Gn0y02EFvwYuuknoVhjB3wAgsYo6gGEIXqvv4Q"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -368,
+        -32
+      ],
+      "id": "867dd2f2-2e7e-41d4-b2ac-285d791ada07",
+      "name": "Get Workflows",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "u6z8UeiwpICLYgpi",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        -32
+      ],
+      "id": "d2e068bd-9546-48c5-a70c-361cc7fe7a1d",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const workflow = $json;\n\nconst safeName = workflow.name\n  .toLowerCase()\n  .replace(/[^a-z0-9а-яіїєґ]+/gi, \"-\")\n  .replace(/^-+|-+$/g, \"\");\n\nconst content = JSON.stringify(workflow, null, 2);\n\nreturn {\n  workflowName: workflow.name,\n  workflowId: workflow.id,\n  filePath: `workflows/production/${safeName}-${workflow.id}.json`,\n  content,\n  contentBase64: Buffer.from(content).toString(\"base64\"),\n  commitMessage: `backup: ${workflow.name}`\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        48,
+        -32
+      ],
+      "id": "6a5dd1f3-ac42-4773-b13f-53ba7c009bb3",
+      "name": "Prepare GitHub file"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "owner": {
+          "__rl": true,
+          "value": "Malligos",
+          "mode": "list",
+          "cachedResultName": "Malligos",
+          "cachedResultUrl": "https://github.com/Malligos"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "n8n-enterprise-version-control",
+          "mode": "list",
+          "cachedResultName": "n8n-enterprise-version-control",
+          "cachedResultUrl": "https://github.com/Malligos/n8n-enterprise-version-control"
+        },
+        "filePath": "={{$json.filePath}}",
+        "fileContent": "={{$json.fileContent || $json.content}}",
+        "commitMessage": "={{$json.commitMessage}}"
+      },
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1.1,
+      "position": [
+        512,
+        32
+      ],
+      "id": "5d84b187-1cf9-45ce-bee0-95ea2ad1e458",
+      "name": "Create a file",
+      "webhookId": "1b7df97a-9bcc-49fa-ad4a-3c1c2a53378c",
+      "credentials": {
+        "githubApi": {
+          "id": "gELBCi5BQ6YeDjYN",
+          "name": "GitHub Enterprise Backup"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.github.com/repos/Malligos/n8n-enterprise-version-control/contents/{{$json.filePath}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        256,
+        -32
+      ],
+      "id": "7f4503ca-afda-4051-9105-40fa006b3915",
+      "name": "Get GitHub File",
+      "credentials": {
+        "githubApi": {
+          "id": "gELBCi5BQ6YeDjYN",
+          "name": "GitHub Enterprise Backup"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://api.github.com/repos/Malligos/n8n-enterprise-version-control/contents/{{$json.filePath}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"message\": \"{{$json.commitMessage}}\",\n  \"content\": \"{{$json.contentBase64}}\",\n  \"branch\": \"main\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        480,
+        160
+      ],
+      "id": "1578f5f1-2730-45ba-a817-c10745136b30",
+      "name": "Create File",
+      "retryOnFail": true,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "githubApi": {
+          "id": "gELBCi5BQ6YeDjYN",
+          "name": "GitHub Enterprise Backup"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://api.github.com/repos/Malligos/n8n-enterprise-version-control/contents/{{$json.path}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"message\": \"backup: {{ $('Prepare GitHub file').item.json.workflowName }}\",\n  \"content\": \"{{ $('Prepare GitHub file').item.json.contentBase64 }}\",\n  \"sha\": \"{{ $json.sha }}\",\n  \"branch\": \"main\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        512,
+        -208
+      ],
+      "id": "788ffe4e-96ef-490d-9f3e-216dffa2a33b",
+      "name": "Update File",
+      "retryOnFail": true,
+      "credentials": {
+        "githubApi": {
+          "id": "gELBCi5BQ6YeDjYN",
+          "name": "GitHub Enterprise Backup"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "review",
+        "operation": "update",
+        "owner": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "repository": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        }
+      },
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1.1,
+      "position": [
+        560,
+        -96
+      ],
+      "id": "44eee0a1-a49e-4e66-9bc0-5b3c9608604b",
+      "name": "Update a review",
+      "webhookId": "069dcb42-5685-47fb-9808-b5d3bcc59a01",
+      "credentials": {
+        "githubApi": {
+          "id": "gELBCi5BQ6YeDjYN",
+          "name": "GitHub Enterprise Backup"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get Workflows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Workflows": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Prepare GitHub file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare GitHub file": {
+      "main": [
+        [
+          {
+            "node": "Get GitHub File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get GitHub File": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Create a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "c31f1608-3730-46e2-a5e0-a0d7d696e664",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-07-01T16:27:14.373Z",
+      "createdAt": "2026-07-01T16:27:14.373Z",
+      "role": "workflow:owner",
+      "workflowId": "QdWdTQqRqDKtn1bv",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
