@@ -1,90 +1,123 @@
 {
-  "updatedAt": "2026-06-22T08:19:39.802Z",
-  "createdAt": "2026-06-01T18:55:26.100Z",
-  "id": "6uUjPPNn9AlhGLkd",
-  "name": "Калькулятор собівартості тату",
+  "updatedAt": "2026-04-11T19:41:32.024Z",
+  "createdAt": "2026-04-08T10:23:54.502Z",
+  "id": "oYc7VMcDoy6gkP90",
+  "name": "error for tony",
   "active": true,
   "isArchived": false,
   "nodes": [
     {
-      "parameters": {
-        "updates": [
-          "message"
-        ],
-        "additionalFields": {}
-      },
-      "id": "ae9d850b-768a-4188-bcbd-a11555b1978e",
-      "name": "Telegram Trigger",
-      "type": "n8n-nodes-base.telegramTrigger",
-      "typeVersion": 1.3,
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
       "position": [
-        240,
-        304
+        -432,
+        -16
       ],
-      "webhookId": "a97d03cc-8b3b-406f-bcff-b7434154d57e",
-      "credentials": {
-        "telegramApi": {
-          "id": "LAKXnWIRDoCt8OvO",
-          "name": "Ai_assistent_Garmash"
-        }
-      }
+      "id": "c173dddf-2a80-4e7e-a15a-0281d4acf024",
+      "name": "Error Trigger"
     },
     {
       "parameters": {
-        "mode": "runOnceForEachItem",
-        "jsCode": "// Отримуємо текст повідомлення\nconst messageText = $input.item.json.message.text.toLowerCase();\n\n// Ініціалізуємо змінні\nlet materialsCost = 0;\nlet hours = 0;\nlet color = '';\n\n// Парсимо матеріали\nconst materialsMatch = messageText.match(/матеріал[иі]?\\s*(\\d+)/);\nif (materialsMatch) {\n  materialsCost = parseFloat(materialsMatch[1]);\n}\n\n// Парсимо години\nconst hoursMatch = messageText.match(/годин[иаі]?\\s*(\\d+\\.?\\d*)/);\nif (hoursMatch) {\n  hours = parseFloat(hoursMatch[1]);\n}\n\n// Парсимо колір\nif (messageText.includes('кольор') || messageText.includes('колір')) {\n  if (messageText.includes('чорн')) {\n    color = 'чорний';\n  } else if (messageText.includes('кольор')) {\n    color = 'кольорове';\n  }\n}\n\n// Розрахунок собівартості\nconst hourlyRate = 800; // грн за годину\nconst colorMultiplier = color === 'кольорове' ? 1.3 : 1.0;\n\nconst laborCost = hours * hourlyRate;\nconst totalCost = (materialsCost + laborCost) * colorMultiplier;\n\nreturn {\n  materialsCost: materialsCost,\n  hours: hours,\n  color: color || 'не вказано',\n  hourlyRate: hourlyRate,\n  laborCost: laborCost,\n  colorMultiplier: colorMultiplier,\n  totalCost: Math.round(totalCost),\n  chatId: $input.item.json.message.chat.id\n};"
-      },
-      "id": "c67e464d-e5ae-45be-91f6-6e85520929e9",
-      "name": "Розрахунок собівартості",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        464,
-        304
-      ]
-    },
-    {
-      "parameters": {
-        "chatId": "={{ $json.chatId }}",
-        "text": "=💰 Розрахунок собівартості тату:\n\n📦 Матеріали: {{ $json.materialsCost }} грн\n⏱ Години роботи: {{ $json.hours }} год × {{ $json.hourlyRate }} грн/год = {{ $json.laborCost }} грн\n🎨 Колір: {{ $json.color }}\n📊 Коефіцієнт кольору: {{ $json.colorMultiplier }}\n\n✅ Загальна собівартість: {{ $json.totalCost }} грн",
+        "chatId": "=-1003778943816",
+        "text": "❌ Неправильний формат часу. \n\nПиши тільки так: 10:00-21:00 \nПриклади правильного формату: 09:50-22:30 08:00-16:45\n",
         "additionalFields": {
-          "parse_mode": "HTML"
+          "appendAttribution": false
         }
       },
-      "id": "48c068ca-4467-464e-8ba1-74455f829a64",
-      "name": "Відправити результат",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        688,
-        304
+        224,
+        -16
       ],
-      "webhookId": "709735f1-c270-4859-a649-048ed8481888",
+      "id": "860743e4-8350-417c-afa8-64de54065c85",
+      "name": "Send a text message",
+      "webhookId": "ee403805-43d8-4451-be92-77a495a8ea6d",
+      "notesInFlow": false,
       "credentials": {
         "telegramApi": {
-          "id": "LAKXnWIRDoCt8OvO",
-          "name": "Ai_assistent_Garmash"
+          "id": "fhuHHM0lesLeKwYF",
+          "name": "tony/time"
         }
       }
+    },
+    {
+      "parameters": {
+        "jsCode": "const rawMessage = $json.execution?.error?.message || '';\n\nlet chat_id = null;\nlet error_type = 'UNKNOWN_ERROR';\n\nif (rawMessage.includes('|')) {\n  const parts = rawMessage.split('|');\n  error_type = parts[0];\n  chat_id = parts[1].split(' ')[0];\n}\n\nreturn [{\n  chat_id,\n  error_type\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -224,
+        -16
+      ],
+      "id": "32cfd76b-b46b-4a4e-b6bf-8b9e5e947e6b",
+      "name": "Parse Error"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "321f96e8-8323-4043-add1-9fcfe1a3e955",
+              "leftValue": "={{ $json.error_type === 'INVALID_FORMAT' }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -16,
+        -16
+      ],
+      "id": "ebd7da98-9065-4bc7-b65d-06d01e06b6d2",
+      "name": "If"
     }
   ],
   "connections": {
-    "Telegram Trigger": {
+    "Error Trigger": {
       "main": [
         [
           {
-            "node": "Розрахунок собівартості",
+            "node": "Parse Error",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Розрахунок собівартості": {
+    "Parse Error": {
       "main": [
         [
           {
-            "node": "Відправити результат",
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
             "type": "main",
             "index": 0
           }
@@ -101,64 +134,136 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "10d01083-c200-49bf-8485-584936c1826d",
-  "activeVersionId": "81e0ee5b-770a-4705-80fa-2b87c3e6d0e8",
-  "triggerCount": 1,
+  "versionId": "d3a59ceb-f6ca-46e0-8d7a-fc16a0e07400",
+  "activeVersionId": "d3a59ceb-f6ca-46e0-8d7a-fc16a0e07400",
+  "triggerCount": 0,
   "shared": [
     {
-      "updatedAt": "2026-06-01T18:55:26.102Z",
-      "createdAt": "2026-06-01T18:55:26.102Z",
+      "updatedAt": "2026-04-08T10:23:54.504Z",
+      "createdAt": "2026-04-08T10:23:54.504Z",
       "role": "workflow:owner",
-      "workflowId": "6uUjPPNn9AlhGLkd",
+      "workflowId": "oYc7VMcDoy6gkP90",
       "projectId": "tpHcOqN3nfT7Wyud"
     }
   ],
   "activeVersion": {
-    "updatedAt": "2026-06-01T19:04:51.000Z",
-    "createdAt": "2026-06-01T19:04:49.422Z",
-    "versionId": "81e0ee5b-770a-4705-80fa-2b87c3e6d0e8",
-    "workflowId": "6uUjPPNn9AlhGLkd",
+    "updatedAt": "2026-04-11T19:56:17.000Z",
+    "createdAt": "2026-04-11T19:41:32.024Z",
+    "versionId": "d3a59ceb-f6ca-46e0-8d7a-fc16a0e07400",
+    "workflowId": "oYc7VMcDoy6gkP90",
     "nodes": [
       {
-        "parameters": {
-          "path": "whatsapp",
-          "responseMode": "responseNode",
-          "options": {}
-        },
-        "type": "n8n-nodes-base.webhook",
-        "typeVersion": 2.1,
+        "parameters": {},
+        "type": "n8n-nodes-base.errorTrigger",
+        "typeVersion": 1,
         "position": [
-          0,
-          0
+          -432,
+          -16
         ],
-        "id": "13cd1a9a-2f94-42db-8fb6-9c53c960265b",
-        "name": "Webhook",
-        "webhookId": "4244aa57-3e91-47d9-a2ae-1b482e72b577"
+        "id": "c173dddf-2a80-4e7e-a15a-0281d4acf024",
+        "name": "Error Trigger"
       },
       {
         "parameters": {
-          "respondWith": "text",
-          "responseBody": "={{ $json.query[\"hub.challenge\"] }}",
-          "options": {
-            "responseCode": 200
+          "chatId": "=-1003778943816",
+          "text": "❌ Неправильний формат часу. \n\nПиши тільки так: 10:00-21:00 \nПриклади правильного формату: 09:50-22:30 08:00-16:45\n",
+          "additionalFields": {
+            "appendAttribution": false
           }
         },
-        "type": "n8n-nodes-base.respondToWebhook",
-        "typeVersion": 1.5,
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
         "position": [
-          208,
-          0
+          224,
+          -16
         ],
-        "id": "3212b6a7-49da-4cc5-949b-134a03d6ed50",
-        "name": "Respond to Webhook"
+        "id": "860743e4-8350-417c-afa8-64de54065c85",
+        "name": "Send a text message",
+        "webhookId": "ee403805-43d8-4451-be92-77a495a8ea6d",
+        "notesInFlow": false,
+        "credentials": {
+          "telegramApi": {
+            "id": "fhuHHM0lesLeKwYF",
+            "name": "tony/time"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const rawMessage = $json.execution?.error?.message || '';\n\nlet chat_id = null;\nlet error_type = 'UNKNOWN_ERROR';\n\nif (rawMessage.includes('|')) {\n  const parts = rawMessage.split('|');\n  error_type = parts[0];\n  chat_id = parts[1].split(' ')[0];\n}\n\nreturn [{\n  chat_id,\n  error_type\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -224,
+          -16
+        ],
+        "id": "32cfd76b-b46b-4a4e-b6bf-8b9e5e947e6b",
+        "name": "Parse Error"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "321f96e8-8323-4043-add1-9fcfe1a3e955",
+                "leftValue": "={{ $json.error_type === 'INVALID_FORMAT' }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          -16,
+          -16
+        ],
+        "id": "ebd7da98-9065-4bc7-b65d-06d01e06b6d2",
+        "name": "If"
       }
     ],
     "connections": {
-      "Webhook": {
+      "Error Trigger": {
         "main": [
           [
             {
-              "node": "Respond to Webhook",
+              "node": "Parse Error",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Parse Error": {
+        "main": [
+          [
+            {
+              "node": "If",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If": {
+        "main": [
+          [
+            {
+              "node": "Send a text message",
               "type": "main",
               "index": 0
             }
@@ -168,7 +273,7 @@
     },
     "nodeGroups": [],
     "authors": "Buts Sergei",
-    "name": "Version 81e0ee5b",
+    "name": "Version d3a59ceb",
     "description": "",
     "autosaved": true
   },
