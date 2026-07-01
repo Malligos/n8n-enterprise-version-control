@@ -1,0 +1,361 @@
+{
+  "updatedAt": "2026-04-15T12:06:07.745Z",
+  "createdAt": "2026-04-15T11:13:16.684Z",
+  "id": "YsTEyM5Eqpt7jJiq",
+  "name": "complete_task",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "fact_type"
+            },
+            {
+              "name": "fact_content"
+            },
+            {
+              "name": "task_text"
+            },
+            {
+              "name": "status"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "0446f5df-d08b-41c3-952b-436019a878b7",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "operation": "deleteRows",
+        "dataTableId": {
+          "__rl": true,
+          "value": "VoGjGXfjo5ItE3v1",
+          "mode": "list",
+          "cachedResultName": "User_facts",
+          "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/VoGjGXfjo5ItE3v1"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "fact_type",
+              "keyValue": "={{ $json.fact_type }}"
+            }
+          ]
+        },
+        "options": {
+          "dryRun": false
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "5d44f082-45aa-4af1-94a3-c24ea54d50a5",
+      "name": "Delete row(s)",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "VoGjGXfjo5ItE3v1",
+          "mode": "list",
+          "cachedResultName": "User_facts",
+          "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/VoGjGXfjo5ItE3v1"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "fact_content": "={{ $('When Executed by Another Workflow').item.json.fact_content }}",
+            "fact_type": "={{ $('When Executed by Another Workflow').item.json.fact_type }}",
+            "task_text": "={{ $('When Executed by Another Workflow').item.json.task_text }}",
+            "status": "={{ $('When Executed by Another Workflow').item.json.status }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "fact_type",
+              "displayName": "fact_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "fact_content",
+              "displayName": "fact_content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "task_text",
+              "displayName": "task_text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "4edbe3b9-440d-40a7-b103-1135ccaf6e1d",
+      "name": "Insert row"
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Delete row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete row(s)": {
+      "main": [
+        [
+          {
+            "node": "Insert row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "5dbb8737-5d07-43bf-83e5-7aaa4c0e3309",
+  "activeVersionId": "5dbb8737-5d07-43bf-83e5-7aaa4c0e3309",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-04-15T11:13:16.685Z",
+      "createdAt": "2026-04-15T11:13:16.685Z",
+      "role": "workflow:owner",
+      "workflowId": "YsTEyM5Eqpt7jJiq",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-04-15T12:06:03.000Z",
+    "createdAt": "2026-04-15T12:05:48.852Z",
+    "versionId": "5dbb8737-5d07-43bf-83e5-7aaa4c0e3309",
+    "workflowId": "YsTEyM5Eqpt7jJiq",
+    "nodes": [
+      {
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "fact_type"
+              },
+              {
+                "name": "fact_content"
+              },
+              {
+                "name": "task_text"
+              },
+              {
+                "name": "status"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          0,
+          0
+        ],
+        "id": "0446f5df-d08b-41c3-952b-436019a878b7",
+        "name": "When Executed by Another Workflow"
+      },
+      {
+        "parameters": {
+          "operation": "deleteRows",
+          "dataTableId": {
+            "__rl": true,
+            "value": "VoGjGXfjo5ItE3v1",
+            "mode": "list",
+            "cachedResultName": "User_facts",
+            "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/VoGjGXfjo5ItE3v1"
+          },
+          "matchType": "allConditions",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "fact_type",
+                "keyValue": "={{ $json.fact_type }}"
+              }
+            ]
+          },
+          "options": {
+            "dryRun": false
+          }
+        },
+        "type": "n8n-nodes-base.dataTable",
+        "typeVersion": 1.1,
+        "position": [
+          208,
+          0
+        ],
+        "id": "5d44f082-45aa-4af1-94a3-c24ea54d50a5",
+        "name": "Delete row(s)",
+        "alwaysOutputData": true
+      },
+      {
+        "parameters": {
+          "dataTableId": {
+            "__rl": true,
+            "value": "VoGjGXfjo5ItE3v1",
+            "mode": "list",
+            "cachedResultName": "User_facts",
+            "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/VoGjGXfjo5ItE3v1"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "fact_content": "={{ $('When Executed by Another Workflow').item.json.fact_content }}",
+              "fact_type": "={{ $('When Executed by Another Workflow').item.json.fact_type }}",
+              "task_text": "={{ $('When Executed by Another Workflow').item.json.task_text }}",
+              "status": "={{ $('When Executed by Another Workflow').item.json.status }}"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "fact_type",
+                "displayName": "fact_type",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              },
+              {
+                "id": "fact_content",
+                "displayName": "fact_content",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              },
+              {
+                "id": "task_text",
+                "displayName": "task_text",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              },
+              {
+                "id": "status",
+                "displayName": "status",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.dataTable",
+        "typeVersion": 1.1,
+        "position": [
+          416,
+          0
+        ],
+        "id": "4edbe3b9-440d-40a7-b103-1135ccaf6e1d",
+        "name": "Insert row"
+      }
+    ],
+    "connections": {
+      "When Executed by Another Workflow": {
+        "main": [
+          [
+            {
+              "node": "Delete row(s)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Delete row(s)": {
+        "main": [
+          [
+            {
+              "node": "Insert row",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Buts Sergei",
+    "name": "Version 5dbb8737",
+    "description": "",
+    "autosaved": false
+  },
+  "tags": []
+}
