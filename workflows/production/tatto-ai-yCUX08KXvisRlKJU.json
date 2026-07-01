@@ -1,0 +1,814 @@
+{
+  "updatedAt": "2026-05-14T18:08:52.951Z",
+  "createdAt": "2026-05-14T17:49:40.690Z",
+  "id": "yCUX08KXvisRlKJU",
+  "name": "tatto ai",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -288,
+        -32
+      ],
+      "id": "32faf3e4-d09e-4ad6-be48-e5527d42ba8e",
+      "name": "Telegram Trigger",
+      "webhookId": "60d5175e-638b-4328-90ff-66b46d250033",
+      "credentials": {
+        "telegramApi": {
+          "id": "wIxKfjFCXEi8oTjZ",
+          "name": "HomeworkBot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "52dad60b-422d-47c6-9cbe-2c3ea7a4b2e6",
+              "name": "message.text",
+              "value": "={{ $json.message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -80,
+        -32
+      ],
+      "id": "bec2b6e0-edcc-4b09-b2c7-b7339e3bc077",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=Ти асистент для тату-майстра.\n\nТвоє завдання — зібрати дані для розрахунку собівартості татуювання.\nОсь текст  {{ $json.message.text }}\nПотрібні поля:\n- type: black або color\n- complexity: easy, medium або hard\n- hours: кількість годин, може бути дробовим числом\n\nКористувач може писати українською або російською.\n\nПравила:\n- \"чорно-біле\", \"чб\", \"black\", \"чёрная\" = black\n- \"кольорова\", \"цветная\", \"color\" = color\n- \"проста\", \"легкая\", \"easy\" = easy\n- \"середня\", \"средняя\", \"medium\" = medium\n- \"складна\", \"сложная\", \"hard\" = hard\n\nЯкщо всіх даних достатньо — поверни тільки JSON:\n\n{\n  \"ready\": true,\n  \"type\": \"color\",\n  \"complexity\": \"medium\",\n  \"hours\": 4.5\n}\n\nЯкщо даних не вистачає — поверни тільки JSON:\n\n{\n  \"ready\": false,\n  \"message\": \"Коротке питання користувачу\"\n}\n\nНе рахуй ціну.\nНе вигадуй дані.\nНе додавай пояснення.\nВідповідай тільки валідним JSON.\n\n"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        128,
+        -32
+      ],
+      "id": "e4796f01-8c77-4e1b-b4c6-f80411767865",
+      "name": "Collect Tattoo Data",
+      "credentials": {
+        "openAiApi": {
+          "id": "wmMo2Lknq3Hi5ts2",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const response =\n  $json.output?.[0]?.content?.[0]?.text || '';\n\nlet clean = response.trim();\n\n// Удаляем markdown блоки ```json ```\nclean = clean.replace(/```json/gi, '');\nclean = clean.replace(/```/g, '');\nclean = clean.trim();\n\nlet data;\n\ntry {\n  data = JSON.parse(clean);\n} catch (e) {\n  return [{\n    json: {\n      ready: false,\n\n      chat_id:\n        $('Telegram Trigger').first().json.message.chat.id,\n\n      message:\n        '❌ Не вдалося розпізнати відповідь. Напишіть, наприклад: кольорова, середня, 4 години'\n    }\n  }];\n}\n\nreturn [{\n  json: {\n    ...data,\n\n    chat_id:\n      $('Telegram Trigger').first().json.message.chat.id,\n\n    username:\n      $('Telegram Trigger').first().json.message.from.username ||\n      $('Telegram Trigger').first().json.message.from.first_name ||\n      ''\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        -32
+      ],
+      "id": "9d0445b2-ac3f-4dda-9cb7-82fd0d44e452",
+      "name": "Parse AI JSON"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "01521e7f-a986-4e23-ba7b-5889eac6449a",
+              "leftValue": "={{ $json.ready }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        688,
+        -32
+      ],
+      "id": "c5078550-06df-494d-bb76-628428793846",
+      "name": "ready?"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.message }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        896,
+        64
+      ],
+      "id": "c492cf1f-ac0d-4002-8063-3b0819e30fb9",
+      "name": "Telegram Ask Question",
+      "webhookId": "f7454d98-d63c-4090-bd42-f76ca392ba16",
+      "credentials": {
+        "telegramApi": {
+          "id": "wIxKfjFCXEi8oTjZ",
+          "name": "HomeworkBot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit?gid=402387704#gid=402387704",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 252442203,
+          "mode": "list",
+          "cachedResultName": "Settings",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit#gid=252442203"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        912,
+        -96
+      ],
+      "id": "7c550fb9-2d77-4607-8952-73a7db5d808c",
+      "name": "Get Settings",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit?gid=402387704#gid=402387704",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Consumables",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1136,
+        -96
+      ],
+      "id": "4e45efd0-a1a9-4d5e-ae8c-6900adfdc512",
+      "name": "Get Consumables",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit?gid=402387704#gid=402387704",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1259929488,
+          "mode": "list",
+          "cachedResultName": "Usage_Norms",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit#gid=1259929488"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1360,
+        -96
+      ],
+      "id": "0e554b25-7926-409d-aaca-5ae064b95083",
+      "name": "Get Usage Norms",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const ai = $('Parse AI JSON').first().json;\n\nconst hours = Number(String(ai.hours).replace(',', '.'));\nconst type = String(ai.type || '').toLowerCase().trim();\nconst complexity = String(ai.complexity || '').toLowerCase().trim();\n\nconst settingsRows = $('Get Settings').all().map(i => i.json);\nconst consumablesRows = $('Get Consumables').all().map(i => i.json);\nconst normsRows = $('Get Usage Norms').all().map(i => i.json);\n\nfunction n(value) {\n  return Number(value || 0);\n}\n\nfunction r(value) {\n  return Math.round(value);\n}\n\nconst settings = {};\nfor (const row of settingsRows) {\n  settings[row.key] = n(row.value);\n}\n\nconst prices = {};\nfor (const row of consumablesRows) {\n  const name = String(row['назва'] || '').trim();\n  prices[name] = n(row['ціна_за_одиницю']);\n}\n\nconst norm = normsRows.find(row =>\n  String(row['тип'] || '').toLowerCase().trim() === type &&\n  String(row['складність'] || '').toLowerCase().trim() === complexity\n);\n\nif (!norm) {\n  return [{\n    json: {\n      success: false,\n      chat_id: ai.chat_id,\n      message: `❌ Не знайдено норму витрат для ${type} / ${complexity}`\n    }\n  }];\n}\n\nconst details = {\n  голки: n(norm['голки']) * n(prices['Голка']),\n  картриджі: n(norm['картриджі']) * n(prices['Картридж']),\n  фарба_чорна: n(norm['фарба_чорна_мл']) * n(prices['Фарба чорна']),\n  фарба_кольорова: n(norm['фарба_кольорова_мл']) * n(prices['Фарба кольорова']),\n  рукавички: n(norm['рукавички_пари']) * n(prices['Рукавички']),\n  плівка: n(norm['плівка_м']) * n(prices['Плівка']),\n  ковпачки: n(norm['ковпачки']) * n(prices['Ковпачки']),\n  серветки: n(norm['серветки']) * n(prices['Серветки']),\n  вазелін: n(norm['вазелін_г']) * n(prices['Вазелін']),\n  дезінфектор: n(norm['дезінфектор_мл']) * n(prices['Дезінфектор']),\n  пелюшки: n(norm['пелюшки']) * n(prices['Одноразова пелюшка']),\n  барєрний_захист: n(norm['барєрний_захист'] || norm['барерний_захист'] || norm['бар’єрний_захист']) * n(prices['Бар’єрний захист'])\n};\n\nconst consumablesTotal = Object.values(details).reduce((sum, value) => sum + value, 0);\n\nconst fixedCostsMonth =\n  n(settings.rent_month) +\n  n(settings.utilities_month) +\n  n(settings.ads_month) +\n  n(settings.equipment_month);\n\nconst workHoursMonth = n(settings.work_hours_month) || 120;\nconst masterRateHour = n(settings.master_rate_hour) || 700;\nconst profitMargin = n(settings.profit_margin) || 20;\n\nconst studioCost = fixedCostsMonth / workHoursMonth * hours;\nconst masterPay = masterRateHour * hours;\nconst costPrice = consumablesTotal + studioCost + masterPay;\nconst finalPrice = costPrice * (1 + profitMargin / 100);\nconst profit = finalPrice - costPrice;\n\nreturn [{\n  json: {\n    success: true,\n    дата: new Date().toISOString().split('T')[0],\n    chat_id: ai.chat_id,\n    username: ai.username,\n    години: hours,\n    тип: type,\n    складність: complexity,\n\n    голки: r(details.голки),\n    картриджі: r(details.картриджі),\n    фарба_чорна: r(details.фарба_чорна),\n    фарба_кольорова: r(details.фарба_кольорова),\n    рукавички: r(details.рукавички),\n    плівка: r(details.плівка),\n    ковпачки: r(details.ковпачки),\n    серветки: r(details.серветки),\n    вазелін: r(details.вазелін),\n    дезінфектор: r(details.дезінфектор),\n    пелюшки: r(details.пелюшки),\n    барєрний_захист: r(details.барєрний_захист),\n\n    витратники_всього: r(consumablesTotal),\n    студійні_витрати: r(studioCost),\n    оплата_майстра: r(masterPay),\n    собівартість: r(costPrice),\n    фінальна_ціна: r(finalPrice),\n    прибуток: r(profit)\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1584,
+        -96
+      ],
+      "id": "9b3550b7-b141-48c3-90ac-689ceea41c85",
+      "name": "Calculate Cost"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "aed1fa4e-42e8-4251-bebd-6b5cdfa7595a",
+              "leftValue": "={{ $json.success }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1808,
+        -96
+      ],
+      "id": "1dd54409-c828-41d2-9913-c33461dfc195",
+      "name": "Calculation Success"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "={{ $json.message }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2080,
+        32
+      ],
+      "id": "80db3b61-7c90-4012-aa72-9f997b6d1831",
+      "name": "Send a text message1",
+      "webhookId": "b87e6aa4-e8c2-428b-be97-d8677a0f6856",
+      "credentials": {
+        "telegramApi": {
+          "id": "wIxKfjFCXEi8oTjZ",
+          "name": "HomeworkBot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit?gid=402387704#gid=402387704",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1495283551,
+          "mode": "list",
+          "cachedResultName": "Orders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15-B3V1f-C4v7CzJjkZu_hL5JTLYh0GPXTNoAkr2jhLk/edit#gid=1495283551"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "дата": "={{ $json.дата }}",
+            "chat_id": "={{ $json.chat_id }}",
+            "username": "={{ $json.username }}",
+            "години": "={{ $json.години }}",
+            "тип": "={{ $json.тип }}",
+            "складність": "={{ $json['складність'] }}",
+            "картриджі": "={{ $json['картриджі'] }}",
+            "фарба_чорна": "={{ $json['фарба_чорна'] }}",
+            "фарба_кольорова": "={{ $json['фарба_кольорова'] }}",
+            "рукавички": "={{ $json['рукавички'] }}",
+            "плівка": "={{ $json['плівка'] }}",
+            "ковпачки": "={{ $json['ковпачки'] }}",
+            "серветки": "={{ $json['серветки'] }}",
+            "вазелін": "={{ $json['вазелін'] }}",
+            "дезінфектор": "={{ $json['дезінфектор'] }}",
+            "пелюшки": "={{ $json['пелюшки'] }}",
+            "барєрний_захист": "={{ $json['барєрний_захист'] }}",
+            "витратники_всього": "={{ $json['витратники_всього'] }}",
+            "студійні_витрати": "={{ $json['студійні_витрати'] }}",
+            "оплата_майстра": "={{ $json['оплата_майстра'] }}",
+            "собівартість": "={{ $json['собівартість'] }}",
+            "фінальна_ціна": "={{ $json['фінальна_ціна'] }}",
+            "прибуток": "={{ $json['прибуток'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "дата",
+              "displayName": "дата",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "username",
+              "displayName": "username",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "години",
+              "displayName": "години",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "тип",
+              "displayName": "тип",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "складність",
+              "displayName": "складність",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "картриджі",
+              "displayName": "картриджі",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "фарба_чорна",
+              "displayName": "фарба_чорна",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "фарба_кольорова",
+              "displayName": "фарба_кольорова",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "рукавички",
+              "displayName": "рукавички",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "плівка",
+              "displayName": "плівка",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ковпачки",
+              "displayName": "ковпачки",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "серветки",
+              "displayName": "серветки",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "вазелін",
+              "displayName": "вазелін",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "дезінфектор",
+              "displayName": "дезінфектор",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "пелюшки",
+              "displayName": "пелюшки",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "барєрний_захист",
+              "displayName": "барєрний_захист",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "витратники_всього",
+              "displayName": "витратники_всього",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "студійні_витрати",
+              "displayName": "студійні_витрати",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "оплата_майстра",
+              "displayName": "оплата_майстра",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "собівартість",
+              "displayName": "собівартість",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "фінальна_ціна",
+              "displayName": "фінальна_ціна",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "прибуток",
+              "displayName": "прибуток",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2080,
+        -160
+      ],
+      "id": "25d73c97-537f-481c-a9ef-1933e702e08b",
+      "name": "Save Order",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Calculate Cost').first().json.chat_id }}",
+        "text": "=💉 Розрахунок татуювання\n\n🕒 Години: {{ $('Calculate Cost').first().json.години }}\n🎨 Тип: {{ $('Calculate Cost').first().json.тип }}\n🔥 Складність: {{ $('Calculate Cost').first().json.складність }}\n\n━━━━━━━━━━━━━━\n📦 Витратники:\n\n🧴 Картриджі: {{ $('Calculate Cost').first().json.картриджі }} грн\n🎨 Фарба чорна: {{ $('Calculate Cost').first().json.фарба_чорна }} грн\n🌈 Фарба кольорова: {{ $('Calculate Cost').first().json.фарба_кольорова }} грн\n🧤 Рукавички: {{ $('Calculate Cost').first().json.рукавички }} грн\n🧻 Серветки: {{ $('Calculate Cost').first().json.серветки }} грн\n🧴 Вазелін: {{ $('Calculate Cost').first().json.вазелін }} грн\n🧼 Дезінфектор: {{ $('Calculate Cost').first().json.дезінфектор }} грн\n🛏 Пелюшки: {{ $('Calculate Cost').first().json.пелюшки }} грн\n🛡 Бар’єрний захист: {{ $('Calculate Cost').first().json.барєрний_захист }} грн\n\n📦 Всього витратники: {{ $('Calculate Cost').first().json.витратники_всього }} грн\n\n━━━━━━━━━━━━━━\n🏠 Студійні витрати: {{ $('Calculate Cost').first().json.студійні_витрати }} грн\n👨‍🎨 Оплата майстра: {{ $('Calculate Cost').first().json.оплата_майстра }} грн\n\n💸 Собівартість: {{ $('Calculate Cost').first().json.собівартість }} грн\n✅ Рекомендована ціна: {{ $('Calculate Cost').first().json.фінальна_ціна }} грн\n📈 Прибуток: {{ $('Calculate Cost').first().json.прибуток }} грн",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2304,
+        -160
+      ],
+      "id": "2bc718ca-20a4-4fca-b519-39c1d132162d",
+      "name": "Send Result",
+      "webhookId": "b87e6aa4-e8c2-428b-be97-d8677a0f6856",
+      "credentials": {
+        "telegramApi": {
+          "id": "wIxKfjFCXEi8oTjZ",
+          "name": "HomeworkBot"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Collect Tattoo Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Tattoo Data": {
+      "main": [
+        [
+          {
+            "node": "Parse AI JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse AI JSON": {
+      "main": [
+        [
+          {
+            "node": "ready?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ready?": {
+      "main": [
+        [
+          {
+            "node": "Get Settings",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram Ask Question",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Settings": {
+      "main": [
+        [
+          {
+            "node": "Get Consumables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Consumables": {
+      "main": [
+        [
+          {
+            "node": "Get Usage Norms",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Usage Norms": {
+      "main": [
+        [
+          {
+            "node": "Calculate Cost",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Cost": {
+      "main": [
+        [
+          {
+            "node": "Calculation Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Order": {
+      "main": [
+        [
+          {
+            "node": "Send Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Result": {
+      "main": [
+        []
+      ]
+    },
+    "Calculation Success": {
+      "main": [
+        [
+          {
+            "node": "Save Order",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "Telegram Trigger": [
+      {
+        "json": {
+          "update_id": 59853067,
+          "message": {
+            "message_id": 333,
+            "from": {
+              "id": 1679040654,
+              "is_bot": false,
+              "first_name": "Сергей",
+              "last_name": "Буц",
+              "username": "But_ss",
+              "language_code": "ru"
+            },
+            "chat": {
+              "id": 1679040654,
+              "first_name": "Сергей",
+              "last_name": "Буц",
+              "username": "But_ss",
+              "type": "private"
+            },
+            "date": 1778781253,
+            "text": "Хочу розрахувати кольорову тату, середня складність, 4.5 години"
+          }
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "versionId": "1db5b088-cd85-42cb-bc35-f9f9b1c02e6d",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-14T17:49:40.694Z",
+      "createdAt": "2026-05-14T17:49:40.694Z",
+      "role": "workflow:owner",
+      "workflowId": "yCUX08KXvisRlKJU",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
