@@ -206,6 +206,7 @@
   "meta": {
     "templateId": "ready-to-run-ai-workflow-v5"
   },
+  "nodeGroups": [],
   "pinData": {},
   "versionId": "5a1a7d00-e6cf-4020-90f0-109f2e803f39",
   "activeVersionId": null,
