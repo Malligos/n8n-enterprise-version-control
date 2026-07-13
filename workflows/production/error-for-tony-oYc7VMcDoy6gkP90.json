@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-04-11T19:41:32.024Z",
+  "updatedAt": "2026-07-02T19:15:17.357Z",
   "createdAt": "2026-04-08T10:23:54.502Z",
   "id": "oYc7VMcDoy6gkP90",
   "name": "error for tony",
@@ -11,7 +11,7 @@
       "type": "n8n-nodes-base.errorTrigger",
       "typeVersion": 1,
       "position": [
-        -432,
+        -624,
         -16
       ],
       "id": "c173dddf-2a80-4e7e-a15a-0281d4acf024",
@@ -28,7 +28,7 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        224,
+        32,
         -16
       ],
       "id": "860743e4-8350-417c-afa8-64de54065c85",
@@ -49,7 +49,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -224,
+        -416,
         -16
       ],
       "id": "32cfd76b-b46b-4a4e-b6bf-8b9e5e947e6b",
@@ -83,7 +83,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        -16,
+        -208,
         -16
       ],
       "id": "ebd7da98-9065-4bc7-b65d-06d01e06b6d2",
@@ -133,9 +133,10 @@
   "meta": {
     "templateCredsSetupCompleted": true
   },
+  "nodeGroups": [],
   "pinData": {},
-  "versionId": "d3a59ceb-f6ca-46e0-8d7a-fc16a0e07400",
-  "activeVersionId": "d3a59ceb-f6ca-46e0-8d7a-fc16a0e07400",
+  "versionId": "5bbfd2ea-38fb-4721-9ae5-e1ef3753a9fd",
+  "activeVersionId": "5bbfd2ea-38fb-4721-9ae5-e1ef3753a9fd",
   "triggerCount": 0,
   "shared": [
     {
@@ -147,9 +148,9 @@
     }
   ],
   "activeVersion": {
-    "updatedAt": "2026-04-11T19:56:17.000Z",
-    "createdAt": "2026-04-11T19:41:32.024Z",
-    "versionId": "d3a59ceb-f6ca-46e0-8d7a-fc16a0e07400",
+    "updatedAt": "2026-07-02T19:15:47.000Z",
+    "createdAt": "2026-07-02T19:15:17.358Z",
+    "versionId": "5bbfd2ea-38fb-4721-9ae5-e1ef3753a9fd",
     "workflowId": "oYc7VMcDoy6gkP90",
     "nodes": [
       {
@@ -157,7 +158,7 @@
         "type": "n8n-nodes-base.errorTrigger",
         "typeVersion": 1,
         "position": [
-          -432,
+          -624,
           -16
         ],
         "id": "c173dddf-2a80-4e7e-a15a-0281d4acf024",
@@ -174,7 +175,7 @@
         "type": "n8n-nodes-base.telegram",
         "typeVersion": 1.2,
         "position": [
-          224,
+          32,
           -16
         ],
         "id": "860743e4-8350-417c-afa8-64de54065c85",
@@ -195,7 +196,7 @@
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
         "position": [
-          -224,
+          -416,
           -16
         ],
         "id": "32cfd76b-b46b-4a4e-b6bf-8b9e5e947e6b",
@@ -229,7 +230,7 @@
         "type": "n8n-nodes-base.if",
         "typeVersion": 2.3,
         "position": [
-          -16,
+          -208,
           -16
         ],
         "id": "ebd7da98-9065-4bc7-b65d-06d01e06b6d2",
@@ -273,7 +274,7 @@
     },
     "nodeGroups": [],
     "authors": "Buts Sergei",
-    "name": "Version d3a59ceb",
+    "name": "Version 5bbfd2ea",
     "description": "",
     "autosaved": true
   },
