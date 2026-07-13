@@ -1,0 +1,678 @@
+{
+  "updatedAt": "2026-07-05T05:17:00.729Z",
+  "createdAt": "2026-07-04T20:48:25.684Z",
+  "id": "Qc65HMepmzzYRJSr",
+  "name": "My summary",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8,
+              "triggerAtMinute": 10
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -224,
+        192
+      ],
+      "id": "09bbe14d-14bd-4f91-a9c3-cf49c5aa1eb1",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=Сформуй короткий ранковий summary українською мовою.\n\nПодії календаря:\n{{ JSON.stringify($json.events) }}\n\nЗадачі:\n{{ JSON.stringify($json.tasks) }}\n\nРегулярні платежі:\n{{ JSON.stringify($json.payments) }}\n\nФормат відповіді:\n\n☀️ Доброго ранку!\n\n📅 Зустрічі на сьогодні:\n- час — назва\n\n✅ Задачі:\n- задача\n\n💰 Платежі:\n- назва — сума — коли оплатити\n\nПравила:\n\n- Якщо подій немає, напиши:\n📅 Зустрічей на сьогодні немає.\n\n- Якщо задач немає, напиши:\n✅ Задач на сьогодні немає.\n\n- Якщо платежів немає, напиши:\n💰 Найближчих платежів немає.\n\n- Якщо сума платежу не вказана, не пиши суму.\n\n- Якщо days_left = 0, напиши:\nсьогодні\n\n- Якщо days_left = 1, напиши:\nзавтра\n\n- Якщо days_left більше 1, напиши:\nчерез X днів\n\n- Не вигадуй події, задачі або платежі.\n- Не додавай інформацію, якої немає у вхідних даних.\n- Пиши коротко, зрозуміло, без зайвої води."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        896,
+        192
+      ],
+      "id": "02c26a5b-03ea-4bdd-9f47-703cdf1c9bc5",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "wmMo2Lknq3Hi5ts2",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "1679040654",
+        "text": "={{ $json.output[0].content[0].text }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1248,
+        192
+      ],
+      "id": "c45726f4-9fb7-46f2-8ccb-e9507c5b9545",
+      "name": "Telegram Send Summary",
+      "webhookId": "974bf46a-d645-48cc-9cb0-e037ca0aac47",
+      "credentials": {
+        "telegramApi": {
+          "id": "hdmpdLRak2SZIxBW",
+          "name": "MyLinkedIn"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "butssergei7778@gmail.com",
+          "mode": "list",
+          "cachedResultName": "butssergei7778@gmail.com"
+        },
+        "timeMin": "={{ $now.startOf('day') }}",
+        "timeMax": "={{ $now.endOf('day') }}",
+        "options": {
+          "timeZone": {
+            "__rl": true,
+            "value": "",
+            "mode": "list",
+            "cachedResultName": "",
+            "cachedResultUrl": ""
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        224,
+        192
+      ],
+      "id": "7de5d13c-79d2-4a11-bba1-8f238a853908",
+      "name": "Get many events",
+      "alwaysOutputData": true,
+      "executeOnce": false,
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "qNRZqyukyft6C0PF",
+          "name": "Google Calendar account My"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "filters": {
+          "projectId": "6gpWRQ9w7pjJG4W6"
+        }
+      },
+      "type": "n8n-nodes-base.todoist",
+      "typeVersion": 2.2,
+      "position": [
+        224,
+        384
+      ],
+      "id": "abf11d25-8314-49cc-b5f5-342af3a49586",
+      "name": "Get many tasks",
+      "alwaysOutputData": true,
+      "retryOnFail": true,
+      "executeOnce": true,
+      "maxTries": 5,
+      "credentials": {
+        "todoistApi": {
+          "id": "UDxyIrQxJzhLUks1",
+          "name": "MyTodoist account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const events = $('Get many events').all().map(item => ({\n  title: item.json.summary || 'Без назви',\n  start: item.json.start?.dateTime || item.json.start?.date || '',\n  end: item.json.end?.dateTime || item.json.end?.date || '',\n  description: item.json.description || ''\n}));\n\nconst tasks = $('Get many tasks').all().map(item => ({\n  title: item.json.content || 'Без назви',\n  description: item.json.description || '',\n  due: item.json.due?.date || ''\n}));\n\nconst payments = $('Check Due Payments').all().map(item => ({\n  name: item.json.payment_name || '',\n  amount: item.json.amount || '',\n  category: item.json.category || '',\n  payment_day: item.json.payment_day || '',\n  days_left: item.json.days_left || ''\n}));\n\nreturn [\n  {\n    json: {\n      events,\n      tasks,\n      payments\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        192
+      ],
+      "id": "b7e7b2dc-e6e4-410f-b13c-befe02625c0f",
+      "name": "Prepare Summary Data"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        448,
+        176
+      ],
+      "id": "fa3a77bb-f7a9-4dde-a374-95afe898c2c2",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1OBMzm4aX3McDP_p_yF6MVDzD3s0zoQdST5-m-0ruSIw/edit?gid=356654616#gid=356654616",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 356654616,
+          "mode": "list",
+          "cachedResultName": "Recurring Payments",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1OBMzm4aX3McDP_p_yF6MVDzD3s0zoQdST5-m-0ruSIw/edit#gid=356654616"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        0,
+        0
+      ],
+      "id": "984d9628-5704-4e64-9641-f9a70454254d",
+      "name": "Recurring Payments",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const today = new Date();\n\nconst currentDay = today.getDate();\n\nconst reminders = [];\n\nfor (const item of items) {\n\n  const paymentDay = Number(item.json.Day);\n  const reminderDays = Number(item.json[\"Reminder Days\"]);\n\n  const daysLeft = paymentDay - currentDay;\n\n  if (daysLeft === reminderDays) {\n\n    reminders.push({\n      json: {\n        payment_name: item.json.Name,\n        amount: item.json.Amount,\n        category: item.json.Category,\n        payment_day: paymentDay,\n        days_left: daysLeft\n      }\n    });\n\n  }\n\n}\n\nreturn reminders;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "1a8f210f-ab71-4e41-aca0-1b87f70ef1f1",
+      "name": "Check Due Payments"
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get many events",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get many tasks",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Recurring Payments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Telegram Send Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many events": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Get many tasks": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Prepare Summary Data": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Prepare Summary Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recurring Payments": {
+      "main": [
+        [
+          {
+            "node": "Check Due Payments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Due Payments": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": [
+        null
+      ],
+      "recurrenceRuleSignatures": [
+        null
+      ]
+    }
+  },
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "603eb898-f0d3-4ab2-9e70-a302c28bad70",
+  "activeVersionId": "603eb898-f0d3-4ab2-9e70-a302c28bad70",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-07-04T20:48:25.686Z",
+      "createdAt": "2026-07-04T20:48:25.686Z",
+      "role": "workflow:owner",
+      "workflowId": "Qc65HMepmzzYRJSr",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-07-05T05:17:12.000Z",
+    "createdAt": "2026-07-05T05:17:00.730Z",
+    "versionId": "603eb898-f0d3-4ab2-9e70-a302c28bad70",
+    "workflowId": "Qc65HMepmzzYRJSr",
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "triggerAtHour": 8,
+                "triggerAtMinute": 10
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          -224,
+          192
+        ],
+        "id": "09bbe14d-14bd-4f91-a9c3-cf49c5aa1eb1",
+        "name": "Schedule Trigger"
+      },
+      {
+        "parameters": {
+          "modelId": {
+            "__rl": true,
+            "value": "gpt-4o-mini",
+            "mode": "list",
+            "cachedResultName": "GPT-4O-MINI"
+          },
+          "responses": {
+            "values": [
+              {
+                "content": "=Сформуй короткий ранковий summary українською мовою.\n\nПодії календаря:\n{{ JSON.stringify($json.events) }}\n\nЗадачі:\n{{ JSON.stringify($json.tasks) }}\n\nРегулярні платежі:\n{{ JSON.stringify($json.payments) }}\n\nФормат відповіді:\n\n☀️ Доброго ранку!\n\n📅 Зустрічі на сьогодні:\n- час — назва\n\n✅ Задачі:\n- задача\n\n💰 Платежі:\n- назва — сума — коли оплатити\n\nПравила:\n\n- Якщо подій немає, напиши:\n📅 Зустрічей на сьогодні немає.\n\n- Якщо задач немає, напиши:\n✅ Задач на сьогодні немає.\n\n- Якщо платежів немає, напиши:\n💰 Найближчих платежів немає.\n\n- Якщо сума платежу не вказана, не пиши суму.\n\n- Якщо days_left = 0, напиши:\nсьогодні\n\n- Якщо days_left = 1, напиши:\nзавтра\n\n- Якщо days_left більше 1, напиши:\nчерез X днів\n\n- Не вигадуй події, задачі або платежі.\n- Не додавай інформацію, якої немає у вхідних даних.\n- Пиши коротко, зрозуміло, без зайвої води."
+              }
+            ]
+          },
+          "builtInTools": {},
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.openAi",
+        "typeVersion": 2.3,
+        "position": [
+          896,
+          192
+        ],
+        "id": "02c26a5b-03ea-4bdd-9f47-703cdf1c9bc5",
+        "name": "Message a model",
+        "credentials": {
+          "openAiApi": {
+            "id": "wmMo2Lknq3Hi5ts2",
+            "name": "OpenAi account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "chatId": "1679040654",
+          "text": "={{ $json.output[0].content[0].text }}",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          1248,
+          192
+        ],
+        "id": "c45726f4-9fb7-46f2-8ccb-e9507c5b9545",
+        "name": "Telegram Send Summary",
+        "webhookId": "974bf46a-d645-48cc-9cb0-e037ca0aac47",
+        "credentials": {
+          "telegramApi": {
+            "id": "hdmpdLRak2SZIxBW",
+            "name": "MyLinkedIn"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "getAll",
+          "calendar": {
+            "__rl": true,
+            "value": "butssergei7778@gmail.com",
+            "mode": "list",
+            "cachedResultName": "butssergei7778@gmail.com"
+          },
+          "timeMin": "={{ $now.startOf('day') }}",
+          "timeMax": "={{ $now.endOf('day') }}",
+          "options": {
+            "timeZone": {
+              "__rl": true,
+              "value": "",
+              "mode": "list",
+              "cachedResultName": "",
+              "cachedResultUrl": ""
+            }
+          }
+        },
+        "type": "n8n-nodes-base.googleCalendar",
+        "typeVersion": 1.3,
+        "position": [
+          224,
+          192
+        ],
+        "id": "7de5d13c-79d2-4a11-bba1-8f238a853908",
+        "name": "Get many events",
+        "alwaysOutputData": true,
+        "executeOnce": false,
+        "credentials": {
+          "googleCalendarOAuth2Api": {
+            "id": "qNRZqyukyft6C0PF",
+            "name": "Google Calendar account My"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "getAll",
+          "filters": {
+            "projectId": "6gpWRQ9w7pjJG4W6"
+          }
+        },
+        "type": "n8n-nodes-base.todoist",
+        "typeVersion": 2.2,
+        "position": [
+          224,
+          384
+        ],
+        "id": "abf11d25-8314-49cc-b5f5-342af3a49586",
+        "name": "Get many tasks",
+        "alwaysOutputData": true,
+        "retryOnFail": true,
+        "executeOnce": true,
+        "maxTries": 5,
+        "credentials": {
+          "todoistApi": {
+            "id": "UDxyIrQxJzhLUks1",
+            "name": "MyTodoist account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const events = $('Get many events').all().map(item => ({\n  title: item.json.summary || 'Без назви',\n  start: item.json.start?.dateTime || item.json.start?.date || '',\n  end: item.json.end?.dateTime || item.json.end?.date || '',\n  description: item.json.description || ''\n}));\n\nconst tasks = $('Get many tasks').all().map(item => ({\n  title: item.json.content || 'Без назви',\n  description: item.json.description || '',\n  due: item.json.due?.date || ''\n}));\n\nconst payments = $('Check Due Payments').all().map(item => ({\n  name: item.json.payment_name || '',\n  amount: item.json.amount || '',\n  category: item.json.category || '',\n  payment_day: item.json.payment_day || '',\n  days_left: item.json.days_left || ''\n}));\n\nreturn [\n  {\n    json: {\n      events,\n      tasks,\n      payments\n    }\n  }\n];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          672,
+          192
+        ],
+        "id": "b7e7b2dc-e6e4-410f-b13c-befe02625c0f",
+        "name": "Prepare Summary Data"
+      },
+      {
+        "parameters": {
+          "numberInputs": 3
+        },
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3.2,
+        "position": [
+          448,
+          176
+        ],
+        "id": "fa3a77bb-f7a9-4dde-a374-95afe898c2c2",
+        "name": "Merge"
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "https://docs.google.com/spreadsheets/d/1OBMzm4aX3McDP_p_yF6MVDzD3s0zoQdST5-m-0ruSIw/edit?gid=356654616#gid=356654616",
+            "mode": "url"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 356654616,
+            "mode": "list",
+            "cachedResultName": "Recurring Payments",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1OBMzm4aX3McDP_p_yF6MVDzD3s0zoQdST5-m-0ruSIw/edit#gid=356654616"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          0,
+          0
+        ],
+        "id": "984d9628-5704-4e64-9641-f9a70454254d",
+        "name": "Recurring Payments",
+        "alwaysOutputData": true,
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "0Gdvf3Mhmj7whXEv",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const today = new Date();\n\nconst currentDay = today.getDate();\n\nconst reminders = [];\n\nfor (const item of items) {\n\n  const paymentDay = Number(item.json.Day);\n  const reminderDays = Number(item.json[\"Reminder Days\"]);\n\n  const daysLeft = paymentDay - currentDay;\n\n  if (daysLeft === reminderDays) {\n\n    reminders.push({\n      json: {\n        payment_name: item.json.Name,\n        amount: item.json.Amount,\n        category: item.json.Category,\n        payment_day: paymentDay,\n        days_left: daysLeft\n      }\n    });\n\n  }\n\n}\n\nreturn reminders;"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          224,
+          0
+        ],
+        "id": "1a8f210f-ab71-4e41-aca0-1b87f70ef1f1",
+        "name": "Check Due Payments"
+      }
+    ],
+    "connections": {
+      "Schedule Trigger": {
+        "main": [
+          [
+            {
+              "node": "Get many events",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Get many tasks",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Recurring Payments",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Message a model": {
+        "main": [
+          [
+            {
+              "node": "Telegram Send Summary",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get many events": {
+        "main": [
+          [
+            {
+              "node": "Merge",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Get many tasks": {
+        "main": [
+          [
+            {
+              "node": "Merge",
+              "type": "main",
+              "index": 2
+            }
+          ]
+        ]
+      },
+      "Prepare Summary Data": {
+        "main": [
+          [
+            {
+              "node": "Message a model",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Merge": {
+        "main": [
+          [
+            {
+              "node": "Prepare Summary Data",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Recurring Payments": {
+        "main": [
+          [
+            {
+              "node": "Check Due Payments",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Check Due Payments": {
+        "main": [
+          [
+            {
+              "node": "Merge",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Buts Sergei",
+    "name": "Version 603eb898",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
