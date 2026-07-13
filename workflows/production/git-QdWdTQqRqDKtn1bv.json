@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-01T17:47:45.726Z",
+  "updatedAt": "2026-07-13T11:18:32.239Z",
   "createdAt": "2026-07-01T16:27:14.369Z",
   "id": "QdWdTQqRqDKtn1bv",
   "name": "Git",
@@ -11,7 +11,7 @@
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        -576,
+        -992,
         16
       ],
       "id": "164b5692-e133-40aa-a547-bb622c7838a2",
@@ -36,7 +36,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        -352,
+        -768,
         16
       ],
       "id": "867dd2f2-2e7e-41d4-b2ac-285d791ada07",
@@ -56,7 +56,7 @@
       "type": "n8n-nodes-base.splitOut",
       "typeVersion": 1,
       "position": [
-        -128,
+        -544,
         16
       ],
       "id": "d2e068bd-9546-48c5-a70c-361cc7fe7a1d",
@@ -65,12 +65,12 @@
     {
       "parameters": {
         "mode": "runOnceForEachItem",
-        "jsCode": "const workflow = $json;\n\nconst safeName = workflow.name\n  .toLowerCase()\n  .replace(/[^a-z0-9а-яіїєґ]+/gi, \"-\")\n  .replace(/^-+|-+$/g, \"\");\n\nconst content = JSON.stringify(workflow, null, 2);\n\nreturn {\n  workflowName: workflow.name,\n  workflowId: workflow.id,\n  filePath: `workflows/production/${safeName}-${workflow.id}.json`,\n  content,\n  contentBase64: Buffer.from(content).toString(\"base64\"),\n  commitMessage: `backup: ${workflow.name}`\n};"
+        "jsCode": "const workflow = $json;\n\nconst safeName = workflow.name\n  .toLowerCase()\n  .replace(/[^a-z0-9а-яіїєґ]+/gi, \"-\")\n  .replace(/^-+|-+$/g, \"\");\n\nconst content = JSON.stringify(workflow, null, 2);\n\nreturn {\n  workflowName: workflow.name,\n  workflowId: workflow.id,\n  filePath: `workflows/production/${safeName}-${workflow.id}.json`,\n  content,\n  commitMessage: `backup: ${workflow.name}`,\n};"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        96,
+        -320,
         16
       ],
       "id": "6a5dd1f3-ac42-4773-b13f-53ba7c009bb3",
@@ -94,7 +94,7 @@
           "cachedResultUrl": "https://github.com/Malligos/n8n-enterprise-version-control"
         },
         "filePath": "={{$json.filePath}}",
-        "fileContent": "={{$json.fileContent || $json.content}}",
+        "fileContent": "={{$json.content}}",
         "commitMessage": "={{$json.commitMessage}}"
       },
       "type": "n8n-nodes-base.github",
@@ -115,29 +115,6 @@
     },
     {
       "parameters": {
-        "url": "=https://api.github.com/repos/Malligos/n8n-enterprise-version-control/contents/{{$json.filePath}}",
-        "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "githubApi",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.4,
-      "position": [
-        320,
-        16
-      ],
-      "id": "7f4503ca-afda-4051-9105-40fa006b3915",
-      "name": "Get GitHub File",
-      "credentials": {
-        "githubApi": {
-          "id": "gELBCi5BQ6YeDjYN",
-          "name": "GitHub Enterprise Backup"
-        }
-      },
-      "onError": "continueErrorOutput"
-    },
-    {
-      "parameters": {
         "resource": "file",
         "operation": "edit",
         "owner": {
@@ -154,9 +131,9 @@
           "cachedResultName": "n8n-enterprise-version-control",
           "cachedResultUrl": "https://github.com/Malligos/n8n-enterprise-version-control"
         },
-        "filePath": "={{$json.path}}",
-        "fileContent": "={{ $('Prepare GitHub file').item.json.content }}",
-        "commitMessage": "={{ $('Prepare GitHub file').item.json.workflowName }}"
+        "filePath": "={{$json.filePath}}",
+        "fileContent": "={{$json.content}}",
+        "commitMessage": "={{$json.commitMessage}}"
       },
       "type": "n8n-nodes-base.github",
       "typeVersion": 1.1,
@@ -167,12 +144,89 @@
       "id": "44eee0a1-a49e-4e66-9bc0-5b3c9608604b",
       "name": "Edit a file",
       "webhookId": "069dcb42-5685-47fb-9808-b5d3bcc59a01",
+      "retryOnFail": false,
       "credentials": {
         "githubApi": {
           "id": "gELBCi5BQ6YeDjYN",
           "name": "GitHub Enterprise Backup"
         }
       }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.github.com/repos/Malligos/n8n-enterprise-version-control/git/trees/main?recursive=1",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -96,
+        16
+      ],
+      "id": "7f4503ca-afda-4051-9105-40fa006b3915",
+      "name": "Get GitHub Tree",
+      "executeOnce": true,
+      "credentials": {
+        "githubApi": {
+          "id": "gELBCi5BQ6YeDjYN",
+          "name": "GitHub Enterprise Backup"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const preparedWorkflows = $items(\"Prepare GitHub file\");\nconst treeResponse = $input.first().json;\n\nconst githubTree = Array.isArray(treeResponse.tree)\n  ? treeResponse.tree\n  : [];\n\nconst filesByPath = new Map(\n  githubTree\n    .filter(entry => entry.type === \"blob\")\n    .map(entry => [entry.path, entry])\n);\n\nreturn preparedWorkflows.map(item => {\n  const workflow = item.json;\n  const existingFile = filesByPath.get(workflow.filePath);\n\n  return {\n    json: {\n      ...workflow,\n      exists: Boolean(existingFile),\n      existingPath: existingFile?.path ?? null,\n      existingSha: existingFile?.sha ?? null,\n    },\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        128,
+        16
+      ],
+      "id": "b1394dbc-a3d2-49a1-bd6a-cfa7a6925c86",
+      "name": "Match Files"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "3c62754b-a306-4e4e-8fab-07fd9eab2db6",
+              "leftValue": "={{$json.exists}}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        336,
+        16
+      ],
+      "id": "2504a477-d4c7-483d-8084-d622b2b33907",
+      "name": "File Exists?"
     }
   ],
   "connections": {
@@ -213,14 +267,37 @@
       "main": [
         [
           {
-            "node": "Get GitHub File",
+            "node": "Get GitHub Tree",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Get GitHub File": {
+    "Get GitHub Tree": {
+      "main": [
+        [
+          {
+            "node": "Match Files",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Match Files": {
+      "main": [
+        [
+          {
+            "node": "File Exists?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "File Exists?": {
       "main": [
         [
           {
@@ -250,7 +327,7 @@
   },
   "nodeGroups": [],
   "pinData": {},
-  "versionId": "d42c8034-b22a-44a2-a04d-e96319f470ef",
+  "versionId": "b3aff8c8-7a2f-48d0-9f60-776d838e9f95",
   "activeVersionId": null,
   "triggerCount": 0,
   "shared": [
