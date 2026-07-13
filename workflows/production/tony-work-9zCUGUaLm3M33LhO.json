@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-06-30T19:39:52.409Z",
+  "updatedAt": "2026-07-04T20:36:27.495Z",
   "createdAt": "2026-04-07T19:13:57.410Z",
   "id": "9zCUGUaLm3M33LhO",
   "name": "Tony work",
@@ -16,8 +16,8 @@
       "type": "n8n-nodes-base.telegramTrigger",
       "typeVersion": 1.2,
       "position": [
-        -2416,
-        -176
+        -2480,
+        -400
       ],
       "id": "0f4dcb8b-8707-4867-9d07-bd059c0c5089",
       "name": "Telegram Trigger",
@@ -58,7 +58,7 @@
       "typeVersion": 2.3,
       "position": [
         -1584,
-        -160
+        -304
       ],
       "id": "b8b09802-d501-46e0-be10-d4b6e265d27f",
       "name": "If"
@@ -97,8 +97,8 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        -1744,
-        -176
+        -1808,
+        -304
       ],
       "id": "9b3384de-af8e-4c41-b36a-6cd55481835f",
       "name": "Get row(s) in sheet",
@@ -526,8 +526,8 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        -1152,
-        -272
+        -1136,
+        -400
       ],
       "id": "f3c1f15c-2991-404b-887d-cf97494c303f",
       "name": "Update row in sheet",
@@ -545,8 +545,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1984,
-        -160
+        -2032,
+        -304
       ],
       "id": "bca957fa-b7f2-4fcd-8533-d341a809acff",
       "name": "Parse & Calc Hours1"
@@ -559,7 +559,7 @@
       "typeVersion": 2,
       "position": [
         -1360,
-        -272
+        -400
       ],
       "id": "4ef43e62-043d-48ca-bc54-1451a8ff51bb",
       "name": "Build update Row"
@@ -571,8 +571,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1344,
-        -48
+        -1360,
+        -208
       ],
       "id": "9660d395-711b-4957-8bca-ce91c9819011",
       "name": "Create New Row"
@@ -981,8 +981,8 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        -1120,
-        -32
+        -1136,
+        -208
       ],
       "id": "1040aa63-2c25-4a5d-8c80-0ca9bf9a979d",
       "name": "Append row in sheet",
@@ -1021,8 +1021,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        -2208,
-        -176
+        -2256,
+        -400
       ],
       "id": "3cd4746a-1694-4d40-93e8-91b5680924d5",
       "name": "If1"
@@ -1038,13 +1038,118 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        -1968,
-        -400
+        -2032,
+        -496
       ],
       "id": "15e9e8d2-d0e7-4a45-94bb-64351144064d",
       "name": "Send a text message",
       "webhookId": "00cfe593-319f-4e4d-8a18-ec2527b3cb65",
       "notesInFlow": false,
+      "credentials": {
+        "telegramApi": {
+          "id": "fhuHHM0lesLeKwYF",
+          "name": "tony/time"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "✅ Зміну записано",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -688,
+        -304
+      ],
+      "id": "873b5e38-c0f7-401d-aa20-cc25e6c91135",
+      "name": "Send a text message1",
+      "webhookId": "15ef2479-8bef-4fb7-a58b-6db7e0117a27",
+      "credentials": {
+        "telegramApi": {
+          "id": "fhuHHM0lesLeKwYF",
+          "name": "tony/time"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $('Telegram Trigger').item.json.message.chat.first_name }} Ласкаво просимо у Тоні\n✅ Зміну записано ",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -912,
+        -208
+      ],
+      "id": "c3531f20-a75b-47c6-bbcd-a69645f253dc",
+      "name": "Send a text message2",
+      "webhookId": "15ef2479-8bef-4fb7-a58b-6db7e0117a27",
+      "credentials": {
+        "telegramApi": {
+          "id": "fhuHHM0lesLeKwYF",
+          "name": "tony/time"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b6222f77-bc2e-4bd2-860a-626703c1ce94",
+              "leftValue": "={{ $json['User id'] }}",
+              "rightValue": "553813843",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -912,
+        -400
+      ],
+      "id": "c08d7034-e45c-42e0-be94-252eaa5d28d9",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "Илья Блять, Молодец\n✅ Зміну записано",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -688,
+        -496
+      ],
+      "id": "264f4415-2193-4a3e-a9ab-857aac44544d",
+      "name": "Send a text message3",
+      "webhookId": "15ef2479-8bef-4fb7-a58b-6db7e0117a27",
       "credentials": {
         "telegramApi": {
           "id": "fhuHHM0lesLeKwYF",
@@ -1144,6 +1249,51 @@
           }
         ]
       ]
+    },
+    "Update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a text message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message1": {
+      "main": [
+        []
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Send a text message3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -1159,9 +1309,10 @@
   "meta": {
     "templateCredsSetupCompleted": true
   },
+  "nodeGroups": [],
   "pinData": {},
-  "versionId": "4cbdd966-85a9-4abc-bf9a-bf4a78cb8bb3",
-  "activeVersionId": "4cbdd966-85a9-4abc-bf9a-bf4a78cb8bb3",
+  "versionId": "2bca9dbc-6db8-4489-9cb2-764453f91448",
+  "activeVersionId": "2bca9dbc-6db8-4489-9cb2-764453f91448",
   "triggerCount": 1,
   "shared": [
     {
@@ -1173,9 +1324,9 @@
     }
   ],
   "activeVersion": {
-    "updatedAt": "2026-06-30T19:40:08.000Z",
-    "createdAt": "2026-06-30T19:39:52.410Z",
-    "versionId": "4cbdd966-85a9-4abc-bf9a-bf4a78cb8bb3",
+    "updatedAt": "2026-07-04T20:36:38.000Z",
+    "createdAt": "2026-07-04T20:36:27.496Z",
+    "versionId": "2bca9dbc-6db8-4489-9cb2-764453f91448",
     "workflowId": "9zCUGUaLm3M33LhO",
     "nodes": [
       {
@@ -1188,8 +1339,8 @@
         "type": "n8n-nodes-base.telegramTrigger",
         "typeVersion": 1.2,
         "position": [
-          -2416,
-          -176
+          -2480,
+          -400
         ],
         "id": "0f4dcb8b-8707-4867-9d07-bd059c0c5089",
         "name": "Telegram Trigger",
@@ -1230,7 +1381,7 @@
         "typeVersion": 2.3,
         "position": [
           -1584,
-          -160
+          -304
         ],
         "id": "b8b09802-d501-46e0-be10-d4b6e265d27f",
         "name": "If"
@@ -1269,8 +1420,8 @@
         "type": "n8n-nodes-base.googleSheets",
         "typeVersion": 4.7,
         "position": [
-          -1744,
-          -176
+          -1808,
+          -304
         ],
         "id": "9b3384de-af8e-4c41-b36a-6cd55481835f",
         "name": "Get row(s) in sheet",
@@ -1698,8 +1849,8 @@
         "type": "n8n-nodes-base.googleSheets",
         "typeVersion": 4.7,
         "position": [
-          -1152,
-          -272
+          -1136,
+          -400
         ],
         "id": "f3c1f15c-2991-404b-887d-cf97494c303f",
         "name": "Update row in sheet",
@@ -1717,8 +1868,8 @@
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
         "position": [
-          -1984,
-          -160
+          -2032,
+          -304
         ],
         "id": "bca957fa-b7f2-4fcd-8533-d341a809acff",
         "name": "Parse & Calc Hours1"
@@ -1731,7 +1882,7 @@
         "typeVersion": 2,
         "position": [
           -1360,
-          -272
+          -400
         ],
         "id": "4ef43e62-043d-48ca-bc54-1451a8ff51bb",
         "name": "Build update Row"
@@ -1743,8 +1894,8 @@
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
         "position": [
-          -1344,
-          -48
+          -1360,
+          -208
         ],
         "id": "9660d395-711b-4957-8bca-ce91c9819011",
         "name": "Create New Row"
@@ -2153,8 +2304,8 @@
         "type": "n8n-nodes-base.googleSheets",
         "typeVersion": 4.7,
         "position": [
-          -1120,
-          -32
+          -1136,
+          -208
         ],
         "id": "1040aa63-2c25-4a5d-8c80-0ca9bf9a979d",
         "name": "Append row in sheet",
@@ -2193,8 +2344,8 @@
         "type": "n8n-nodes-base.if",
         "typeVersion": 2.3,
         "position": [
-          -2208,
-          -176
+          -2256,
+          -400
         ],
         "id": "3cd4746a-1694-4d40-93e8-91b5680924d5",
         "name": "If1"
@@ -2210,13 +2361,118 @@
         "type": "n8n-nodes-base.telegram",
         "typeVersion": 1.2,
         "position": [
-          -1968,
-          -400
+          -2032,
+          -496
         ],
         "id": "15e9e8d2-d0e7-4a45-94bb-64351144064d",
         "name": "Send a text message",
         "webhookId": "00cfe593-319f-4e4d-8a18-ec2527b3cb65",
         "notesInFlow": false,
+        "credentials": {
+          "telegramApi": {
+            "id": "fhuHHM0lesLeKwYF",
+            "name": "tony/time"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+          "text": "✅ Зміну записано",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          -688,
+          -304
+        ],
+        "id": "873b5e38-c0f7-401d-aa20-cc25e6c91135",
+        "name": "Send a text message1",
+        "webhookId": "15ef2479-8bef-4fb7-a58b-6db7e0117a27",
+        "credentials": {
+          "telegramApi": {
+            "id": "fhuHHM0lesLeKwYF",
+            "name": "tony/time"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+          "text": "={{ $('Telegram Trigger').item.json.message.chat.first_name }} Ласкаво просимо у Тоні\n✅ Зміну записано ",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          -912,
+          -208
+        ],
+        "id": "c3531f20-a75b-47c6-bbcd-a69645f253dc",
+        "name": "Send a text message2",
+        "webhookId": "15ef2479-8bef-4fb7-a58b-6db7e0117a27",
+        "credentials": {
+          "telegramApi": {
+            "id": "fhuHHM0lesLeKwYF",
+            "name": "tony/time"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "b6222f77-bc2e-4bd2-860a-626703c1ce94",
+                "leftValue": "={{ $json['User id'] }}",
+                "rightValue": "553813843",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          -912,
+          -400
+        ],
+        "id": "c08d7034-e45c-42e0-be94-252eaa5d28d9",
+        "name": "If2"
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+          "text": "Илья Блять, Молодец\n✅ Зміну записано",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          -688,
+          -496
+        ],
+        "id": "264f4415-2193-4a3e-a9ab-857aac44544d",
+        "name": "Send a text message3",
+        "webhookId": "15ef2479-8bef-4fb7-a58b-6db7e0117a27",
         "credentials": {
           "telegramApi": {
             "id": "fhuHHM0lesLeKwYF",
@@ -2316,11 +2572,56 @@
             }
           ]
         ]
+      },
+      "Update row in sheet": {
+        "main": [
+          [
+            {
+              "node": "If2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Append row in sheet": {
+        "main": [
+          [
+            {
+              "node": "Send a text message2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Send a text message1": {
+        "main": [
+          []
+        ]
+      },
+      "If2": {
+        "main": [
+          [
+            {
+              "node": "Send a text message3",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Send a text message1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
       }
     },
     "nodeGroups": [],
     "authors": "Buts Sergei",
-    "name": "Version 4cbdd966",
+    "name": "Version 2bca9dbc",
     "description": "",
     "autosaved": true
   },
