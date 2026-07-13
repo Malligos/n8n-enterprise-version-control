@@ -1,0 +1,391 @@
+{
+  "updatedAt": "2026-07-12T12:29:55.519Z",
+  "createdAt": "2026-07-12T12:25:05.572Z",
+  "id": "80bkVTAxs3V0Rdgz",
+  "name": "test airtable",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -304,
+        -48
+      ],
+      "id": "fb500b25-4771-44a9-b140-a1973b478f07",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "65534e62-8308-484d-9318-88dc7c8260c9",
+              "name": "Confirmation ID",
+              "value": "={{ 'test_' + $execution.id + '_' + $now.toMillis() }}",
+              "type": "string"
+            },
+            {
+              "id": "73951308-ac73-4c67-bc3f-727b78803221",
+              "name": "Telegram Chat ID",
+              "value": 123456789,
+              "type": "number"
+            },
+            {
+              "id": "ee38f443-8245-4962-88db-f819a39d48d2",
+              "name": "Telegram User ID",
+              "value": 1568451698,
+              "type": "number"
+            },
+            {
+              "id": "a45a3f65-d232-4250-86cb-40dc7187c5ae",
+              "name": "Intent",
+              "value": "meeting",
+              "type": "string"
+            },
+            {
+              "id": "2316756b-7727-469b-b278-a8db48db2d80",
+              "name": "Payload",
+              "value": "={{ JSON.stringify({\n  title: 'Тестова зустріч',\n  date: '2026-07-15',\n  time: '15:00',\n  description: 'Перевірка підключення Airtable'\n}) }}",
+              "type": "string"
+            },
+            {
+              "id": "fd7f1179-d7c9-4d3a-86f7-c3e3d2572ebb",
+              "name": "Status",
+              "value": "pending",
+              "type": "string"
+            },
+            {
+              "id": "4b622c9b-3425-4905-b61a-86a4779cf346",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -96,
+        -48
+      ],
+      "id": "c9272ead-5ed3-4519-8323-54af3e73d4b2",
+      "name": "Prepare Test Confirmation"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appVMQY0wNMWdr4IQ",
+          "mode": "list",
+          "cachedResultName": "Ai Assistant",
+          "cachedResultUrl": "https://airtable.com/appVMQY0wNMWdr4IQ"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblW1NpbdgOAXNWDw",
+          "mode": "list",
+          "cachedResultName": "Confirmations",
+          "cachedResultUrl": "https://airtable.com/appVMQY0wNMWdr4IQ/tblW1NpbdgOAXNWDw"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Confirmation ID": "={{ $json['Confirmation ID'] }}",
+            "Telegram Chat ID": "={{ $json['Telegram Chat ID'] }}",
+            "Telegram User ID": "={{ $json['Telegram User ID'] }}",
+            "Intent": "={{ $json.Intent }}",
+            "Payload": "={{ $json.Payload }}",
+            "Status": "={{ $json.Status }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Confirmation ID",
+              "displayName": "Confirmation ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Telegram Chat ID",
+              "displayName": "Telegram Chat ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Telegram User ID",
+              "displayName": "Telegram User ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Intent",
+              "displayName": "Intent",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "meeting",
+                  "value": "meeting"
+                },
+                {
+                  "name": "task",
+                  "value": "task"
+                },
+                {
+                  "name": "note",
+                  "value": "note"
+                },
+                {
+                  "name": "finance",
+                  "value": "finance"
+                },
+                {
+                  "name": "payment",
+                  "value": "payment"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Priority",
+              "displayName": "Priority",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Low",
+                  "value": "Low"
+                },
+                {
+                  "name": "Medium",
+                  "value": "Medium"
+                },
+                {
+                  "name": "High",
+                  "value": "High"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Start date",
+              "displayName": "Start date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Deadline",
+              "displayName": "Deadline",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Payload",
+              "displayName": "Payload",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "pending",
+                  "value": "pending"
+                },
+                {
+                  "name": "completed",
+                  "value": "completed"
+                },
+                {
+                  "name": "cancelled",
+                  "value": "cancelled"
+                },
+                {
+                  "name": "expired",
+                  "value": "expired"
+                },
+                {
+                  "name": "expired",
+                  "value": "expired"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Telegram Message ID",
+              "displayName": "Telegram Message ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Created At",
+              "displayName": "Created At",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Completed At",
+              "displayName": "Completed At",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Result ID",
+              "displayName": "Result ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Error",
+              "displayName": "Error",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        112,
+        -48
+      ],
+      "id": "8ce35c2a-9f30-43e3-bd7f-501fc9bb2638",
+      "name": "Create Test Confirmation",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "P2Yfe7gSyX92kB5u",
+          "name": "My Airtable"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Prepare Test Confirmation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Test Confirmation": {
+      "main": [
+        [
+          {
+            "node": "Create Test Confirmation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "241f88e6-49bd-4ec3-80c8-61a8d59eab41",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-07-12T12:25:05.574Z",
+      "createdAt": "2026-07-12T12:25:05.574Z",
+      "role": "workflow:owner",
+      "workflowId": "80bkVTAxs3V0Rdgz",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
