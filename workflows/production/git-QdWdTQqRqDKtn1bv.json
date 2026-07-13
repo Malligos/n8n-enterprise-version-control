@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-01T17:33:42.880Z",
+  "updatedAt": "2026-07-01T17:47:45.726Z",
   "createdAt": "2026-07-01T16:27:14.369Z",
   "id": "QdWdTQqRqDKtn1bv",
   "name": "Git",
@@ -248,8 +248,9 @@
   "meta": {
     "templateCredsSetupCompleted": true
   },
+  "nodeGroups": [],
   "pinData": {},
-  "versionId": "dfe3924e-5740-4bbf-9036-6fe665d70015",
+  "versionId": "d42c8034-b22a-44a2-a04d-e96319f470ef",
   "activeVersionId": null,
   "triggerCount": 0,
   "shared": [
