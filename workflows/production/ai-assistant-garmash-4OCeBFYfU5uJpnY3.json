@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-06-22T09:08:19.249Z",
+  "updatedAt": "2026-07-02T13:44:30.610Z",
   "createdAt": "2026-06-04T19:28:46.828Z",
   "id": "4OCeBFYfU5uJpnY3",
   "name": "Ai_assistant_Garmash",
@@ -2189,6 +2189,50 @@
           "name": "Ai_assistent_Garmash"
         }
       }
+    },
+    {
+      "parameters": {
+        "operation": "deleteMessage",
+        "chatId": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
+        "messageId": "={{ $('Telegram Trigger').item.json.callback_query.message.message_id }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -1200,
+        -944
+      ],
+      "id": "ae3e5141-e2d8-4757-95b4-e4c44ef945bf",
+      "name": "Delete a chat message",
+      "webhookId": "390d0ed4-92ac-4fd3-92cc-8f80defee9e1",
+      "credentials": {
+        "telegramApi": {
+          "id": "LAKXnWIRDoCt8OvO",
+          "name": "Ai_assistent_Garmash"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "deleteMessage",
+        "chatId": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
+        "messageId": "={{ $('Telegram Trigger').item.json.callback_query.message.message_id }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -1168,
+        -560
+      ],
+      "id": "43ecbef3-dbe4-406c-acc6-ef9cbfc87065",
+      "name": "Delete a chat message1",
+      "webhookId": "390d0ed4-92ac-4fd3-92cc-8f80defee9e1",
+      "credentials": {
+        "telegramApi": {
+          "id": "LAKXnWIRDoCt8OvO",
+          "name": "Ai_assistent_Garmash"
+        }
+      }
     }
   ],
   "connections": {
@@ -2732,6 +2776,28 @@
           }
         ]
       ]
+    },
+    "Delete row(s)": {
+      "main": [
+        [
+          {
+            "node": "Delete a chat message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete row(s) Task": {
+      "main": [
+        [
+          {
+            "node": "Delete a chat message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -2746,9 +2812,10 @@
   "meta": {
     "templateCredsSetupCompleted": true
   },
+  "nodeGroups": [],
   "pinData": {},
-  "versionId": "87ec646a-d523-4f6f-b429-ea363e4a7378",
-  "activeVersionId": "87ec646a-d523-4f6f-b429-ea363e4a7378",
+  "versionId": "b2d62a86-c835-40c4-900e-bcbd42c958aa",
+  "activeVersionId": "b2d62a86-c835-40c4-900e-bcbd42c958aa",
   "triggerCount": 1,
   "shared": [
     {
@@ -2760,9 +2827,9 @@
     }
   ],
   "activeVersion": {
-    "updatedAt": "2026-06-22T09:17:12.000Z",
-    "createdAt": "2026-06-22T09:08:19.251Z",
-    "versionId": "87ec646a-d523-4f6f-b429-ea363e4a7378",
+    "updatedAt": "2026-07-02T13:44:32.000Z",
+    "createdAt": "2026-07-02T13:44:30.613Z",
+    "versionId": "b2d62a86-c835-40c4-900e-bcbd42c958aa",
     "workflowId": "4OCeBFYfU5uJpnY3",
     "nodes": [
       {
@@ -4948,6 +5015,50 @@
             "name": "Ai_assistent_Garmash"
           }
         }
+      },
+      {
+        "parameters": {
+          "operation": "deleteMessage",
+          "chatId": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
+          "messageId": "={{ $('Telegram Trigger').item.json.callback_query.message.message_id }}"
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          -1200,
+          -944
+        ],
+        "id": "ae3e5141-e2d8-4757-95b4-e4c44ef945bf",
+        "name": "Delete a chat message",
+        "webhookId": "390d0ed4-92ac-4fd3-92cc-8f80defee9e1",
+        "credentials": {
+          "telegramApi": {
+            "id": "LAKXnWIRDoCt8OvO",
+            "name": "Ai_assistent_Garmash"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "deleteMessage",
+          "chatId": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
+          "messageId": "={{ $('Telegram Trigger').item.json.callback_query.message.message_id }}"
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          -1168,
+          -560
+        ],
+        "id": "43ecbef3-dbe4-406c-acc6-ef9cbfc87065",
+        "name": "Delete a chat message1",
+        "webhookId": "390d0ed4-92ac-4fd3-92cc-8f80defee9e1",
+        "credentials": {
+          "telegramApi": {
+            "id": "LAKXnWIRDoCt8OvO",
+            "name": "Ai_assistent_Garmash"
+          }
+        }
       }
     ],
     "connections": {
@@ -5491,11 +5602,33 @@
             }
           ]
         ]
+      },
+      "Delete row(s)": {
+        "main": [
+          [
+            {
+              "node": "Delete a chat message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Delete row(s) Task": {
+        "main": [
+          [
+            {
+              "node": "Delete a chat message1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
       }
     },
     "nodeGroups": [],
     "authors": "Buts Sergei",
-    "name": "Version 87ec646a",
+    "name": "Version b2d62a86",
     "description": "",
     "autosaved": true
   },
