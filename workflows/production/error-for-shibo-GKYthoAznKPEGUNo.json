@@ -3,7 +3,7 @@
   "createdAt": "2026-05-08T22:27:47.115Z",
   "id": "GKYthoAznKPEGUNo",
   "name": "Error for shibo",
-  "active": true,
+  "active": false,
   "isArchived": false,
   "nodes": [
     {
@@ -131,9 +131,10 @@
   },
   "staticData": null,
   "meta": null,
+  "nodeGroups": [],
   "pinData": {},
   "versionId": "0676dba5-ef2d-4f58-857b-3a98b3e0165c",
-  "activeVersionId": "0676dba5-ef2d-4f58-857b-3a98b3e0165c",
+  "activeVersionId": null,
   "triggerCount": 0,
   "shared": [
     {
@@ -144,136 +145,6 @@
       "projectId": "tpHcOqN3nfT7Wyud"
     }
   ],
-  "activeVersion": {
-    "updatedAt": "2026-05-08T22:42:23.000Z",
-    "createdAt": "2026-05-08T22:42:05.560Z",
-    "versionId": "0676dba5-ef2d-4f58-857b-3a98b3e0165c",
-    "workflowId": "GKYthoAznKPEGUNo",
-    "nodes": [
-      {
-        "parameters": {
-          "chatId": "=-1003855363249",
-          "text": "❌ Неправильний формат часу. \n\nПиши тільки так: 10:00-21:00 \nПриклади правильного формату: 09:50-22:30 08:00-16:45\n",
-          "additionalFields": {
-            "appendAttribution": false
-          }
-        },
-        "type": "n8n-nodes-base.telegram",
-        "typeVersion": 1.2,
-        "position": [
-          480,
-          16
-        ],
-        "id": "d37bbf1c-89f4-4d6d-b36b-1232527e844f",
-        "name": "Send a text message",
-        "webhookId": "ee403805-43d8-4451-be92-77a495a8ea6d",
-        "notesInFlow": false,
-        "credentials": {
-          "telegramApi": {
-            "id": "lpSZgr42srK3I6se",
-            "name": "Shibo_bot"
-          }
-        }
-      },
-      {
-        "parameters": {
-          "jsCode": "const rawMessage = $json.execution?.error?.message || '';\n\nlet chat_id = null;\nlet error_type = 'UNKNOWN_ERROR';\n\nif (rawMessage.includes('|')) {\n  const parts = rawMessage.split('|');\n  error_type = parts[0];\n  chat_id = parts[1].split(' ')[0];\n}\n\nreturn [{\n  chat_id,\n  error_type\n}];"
-        },
-        "type": "n8n-nodes-base.code",
-        "typeVersion": 2,
-        "position": [
-          32,
-          16
-        ],
-        "id": "ed73a140-ebb5-4b01-8195-453e0f5dfa38",
-        "name": "Parse Error"
-      },
-      {
-        "parameters": {
-          "conditions": {
-            "options": {
-              "caseSensitive": true,
-              "leftValue": "",
-              "typeValidation": "strict",
-              "version": 3
-            },
-            "conditions": [
-              {
-                "id": "321f96e8-8323-4043-add1-9fcfe1a3e955",
-                "leftValue": "={{ $json.error_type === 'INVALID_FORMAT' }}",
-                "rightValue": "",
-                "operator": {
-                  "type": "boolean",
-                  "operation": "true",
-                  "singleValue": true
-                }
-              }
-            ],
-            "combinator": "and"
-          },
-          "options": {}
-        },
-        "type": "n8n-nodes-base.if",
-        "typeVersion": 2.3,
-        "position": [
-          240,
-          16
-        ],
-        "id": "47e5881f-5a2b-4bf9-b371-83170b00fb1a",
-        "name": "If"
-      },
-      {
-        "parameters": {},
-        "type": "n8n-nodes-base.errorTrigger",
-        "typeVersion": 1,
-        "position": [
-          -144,
-          16
-        ],
-        "id": "1955137d-c1c3-4f3c-849d-993794a4f2ad",
-        "name": "Error Trigger"
-      }
-    ],
-    "connections": {
-      "Parse Error": {
-        "main": [
-          [
-            {
-              "node": "If",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "If": {
-        "main": [
-          [
-            {
-              "node": "Send a text message",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Error Trigger": {
-        "main": [
-          [
-            {
-              "node": "Parse Error",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      }
-    },
-    "nodeGroups": [],
-    "authors": "Buts Sergei",
-    "name": "Version 0676dba5",
-    "description": "",
-    "autosaved": true
-  },
+  "activeVersion": null,
   "tags": []
 }
