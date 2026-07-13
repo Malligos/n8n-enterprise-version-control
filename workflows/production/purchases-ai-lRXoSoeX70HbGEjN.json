@@ -1,9 +1,9 @@
 {
-  "updatedAt": "2026-05-21T16:28:52.758Z",
+  "updatedAt": "2026-07-02T18:59:19.795Z",
   "createdAt": "2026-05-20T16:32:09.784Z",
   "id": "lRXoSoeX70HbGEjN",
   "name": "Purchases_ai",
-  "active": false,
+  "active": true,
   "isArchived": false,
   "nodes": [
     {
@@ -73,43 +73,6 @@
         "telegramApi": {
           "id": "HdYtgfV1noTqi1CX",
           "name": "My_ai"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "modelId": {
-          "__rl": true,
-          "value": "gpt-4.1",
-          "mode": "list",
-          "cachedResultName": "GPT-4.1"
-        },
-        "responses": {
-          "values": [
-            {
-              "type": "image",
-              "imageType": "base64"
-            },
-            {
-              "content": "Ти обробляєш фото ресторанної накладної.\n\nВитягни з фото:\n- постачальника\n- дату накладної\n- номер накладної\n- всі товари\n- кількість\n- одиницю виміру\n- ціну за одиницю\n- суму по кожному товару\n- загальну суму накладної\n\nПоверни тільки чистий JSON без markdown, без пояснень.\n\nФормат:\n\n{\n  \"supplier\": \"\",\n  \"invoice_date\": \"\",\n  \"invoice_number\": \"\",\n  \"items\": [\n    {\n      \"product\": \"\",\n      \"quantity\": 0,\n      \"unit\": \"\",\n      \"price_per_unit\": 0,\n      \"total\": 0\n    }\n  ],\n  \"invoice_total\": 0,\n  \"confidence\": 0\n}\n\nЯкщо поле не видно — null.\nНе вигадуй дані.\nПоверни тільки валідний JSON.\nНе використовуй markdown.\nУсі рядки мають бути в подвійних лапках.\nУ назвах товарів не використовуй лапки, замінюй їх на апостроф.\nНе став коми після останнього елемента."
-            }
-          ]
-        },
-        "builtInTools": {},
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.openAi",
-      "typeVersion": 2.3,
-      "position": [
-        -560,
-        -320
-      ],
-      "id": "f4e92819-1565-4add-a1a4-8386ff46e37e",
-      "name": "Message a model",
-      "credentials": {
-        "openAiApi": {
-          "id": "wmMo2Lknq3Hi5ts2",
-          "name": "OpenAi account"
         }
       }
     },
@@ -294,7 +257,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        0,
+        384,
         -320
       ],
       "id": "eda9114a-1fc6-4a37-9fcc-19d288f5d426",
@@ -335,8 +298,8 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        688,
-        -320
+        1072,
+        -304
       ],
       "id": "983cf01b-51d1-413d-bc15-5ca6735c7e65",
       "name": "Send a text message3",
@@ -355,7 +318,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        208,
+        592,
         -320
       ],
       "id": "e5e12961-3bdf-4657-a624-7b26f4b52537",
@@ -365,14 +328,15 @@
       "parameters": {
         "dataTableId": {
           "__rl": true,
-          "value": "nI0gDZSQ5goztTOc",
+          "value": "468KD7MEVYZUCI4Q",
           "mode": "list",
-          "cachedResultName": "pending_invoices",
-          "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/nI0gDZSQ5goztTOc"
+          "cachedResultName": "panding_invoices",
+          "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/468KD7MEVYZUCI4Q"
         },
         "columns": {
           "mappingMode": "defineBelow",
           "value": {
+            "message_id": false,
             "invoice_id": "={{ $json.invoice_id }}",
             "chat_id": "={{ $json.chat_id }}",
             "status": "={{ $json.status }}",
@@ -417,7 +381,7 @@
               "required": false,
               "defaultMatch": false,
               "display": true,
-              "type": "string",
+              "type": "boolean",
               "readOnly": false,
               "removed": false
             },
@@ -450,8 +414,8 @@
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1.1,
       "position": [
-        416,
-        -320
+        800,
+        -304
       ],
       "id": "c73ad970-70ad-4b8e-aa15-ddd766baff7d",
       "name": "Insert row"
@@ -492,12 +456,12 @@
     },
     {
       "parameters": {
-        "jsCode": "const text =\n  $json.output?.[0]?.content?.[0]?.text ||\n  $json.text ||\n  $json.response ||\n  '';\n\nif (!text) {\n  throw new Error('AI не повернув текст');\n}\n\nlet cleaned = text\n  .replace(/```json/g, '')\n  .replace(/```/g, '')\n  .trim();\n\n// дістаємо JSON навіть якщо AI додав текст навколо\nconst firstBrace = cleaned.indexOf('{');\nconst firstBracket = cleaned.indexOf('[');\n\nlet startIndex = -1;\n\nif (firstBrace === -1) startIndex = firstBracket;\nelse if (firstBracket === -1) startIndex = firstBrace;\nelse startIndex = Math.min(firstBrace, firstBracket);\n\nif (startIndex > 0) {\n  cleaned = cleaned.slice(startIndex);\n}\n\nlet data;\n\ntry {\n  data = JSON.parse(cleaned);\n} catch (e) {\n  throw new Error('AI повернув невалідний JSON: ' + cleaned.slice(0, 300));\n}\n\nconst items = Array.isArray(data) ? data : data.items;\n\nif (!Array.isArray(items)) {\n  throw new Error('У JSON немає масиву items');\n}\n\nreturn items.map(item => ({\n  json: {\n    supplier: data.supplier || '',\n    invoice_date: data.invoice_date || '',\n    invoice_number: data.invoice_number || '',\n    product: item.product || item.name || '',\n    quantity: item.quantity || item.qty || '',\n    unit: item.unit || '',\n    price_per_unit: item.price_per_unit || item.price || '',\n    total: item.total || item.sum || ''\n  }\n}));"
+        "jsCode": "const data = $json;\n\nconst items = data.items;\n\nif (!Array.isArray(items)) {\n  throw new Error('У JSON немає масиву items');\n}\n\nreturn items.map(item => ({\n  json: {\n    supplier: data.supplier || '',\n    invoice_date: data.invoice_date || '',\n    invoice_number: data.invoice_number || '',\n    product: item.product || '',\n    quantity: item.quantity || '',\n    unit: item.unit || '',\n    price_per_unit: item.price_per_unit || '',\n    total: item.total || ''\n  }\n}));"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -208,
+        160,
         -320
       ],
       "id": "ca1018f3-7bc4-47d5-a659-16de9de14b19",
@@ -555,10 +519,10 @@
         "operation": "get",
         "dataTableId": {
           "__rl": true,
-          "value": "nI0gDZSQ5goztTOc",
+          "value": "468KD7MEVYZUCI4Q",
           "mode": "list",
-          "cachedResultName": "pending_invoices",
-          "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/nI0gDZSQ5goztTOc"
+          "cachedResultName": "panding_invoices",
+          "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/468KD7MEVYZUCI4Q"
         },
         "filters": {
           "conditions": [
@@ -617,10 +581,10 @@
         "operation": "update",
         "dataTableId": {
           "__rl": true,
-          "value": "nI0gDZSQ5goztTOc",
+          "value": "468KD7MEVYZUCI4Q",
           "mode": "list",
-          "cachedResultName": "pending_invoices",
-          "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/nI0gDZSQ5goztTOc"
+          "cachedResultName": "panding_invoices",
+          "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/468KD7MEVYZUCI4Q"
         },
         "filters": {
           "conditions": [
@@ -741,10 +705,10 @@
         "operation": "update",
         "dataTableId": {
           "__rl": true,
-          "value": "nI0gDZSQ5goztTOc",
+          "value": "468KD7MEVYZUCI4Q",
           "mode": "list",
-          "cachedResultName": "pending_invoices",
-          "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/nI0gDZSQ5goztTOc"
+          "cachedResultName": "panding_invoices",
+          "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/468KD7MEVYZUCI4Q"
         },
         "filters": {
           "conditions": [
@@ -883,6 +847,169 @@
       ],
       "id": "cd6105c1-7b8b-4d5b-a577-3a415b3f7788",
       "name": "Restore Invoice Items"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-5.5",
+          "mode": "list",
+          "cachedResultName": "GPT-5.5"
+        },
+        "responses": {
+          "values": [
+            {
+              "type": "image",
+              "imageType": "base64",
+              "imageDetail": "high"
+            },
+            {
+              "content": "Ти OCR-система для ресторанних накладних.\n\nВитягни тільки ті дані, які буквально видно на фото.\nНе вигадуй товари.\nНе замінюй нечіткі товари схожими назвами.\nНе нормалізуй назви товарів.\nНе виправляй орфографію.\nЯкщо поле не видно — null.\n\nДата має бути у форматі YYYY-MM-DD.\n\nПоверни тільки валідний JSON:\n\n{\n  \"supplier\": \"\",\n  \"invoice_date\": \"\",\n  \"invoice_number\": \"\",\n  \"items_count\": 0,\n  \"items\": [\n    {\n      \"product\": \"\",\n      \"quantity\": 0,\n      \"unit\": \"\",\n      \"price_per_unit\": 0,\n      \"total\": 0\n    }\n  ],\n  \"invoice_total\": 0,\n  \"currency\": \"UAH\"\n}\n\nПеред відповіддю перевір:\n- items_count дорівнює кількості рядків у таблиці;\n- сума всіх total приблизно дорівнює invoice_total;\n- кожен товар реально є на фото.\n\nБез markdown. Без пояснень."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        -560,
+        -320
+      ],
+      "id": "4a539d39-ec52-4037-9ff8-fc9c8856ebf1",
+      "name": "Message a model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "wmMo2Lknq3Hi5ts2",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const rawText = $json.output?.[0]?.content?.[0]?.text;\n\nlet invoice;\n\ntry {\n  invoice = JSON.parse(rawText);\n} catch (error) {\n  return [{\n    json: {\n      error: 'JSON parse error',\n      rawText,\n      validation: {\n        is_valid: false\n      }\n    }\n  }];\n}\n\nconst items = invoice.items || [];\nconst sum = items.reduce((acc, item) => acc + Number(item.total || 0), 0);\nconst invoiceTotal = Number(invoice.invoice_total || 0);\nconst diff = Math.abs(sum - invoiceTotal);\n\nreturn [{\n  json: {\n    ...invoice,\n    validation: {\n      items_found: items.length,\n      items_count: invoice.items_count || items.length,\n      calculated_total: Number(sum.toFixed(2)),\n      invoice_total: invoiceTotal,\n      total_diff: Number(diff.toFixed(2)),\n      is_valid: diff <= 1 && items.length > 0\n    }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -208,
+        -304
+      ],
+      "id": "e8893f64-e7d1-43b2-b399-fc5e203b7fe4",
+      "name": "Validate Invoice"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "5480e4a0-c105-4043-80bd-837d88c08b27",
+              "leftValue": "={{ $json.validation.is_valid }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -48,
+        -304
+      ],
+      "id": "6025be15-fb8c-4efa-a67e-c1a08d520843",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=⚠️ Накладна розпізнана з помилкою.  Знайдено товарів: {{$json.validation.items_found}} Очікувано товарів: {{$json.validation.items_count}} Сума по товарах: {{$json.validation.calculated_total}} грн Сума накладної: {{$json.validation.invoice_total}} грн Різниця: {{$json.validation.total_diff}} грн  Надішли фото ще раз або перевір вручну.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        160,
+        -112
+      ],
+      "id": "dee88e4a-f7db-42b4-854d-0731d7b3dd14",
+      "name": "Send a text message1",
+      "webhookId": "fba3feb9-e8c9-43b0-a207-d4bc19d2eb10",
+      "credentials": {
+        "telegramApi": {
+          "id": "HdYtgfV1noTqi1CX",
+          "name": "My_ai"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "deleteRows",
+        "dataTableId": {
+          "__rl": true,
+          "value": "468KD7MEVYZUCI4Q",
+          "mode": "list",
+          "cachedResultName": "panding_invoices",
+          "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/468KD7MEVYZUCI4Q"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        688,
+        -640
+      ],
+      "id": "9f64aeaf-e576-41eb-a5af-5a82de20af93",
+      "name": "Delete row(s)"
+    },
+    {
+      "parameters": {
+        "operation": "deleteRows",
+        "dataTableId": {
+          "__rl": true,
+          "value": "468KD7MEVYZUCI4Q",
+          "mode": "list",
+          "cachedResultName": "panding_invoices",
+          "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/468KD7MEVYZUCI4Q"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -16,
+        -448
+      ],
+      "id": "751937c8-4241-49f5-9ab6-5c662d86896e",
+      "name": "Delete row(s)1"
     }
   ],
   "connections": {
@@ -901,18 +1028,7 @@
       "main": [
         [
           {
-            "node": "Message a model",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Message a model": {
-      "main": [
-        [
-          {
-            "node": "Parse",
+            "node": "Message a model1",
             "type": "main",
             "index": 0
           }
@@ -1098,6 +1214,68 @@
           }
         ]
       ]
+    },
+    "Message a model1": {
+      "main": [
+        [
+          {
+            "node": "Validate Invoice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Invoice": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Parse",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "success message": {
+      "main": [
+        [
+          {
+            "node": "Delete row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message4": {
+      "main": [
+        [
+          {
+            "node": "Delete row(s)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -1108,9 +1286,10 @@
   "meta": {
     "templateCredsSetupCompleted": true
   },
+  "nodeGroups": [],
   "pinData": {},
-  "versionId": "7c6c7908-fcb8-4317-aeb2-c89a0ada4922",
-  "activeVersionId": null,
+  "versionId": "9b2471a4-260a-4f5e-a74c-cc5c22c27107",
+  "activeVersionId": "9b2471a4-260a-4f5e-a74c-cc5c22c27107",
   "triggerCount": 1,
   "shared": [
     {
@@ -1121,6 +1300,1289 @@
       "projectId": "tpHcOqN3nfT7Wyud"
     }
   ],
-  "activeVersion": null,
+  "activeVersion": {
+    "updatedAt": "2026-07-02T19:00:25.000Z",
+    "createdAt": "2026-07-02T18:59:19.796Z",
+    "versionId": "9b2471a4-260a-4f5e-a74c-cc5c22c27107",
+    "workflowId": "lRXoSoeX70HbGEjN",
+    "nodes": [
+      {
+        "parameters": {
+          "updates": [
+            "message",
+            "callback_query"
+          ],
+          "additionalFields": {}
+        },
+        "type": "n8n-nodes-base.telegramTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          -1456,
+          -448
+        ],
+        "id": "fd893fe2-1e62-4082-9b07-31cd3e0ba0d4",
+        "name": "Telegram Trigger",
+        "webhookId": "7c5da42f-bbfd-4912-a596-762d8ad4547f",
+        "credentials": {
+          "telegramApi": {
+            "id": "HdYtgfV1noTqi1CX",
+            "name": "My_ai"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+          "text": "❌ Надішліть фото накладної.",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          -624,
+          16
+        ],
+        "id": "3f2d3da9-219c-47cc-8d34-cf7d37212050",
+        "name": "Send a text message",
+        "webhookId": "2ab74eeb-2dee-4071-b120-a66f6ef6b6cd",
+        "credentials": {
+          "telegramApi": {
+            "id": "HdYtgfV1noTqi1CX",
+            "name": "My_ai"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "resource": "file",
+          "fileId": "={{$json.message.photo[$json.message.photo.length - 1].file_id}}",
+          "additionalFields": {}
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          -768,
+          -320
+        ],
+        "id": "cf9c1885-e830-49f7-8896-1ce21d3c2a30",
+        "name": "Get a file",
+        "webhookId": "1e623d9d-6d37-4d71-aef4-79d6868c0a65",
+        "credentials": {
+          "telegramApi": {
+            "id": "HdYtgfV1noTqi1CX",
+            "name": "My_ai"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "https://docs.google.com/spreadsheets/d/1GkyhAOJEcUKuD2_jGbj-C6FqraIQBGvTuS5FvDSI5VU/edit?gid=0#gid=0",
+            "mode": "url"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Лист1",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GkyhAOJEcUKuD2_jGbj-C6FqraIQBGvTuS5FvDSI5VU/edit#gid=0"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "Date": "={{ $json.Date }}",
+              "Supplier": "={{ $json.Supplier }}",
+              "Product": "={{ $json.Product }}",
+              "Quantity": "={{ $json.Quantity }}",
+              "Unit": "={{ $json.Unit }}",
+              "Price per unit": "={{ $json['Price per unit'] }}",
+              "Total": "={{ $json.Total }}",
+              "Invoice number": "={{ $json['Invoice number'] }}",
+              "Confidence": "={{ $json.Confidence }}",
+              "Invoice total": "={{ $json['Invoice total'] }}",
+              "Added by": "={{ $json['Added by'] }}",
+              "Created at": "={{ $json['Created at'] }}",
+              "Status": "={{ $json.Status }}"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "Date",
+                "displayName": "Date",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Supplier",
+                "displayName": "Supplier",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Product",
+                "displayName": "Product",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Quantity",
+                "displayName": "Quantity",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Unit",
+                "displayName": "Unit",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Price per unit",
+                "displayName": "Price per unit",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Total",
+                "displayName": "Total",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Invoice number",
+                "displayName": "Invoice number",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Invoice total",
+                "displayName": "Invoice total",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Confidence",
+                "displayName": "Confidence",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Added by",
+                "displayName": "Added by",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Created at",
+                "displayName": "Created at",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Status",
+                "displayName": "Status",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          -224,
+          -640
+        ],
+        "id": "4d23903a-d47d-40ed-ae83-2c227c656a05",
+        "name": "Append row in sheet",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "0Gdvf3Mhmj7whXEv",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const items = $input.all();\n\nlet message = '📦 *Перевір накладну перед записом:*\\n\\n';\nlet total = 0;\n\nfor (const item of items) {\n  const product = item.json.product || 'Невідомо';\n  const quantity = item.json.quantity || '';\n  const price = item.json.price || '';\n  const sum = Number(item.json.total || 0);\n\n  total += sum;\n\n  message += `• *${product}*\\n`;\n  message += `  К-сть: ${quantity}\\n`;\n  message += `  Ціна: ${price} грн\\n`;\n  message += `  Сума: ${sum} грн\\n\\n`;\n}\n\nmessage += `💰 *Разом:* ${total} грн`;\n\nreturn [{\n  json: {\n    chatId: $('Telegram Trigger').first().json.message.chat.id,\n    message,\n    invoiceData: items.map(i => i.json)\n  }\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          384,
+          -320
+        ],
+        "id": "eda9114a-1fc6-4a37-9fcc-19d288f5d426",
+        "name": "Build Preview"
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+          "text": "={{ $('Prepare Pending Invoice').item.json.message }}",
+          "replyMarkup": "inlineKeyboard",
+          "inlineKeyboard": {
+            "rows": [
+              {
+                "row": {
+                  "buttons": [
+                    {
+                      "text": "✅ Підтвердити",
+                      "additionalFields": {
+                        "callback_data": "=confirm_invoice:{{ $('Prepare Pending Invoice').first().json.invoice_id }}"
+                      }
+                    },
+                    {
+                      "text": "❌ Скасувати",
+                      "additionalFields": {
+                        "callback_data": "=cancel_invoice:{{ $('Prepare Pending Invoice').first().json.invoice_id }}"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "additionalFields": {
+            "appendAttribution": false,
+            "parse_mode": "Markdown"
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          1072,
+          -304
+        ],
+        "id": "983cf01b-51d1-413d-bc15-5ca6735c7e65",
+        "name": "Send a text message3",
+        "webhookId": "a34134b9-c56f-4f0d-9743-c277f67ddab3",
+        "credentials": {
+          "telegramApi": {
+            "id": "HdYtgfV1noTqi1CX",
+            "name": "My_ai"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const invoiceId = Date.now().toString();\n\nreturn [{\n  json: {\n    invoice_id: invoiceId,\n    chat_id: String($json.chatId),\n    status: 'pending',\n    invoice_data: JSON.stringify($json.invoiceData),\n    created_at: new Date().toISOString(),\n    message: $json.message\n  }\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          592,
+          -320
+        ],
+        "id": "e5e12961-3bdf-4657-a624-7b26f4b52537",
+        "name": "Prepare Pending Invoice"
+      },
+      {
+        "parameters": {
+          "dataTableId": {
+            "__rl": true,
+            "value": "468KD7MEVYZUCI4Q",
+            "mode": "list",
+            "cachedResultName": "panding_invoices",
+            "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/468KD7MEVYZUCI4Q"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "message_id": false,
+              "invoice_id": "={{ $json.invoice_id }}",
+              "chat_id": "={{ $json.chat_id }}",
+              "status": "={{ $json.status }}",
+              "invoice_data": "={{ $json.invoice_data }}",
+              "created_at": "={{ $json.created_at }}"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "invoice_id",
+                "displayName": "invoice_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              },
+              {
+                "id": "chat_id",
+                "displayName": "chat_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              },
+              {
+                "id": "status",
+                "displayName": "status",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              },
+              {
+                "id": "message_id",
+                "displayName": "message_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "boolean",
+                "readOnly": false,
+                "removed": false
+              },
+              {
+                "id": "invoice_data",
+                "displayName": "invoice_data",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              },
+              {
+                "id": "created_at",
+                "displayName": "created_at",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.dataTable",
+        "typeVersion": 1.1,
+        "position": [
+          800,
+          -304
+        ],
+        "id": "c73ad970-70ad-4b8e-aa15-ddd766baff7d",
+        "name": "Insert row"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "ef09aedc-fe23-41a6-93a3-82d614b553cb",
+                "leftValue": "={{ $json.callback_query }}",
+                "rightValue": "invoice_confirm",
+                "operator": {
+                  "type": "object",
+                  "operation": "exists",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          -1280,
+          -448
+        ],
+        "id": "f3ccc373-0e34-411d-bcac-d25957d30cc4",
+        "name": "IF callback?"
+      },
+      {
+        "parameters": {
+          "jsCode": "const data = $json;\n\nconst items = data.items;\n\nif (!Array.isArray(items)) {\n  throw new Error('У JSON немає масиву items');\n}\n\nreturn items.map(item => ({\n  json: {\n    supplier: data.supplier || '',\n    invoice_date: data.invoice_date || '',\n    invoice_number: data.invoice_number || '',\n    product: item.product || '',\n    quantity: item.quantity || '',\n    unit: item.unit || '',\n    price_per_unit: item.price_per_unit || '',\n    total: item.total || ''\n  }\n}));"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          160,
+          -320
+        ],
+        "id": "ca1018f3-7bc4-47d5-a659-16de9de14b19",
+        "name": "Parse"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "eea7be44-a8c5-4132-ac8a-e77e48233df6",
+                "leftValue": "={{$json.message.photo}}",
+                "rightValue": "",
+                "operator": {
+                  "type": "array",
+                  "operation": "exists",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          -1040,
+          -240
+        ],
+        "id": "9cc266b7-1f78-4da2-b992-5ab40e34cbeb",
+        "name": "IF Photo?"
+      },
+      {
+        "parameters": {
+          "jsCode": "const data = $json.callback_query.data || '';\n\nconst parts = data.split(':');\nconst action = parts[0];\nconst invoiceId = parts[1];\n\nif (!invoiceId) {\n  throw new Error('У callback_data немає invoice_id. Зараз data = ' + data);\n}\n\nreturn [{\n  json: {\n    action,\n    invoice_id: invoiceId,\n    chat_id: String($json.callback_query.message.chat.id),\n    callback_query_id: $json.callback_query.id\n  }\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -1072,
+          -544
+        ],
+        "id": "d46c2feb-82cb-47c1-bff1-7dfe44d9a3a2",
+        "name": "Parse Callback"
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "dataTableId": {
+            "__rl": true,
+            "value": "468KD7MEVYZUCI4Q",
+            "mode": "list",
+            "cachedResultName": "panding_invoices",
+            "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/468KD7MEVYZUCI4Q"
+          },
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "invoice_id",
+                "keyValue": "={{ $('Parse Callback').first().json.invoice_id }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.dataTable",
+        "typeVersion": 1.1,
+        "position": [
+          -864,
+          -544
+        ],
+        "id": "d360454e-15a0-4eac-b09e-4ba2ea744c79",
+        "name": "Get row(s)"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "d24a4d38-ee74-4770-9845-202a6ceaa650",
+                "leftValue": "={{ $('Parse Callback').first().json.action }}",
+                "rightValue": "confirm_invoice",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals",
+                  "name": "filter.operator.equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          -656,
+          -544
+        ],
+        "id": "c4b1ccde-0da2-462f-90dd-cc0462fe9bbe",
+        "name": "IF: Confirm?"
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "dataTableId": {
+            "__rl": true,
+            "value": "468KD7MEVYZUCI4Q",
+            "mode": "list",
+            "cachedResultName": "panding_invoices",
+            "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/468KD7MEVYZUCI4Q"
+          },
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "invoice_id",
+                "keyValue": "={{ $('Parse Callback').first().json.invoice_id }}"
+              }
+            ]
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "status": "confirmed"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "invoice_id",
+                "displayName": "invoice_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": true
+              },
+              {
+                "id": "chat_id",
+                "displayName": "chat_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": true
+              },
+              {
+                "id": "status",
+                "displayName": "status",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              },
+              {
+                "id": "message_id",
+                "displayName": "message_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": true
+              },
+              {
+                "id": "invoice_data",
+                "displayName": "invoice_data",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": true
+              },
+              {
+                "id": "created_at",
+                "displayName": "created_at",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.dataTable",
+        "typeVersion": 1.1,
+        "position": [
+          -16,
+          -640
+        ],
+        "id": "11f7def6-7df1-4f54-af7d-cdcd2e96e12f",
+        "name": "Update row(s)"
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Parse Callback').item.json.chat_id }}",
+          "text": "={{ $json.message }}",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          480,
+          -640
+        ],
+        "id": "11203428-a490-45b5-9f90-377769de9d36",
+        "name": "success message",
+        "webhookId": "5c783bb5-f9c1-40b5-bc85-5b1bbf0fa54e",
+        "credentials": {
+          "telegramApi": {
+            "id": "HdYtgfV1noTqi1CX",
+            "name": "My_ai"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "dataTableId": {
+            "__rl": true,
+            "value": "468KD7MEVYZUCI4Q",
+            "mode": "list",
+            "cachedResultName": "panding_invoices",
+            "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/468KD7MEVYZUCI4Q"
+          },
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "invoice_id",
+                "keyValue": "={{ $('Parse Callback').item.json.invoice_id }}"
+              }
+            ]
+          },
+          "columns": {
+            "mappingMode": "autoMapInputData",
+            "value": {},
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "invoice_id",
+                "displayName": "invoice_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              },
+              {
+                "id": "chat_id",
+                "displayName": "chat_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              },
+              {
+                "id": "status",
+                "displayName": "status",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              },
+              {
+                "id": "message_id",
+                "displayName": "message_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              },
+              {
+                "id": "invoice_data",
+                "displayName": "invoice_data",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              },
+              {
+                "id": "created_at",
+                "displayName": "created_at",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "readOnly": false,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.dataTable",
+        "typeVersion": 1.1,
+        "position": [
+          -448,
+          -448
+        ],
+        "id": "838ceddb-f358-4e5a-b3e0-40574566cc20",
+        "name": "Update row(s)1"
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $json.chat_id }}",
+          "text": "❌ Накладну скасовано. Дані не були записані.",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          -240,
+          -448
+        ],
+        "id": "6c1256ed-ec4c-4d93-a6c6-45c069e53a40",
+        "name": "Send a text message4",
+        "webhookId": "fb54e335-32a2-4a36-a9e7-cfb7ea57a838",
+        "credentials": {
+          "telegramApi": {
+            "id": "HdYtgfV1noTqi1CX",
+            "name": "My_ai"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "return [{\n  json: {\n    chat_id: $('Parse Callback').first().json.chat_id,\n    message: '✅ Накладну підтверджено. Дані записані в Google Sheets.'\n  }\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          192,
+          -640
+        ],
+        "id": "f61fef6a-f72a-4315-afc2-2ce4b71606d6",
+        "name": "Build Success Once"
+      },
+      {
+        "parameters": {
+          "jsCode": "const invoiceData = JSON.parse($json.invoice_data || '[]');\n\nreturn invoiceData.map(item => ({\n  json: {\n    Date: item.invoice_date || item.date || '',\n    Supplier: item.supplier || '',\n    Product: item.product || '',\n    Quantity: item.quantity || '',\n    Unit: item.unit || '',\n    'Price per unit': item.price_per_unit || item.price || '',\n    Total: item.total || '',\n    'Invoice number': item.invoice_number || '',\n    'Invoice total': item.invoice_total || '',\n    Confidence: item.confidence || '',\n    'Added by': $('Parse Callback').first().json.chat_id || '',\n    'Created at': new Date().toISOString(),\n    Status: 'confirmed'\n  }\n}));"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -448,
+          -640
+        ],
+        "id": "cd6105c1-7b8b-4d5b-a577-3a415b3f7788",
+        "name": "Restore Invoice Items"
+      },
+      {
+        "parameters": {
+          "modelId": {
+            "__rl": true,
+            "value": "gpt-5.5",
+            "mode": "list",
+            "cachedResultName": "GPT-5.5"
+          },
+          "responses": {
+            "values": [
+              {
+                "type": "image",
+                "imageType": "base64",
+                "imageDetail": "high"
+              },
+              {
+                "content": "Ти OCR-система для ресторанних накладних.\n\nВитягни тільки ті дані, які буквально видно на фото.\nНе вигадуй товари.\nНе замінюй нечіткі товари схожими назвами.\nНе нормалізуй назви товарів.\nНе виправляй орфографію.\nЯкщо поле не видно — null.\n\nДата має бути у форматі YYYY-MM-DD.\n\nПоверни тільки валідний JSON:\n\n{\n  \"supplier\": \"\",\n  \"invoice_date\": \"\",\n  \"invoice_number\": \"\",\n  \"items_count\": 0,\n  \"items\": [\n    {\n      \"product\": \"\",\n      \"quantity\": 0,\n      \"unit\": \"\",\n      \"price_per_unit\": 0,\n      \"total\": 0\n    }\n  ],\n  \"invoice_total\": 0,\n  \"currency\": \"UAH\"\n}\n\nПеред відповіддю перевір:\n- items_count дорівнює кількості рядків у таблиці;\n- сума всіх total приблизно дорівнює invoice_total;\n- кожен товар реально є на фото.\n\nБез markdown. Без пояснень."
+              }
+            ]
+          },
+          "builtInTools": {},
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.openAi",
+        "typeVersion": 2.3,
+        "position": [
+          -560,
+          -320
+        ],
+        "id": "4a539d39-ec52-4037-9ff8-fc9c8856ebf1",
+        "name": "Message a model1",
+        "credentials": {
+          "openAiApi": {
+            "id": "wmMo2Lknq3Hi5ts2",
+            "name": "OpenAi account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const rawText = $json.output?.[0]?.content?.[0]?.text;\n\nlet invoice;\n\ntry {\n  invoice = JSON.parse(rawText);\n} catch (error) {\n  return [{\n    json: {\n      error: 'JSON parse error',\n      rawText,\n      validation: {\n        is_valid: false\n      }\n    }\n  }];\n}\n\nconst items = invoice.items || [];\nconst sum = items.reduce((acc, item) => acc + Number(item.total || 0), 0);\nconst invoiceTotal = Number(invoice.invoice_total || 0);\nconst diff = Math.abs(sum - invoiceTotal);\n\nreturn [{\n  json: {\n    ...invoice,\n    validation: {\n      items_found: items.length,\n      items_count: invoice.items_count || items.length,\n      calculated_total: Number(sum.toFixed(2)),\n      invoice_total: invoiceTotal,\n      total_diff: Number(diff.toFixed(2)),\n      is_valid: diff <= 1 && items.length > 0\n    }\n  }\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -208,
+          -304
+        ],
+        "id": "e8893f64-e7d1-43b2-b399-fc5e203b7fe4",
+        "name": "Validate Invoice"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "5480e4a0-c105-4043-80bd-837d88c08b27",
+                "leftValue": "={{ $json.validation.is_valid }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          -48,
+          -304
+        ],
+        "id": "6025be15-fb8c-4efa-a67e-c1a08d520843",
+        "name": "If"
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+          "text": "=⚠️ Накладна розпізнана з помилкою.  Знайдено товарів: {{$json.validation.items_found}} Очікувано товарів: {{$json.validation.items_count}} Сума по товарах: {{$json.validation.calculated_total}} грн Сума накладної: {{$json.validation.invoice_total}} грн Різниця: {{$json.validation.total_diff}} грн  Надішли фото ще раз або перевір вручну.",
+          "additionalFields": {}
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          160,
+          -112
+        ],
+        "id": "dee88e4a-f7db-42b4-854d-0731d7b3dd14",
+        "name": "Send a text message1",
+        "webhookId": "fba3feb9-e8c9-43b0-a207-d4bc19d2eb10",
+        "credentials": {
+          "telegramApi": {
+            "id": "HdYtgfV1noTqi1CX",
+            "name": "My_ai"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "deleteRows",
+          "dataTableId": {
+            "__rl": true,
+            "value": "468KD7MEVYZUCI4Q",
+            "mode": "list",
+            "cachedResultName": "panding_invoices",
+            "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/468KD7MEVYZUCI4Q"
+          },
+          "filters": {
+            "conditions": [
+              {
+                "keyValue": "1"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.dataTable",
+        "typeVersion": 1.1,
+        "position": [
+          688,
+          -640
+        ],
+        "id": "9f64aeaf-e576-41eb-a5af-5a82de20af93",
+        "name": "Delete row(s)"
+      },
+      {
+        "parameters": {
+          "operation": "deleteRows",
+          "dataTableId": {
+            "__rl": true,
+            "value": "468KD7MEVYZUCI4Q",
+            "mode": "list",
+            "cachedResultName": "panding_invoices",
+            "cachedResultUrl": "/projects/tpHcOqN3nfT7Wyud/datatables/468KD7MEVYZUCI4Q"
+          },
+          "filters": {
+            "conditions": [
+              {
+                "keyValue": "1"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.dataTable",
+        "typeVersion": 1.1,
+        "position": [
+          -16,
+          -448
+        ],
+        "id": "751937c8-4241-49f5-9ab6-5c662d86896e",
+        "name": "Delete row(s)1"
+      }
+    ],
+    "connections": {
+      "Telegram Trigger": {
+        "main": [
+          [
+            {
+              "node": "IF callback?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get a file": {
+        "main": [
+          [
+            {
+              "node": "Message a model1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Append row in sheet": {
+        "main": [
+          [
+            {
+              "node": "Update row(s)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Preview": {
+        "main": [
+          [
+            {
+              "node": "Prepare Pending Invoice",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Send a text message3": {
+        "main": [
+          []
+        ]
+      },
+      "Prepare Pending Invoice": {
+        "main": [
+          [
+            {
+              "node": "Insert row",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "IF callback?": {
+        "main": [
+          [
+            {
+              "node": "Parse Callback",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "IF Photo?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Parse": {
+        "main": [
+          [
+            {
+              "node": "Build Preview",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Insert row": {
+        "main": [
+          [
+            {
+              "node": "Send a text message3",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "IF Photo?": {
+        "main": [
+          [
+            {
+              "node": "Get a file",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Send a text message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Parse Callback": {
+        "main": [
+          [
+            {
+              "node": "Get row(s)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get row(s)": {
+        "main": [
+          [
+            {
+              "node": "IF: Confirm?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "IF: Confirm?": {
+        "main": [
+          [
+            {
+              "node": "Restore Invoice Items",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Update row(s)1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Update row(s)": {
+        "main": [
+          [
+            {
+              "node": "Build Success Once",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Update row(s)1": {
+        "main": [
+          [
+            {
+              "node": "Send a text message4",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Success Once": {
+        "main": [
+          [
+            {
+              "node": "success message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Restore Invoice Items": {
+        "main": [
+          [
+            {
+              "node": "Append row in sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Message a model1": {
+        "main": [
+          [
+            {
+              "node": "Validate Invoice",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Validate Invoice": {
+        "main": [
+          [
+            {
+              "node": "If",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If": {
+        "main": [
+          [
+            {
+              "node": "Parse",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Send a text message1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "success message": {
+        "main": [
+          [
+            {
+              "node": "Delete row(s)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Send a text message4": {
+        "main": [
+          [
+            {
+              "node": "Delete row(s)1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Buts Sergei",
+    "name": "Version 9b2471a4",
+    "description": "",
+    "autosaved": true
+  },
   "tags": []
 }
