@@ -328,12 +328,18 @@
   },
   "staticData": {
     "node:Schedule Trigger": {
-      "recurrenceRules": []
+      "recurrenceRules": [
+        null
+      ],
+      "recurrenceRuleSignatures": [
+        null
+      ]
     }
   },
   "meta": {
     "templateCredsSetupCompleted": true
   },
+  "nodeGroups": [],
   "pinData": {},
   "versionId": "4b22ddc8-7f6f-427c-bd1b-103302abe0ac",
   "activeVersionId": "4b22ddc8-7f6f-427c-bd1b-103302abe0ac",
