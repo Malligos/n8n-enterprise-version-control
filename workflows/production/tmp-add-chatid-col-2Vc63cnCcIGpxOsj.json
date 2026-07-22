@@ -1,0 +1,199 @@
+{
+  "updatedAt": "2026-07-18T21:14:24.000Z",
+  "createdAt": "2026-07-18T21:14:05.804Z",
+  "id": "2Vc63cnCcIGpxOsj",
+  "name": "tmp-add-chatid-col",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "id": "ef0d1c7c-da2f-4b67-8734-e691716e59ab",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "259cc1c2-76bd-47b1-91f3-add412934ae8",
+      "name": "Пустая строка +ChatId",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        460,
+        300
+      ],
+      "parameters": {
+        "mode": "manual",
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "Name",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "2",
+              "name": "Id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "3",
+              "name": "Location",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "4",
+              "name": "Updated",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "5",
+              "name": "ChatId",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "bedb3579-f1ac-4b62-b4b1-133d1e8338b0",
+      "name": "Добавить колонку ChatId",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        700,
+        300
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "append",
+        "dataMode": "autoMapInputData",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE",
+          "cachedResultName": "x"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Сотрудники"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "schema": []
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "id": "50508025-9015-4f45-9396-be91895added",
+      "name": "Удалить пустую строку",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        940,
+        300
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE",
+          "cachedResultName": "x"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Сотрудники"
+        },
+        "clear": "specificRows",
+        "startIndex": 2,
+        "rowsToDelete": 1
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Пустая строка +ChatId",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Пустая строка +ChatId": {
+      "main": [
+        [
+          {
+            "node": "Добавить колонку ChatId",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Добавить колонку ChatId": {
+      "main": [
+        [
+          {
+            "node": "Удалить пустую строку",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "nodeGroups": [],
+  "pinData": null,
+  "versionId": "739dca2f-927a-43be-bcab-fcef37ba34c8",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-07-18T21:14:05.806Z",
+      "createdAt": "2026-07-18T21:14:05.806Z",
+      "role": "workflow:owner",
+      "workflowId": "2Vc63cnCcIGpxOsj",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
