@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-09T08:15:09.959Z",
+  "updatedAt": "2026-07-14T05:54:27.285Z",
   "createdAt": "2026-07-03T14:50:45.645Z",
   "id": "vHekMdSaIblyVaXo",
   "name": "AI",
@@ -1280,7 +1280,7 @@
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
-    "availableInMCP": false
+    "availableInMCP": true
   },
   "staticData": null,
   "meta": {
