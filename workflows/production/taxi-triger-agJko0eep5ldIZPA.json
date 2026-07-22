@@ -1,0 +1,357 @@
+{
+  "updatedAt": "2026-07-19T11:10:45.000Z",
+  "createdAt": "2026-07-19T08:58:10.338Z",
+  "id": "agJko0eep5ldIZPA",
+  "name": "Taxi triger",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -432,
+        -32
+      ],
+      "id": "3ebcb34a-92f1-4550-b879-bb720be09bf0",
+      "name": "Telegram Trigger",
+      "webhookId": "09558541-6694-4f73-a5cd-b894f46187bc",
+      "credentials": {
+        "telegramApi": {
+          "id": "9xCUi3DJqhjcPWIQ",
+          "name": "Taxi tony"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "cc9e7415-4c16-42b3-a2c2-0ab4c6864b36",
+              "leftValue": "={{ $json.isPlus || $json.isMinus }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        288,
+        -32
+      ],
+      "id": "0b1ee156-7d54-4f41-973a-36680cfb1ee6",
+      "name": "Is Group Taxi Command"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE/edit?gid=710055014#gid=710055014",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 710055014,
+          "mode": "list",
+          "cachedResultName": "Employees",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE/edit#gid=710055014"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "telegram_user_id",
+              "lookupValue": "={{ $(\"Normalize Group Message\").item.json.telegramUserId }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        624,
+        -144
+      ],
+      "id": "35a4b297-f1fe-49fa-89fd-2e3107514e7c",
+      "name": "Get Employee",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const source =\n  $(\"Normalize Group Message\").first().json;\n\nconst rows = $input.all()\n  .map(item => item.json)\n  .filter(row =>\n    row &&\n    Object.keys(row).length > 0 &&\n    row.telegram_user_id\n  );\n\nconst employee = rows.find(row =>\n  String(row.telegram_user_id || \"\").trim() ===\n  String(source.telegramUserId || \"\").trim()\n);\n\nreturn [\n  {\n    json: {\n      ...source,\n      employeeFound: Boolean(employee),\n      employee: employee || null\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        832,
+        -144
+      ],
+      "id": "8968526d-0107-486d-9f3b-ff44e6adcbaf",
+      "name": "Check Employee"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "3142bd26-4386-4b60-82be-c4b90398d680",
+              "leftValue": "={{ $json.employeeFound}}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1040,
+        -144
+      ],
+      "id": "f2b03628-8b1b-4b83-bc63-62be663b2e61",
+      "name": "Employee Found"
+    },
+    {
+      "parameters": {
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1248,
+        -48
+      ],
+      "id": "d3b562bb-7d15-4e06-9020-5e64da0d1c88",
+      "name": "Send a text message",
+      "webhookId": "cec38b5f-605b-42dc-a5be-8cb7fc44d647",
+      "credentials": {
+        "telegramApi": {
+          "id": "9xCUi3DJqhjcPWIQ",
+          "name": "Taxi tony"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "7f76a9ec-98fc-4130-bd58-a86ad5821021",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1248,
+        -160
+      ],
+      "id": "df116db5-88d6-4348-a00c-7555759e5612",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const message = $json.message;\n\nif (!message) {\n  return {\n    ignore: true,\n    isTaxiCommand: false,\n    reason: \"No Telegram message\"\n  };\n}\n\nconst text = String(message.text || \"\").trim();\nconst chatType = String(message.chat?.type || \"\");\n\nconst now = new Date();\n\nconst taxiDate = new Intl.DateTimeFormat(\"en-CA\", {\n  timeZone: \"Europe/Kyiv\",\n  year: \"numeric\",\n  month: \"2-digit\",\n  day: \"2-digit\"\n}).format(now);\n\nconst taxiMarkedAt = new Intl.DateTimeFormat(\"sv-SE\", {\n  timeZone: \"Europe/Kyiv\",\n  year: \"numeric\",\n  month: \"2-digit\",\n  day: \"2-digit\",\n  hour: \"2-digit\",\n  minute: \"2-digit\",\n  second: \"2-digit\"\n}).format(now);\n\nconst isGroup =\n  chatType === \"group\" ||\n  chatType === \"supergroup\";\n\nconst isPlus = text === \"+\";\nconst isMinus = text === \"-\";\n\nreturn {\n  chatId: String(message.chat?.id || \"\"),\n  chatType,\n  chatTitle: String(message.chat?.title || \"\"),\n  messageId: message.message_id || null,\n\n  telegramUserId: String(message.from?.id || \"\"),\n  telegramUsername: String(message.from?.username || \"\"),\n  telegramFirstName: String(message.from?.first_name || \"\"),\n\n  text,\n\n  isGroup,\n  isPlus,\n  isMinus,\n\n  isTaxiCommand:\n    isGroup &&\n    (isPlus || isMinus),\n\n  taxiDate,\n  taxiMarkedAt\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -224,
+        -32
+      ],
+      "id": "5c2238c4-a93c-4b67-b711-7b43a44b8482",
+      "name": "Normalize Group Message"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "8f7c10e6-316f-465a-aaed-8036a2b3f7a7",
+              "leftValue": "={{ $json.isTaxiCommand }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -16,
+        -32
+      ],
+      "id": "005618e1-4991-4cea-80e0-8d6363bfc3f1",
+      "name": "Is Taxi Command"
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Normalize Group Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Group Taxi Command": {
+      "main": [
+        [
+          {
+            "node": "Get Employee",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Employee": {
+      "main": [
+        [
+          {
+            "node": "Check Employee",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Employee": {
+      "main": [
+        [
+          {
+            "node": "Employee Found",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Employee Found": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Group Message": {
+      "main": [
+        [
+          {
+            "node": "Is Taxi Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "ba006f2e-f371-423e-8f99-5d1af61f6601",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-07-19T08:58:10.340Z",
+      "createdAt": "2026-07-19T08:58:10.340Z",
+      "role": "workflow:owner",
+      "workflowId": "agJko0eep5ldIZPA",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
