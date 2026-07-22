@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-06-01T15:33:48.297Z",
+  "updatedAt": "2026-07-14T05:54:00.965Z",
   "createdAt": "2026-06-01T15:33:27.237Z",
   "id": "qP9B1Ixu673iBCQY",
   "name": "Оркестратор",
@@ -26,7 +26,8 @@
   "connections": {},
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate"
+    "binaryMode": "separate",
+    "availableInMCP": true
   },
   "staticData": null,
   "meta": null,
