@@ -1,0 +1,157 @@
+{
+  "updatedAt": "2026-07-18T06:04:44.268Z",
+  "createdAt": "2026-07-18T05:43:02.253Z",
+  "id": "kyvueCZpEEmShbBh",
+  "name": "My workflow 6",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 20
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -464,
+        -48
+      ],
+      "id": "1324f289-ccd2-4a30-92bf-c24f89fde661",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/118QpWy9RliO0v8c4_peXq3dVUAxjxsRjbUoThNISaCs/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 126505619,
+          "mode": "list",
+          "cachedResultName": "план работы",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/118QpWy9RliO0v8c4_peXq3dVUAxjxsRjbUoThNISaCs/edit#gid=126505619"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -256,
+        -48
+      ],
+      "id": "e1ddf6b7-47c7-4476-9406-0a4bb5004eec",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = $input.all().map(item => item.json);\n\n// ======================================================\n// НАСТРОЙКИ\n// ======================================================\n\n// Основной блок со швеями.\nconst sewingRowPairs = [\n  { nameRow: 7, statusRow: 8 },\n  { nameRow: 10, statusRow: 11 },\n];\n\n// Нижний блок с другим персоналом.\nconst staffRowPairs = [\n  { nameRow: 14, statusRow: 15 },\n  { nameRow: 17, statusRow: 18 },\n];\n\n// Игнорируем только номер строки и вертикальную ячейку \"ШВЕИ\".\n// Поля \"18\", \"col_8\", \"col_10\" не удаляем:\n// в них находятся реальные сотрудники.\nconst ignoredColumns = new Set([\n  \"row_number\",\n  \"col_1\",\n]);\n\n// ======================================================\n// ФУНКЦИИ\n// ======================================================\n\nfunction findRow(rowNumber) {\n  return rows.find(\n    row => Number(row.row_number) === Number(rowNumber)\n  );\n}\n\nfunction isEmpty(value) {\n  if (value === null || value === undefined) {\n    return true;\n  }\n\n  const text = String(value).trim().toLowerCase();\n\n  return (\n    text === \"\" ||\n    text === \"empty\" ||\n    text === \"undefined\" ||\n    text === \"null\"\n  );\n}\n\nfunction cleanEmployeeName(value) {\n  return String(value)\n    .replace(\n      /\\s*-\\s*(швачка|швея|закрійник|закройщик|пакувальниця|упаковщица|фурнітурниця|фурнитурщица|прибиральниця|уборщица|різноробочий|разнорабочий|майстер|мастер).*$/i,\n      \"\"\n    )\n    .replace(/\\s+/g, \" \")\n    .trim();\n}\n\nfunction normalizeStatus(value) {\n  if (isEmpty(value)) {\n    return \"Не внесено\";\n  }\n\n  return String(value).trim();\n}\n\nfunction isWorkingStatus(status) {\n  const value = String(status).trim().toLowerCase();\n\n  return (\n    value.includes(\"работает\") ||\n    value.includes(\"працює\") ||\n    value === \"+\" ||\n    value === \"так\" ||\n    value === \"да\"\n  );\n}\n\nfunction isDowntimeStatus(status) {\n  const value = String(status).trim().toLowerCase();\n\n  return (\n    value.includes(\"простой\") ||\n    value.includes(\"простій\")\n  );\n}\n\nfunction isDayOffStatus(status) {\n  const value = String(status).trim().toLowerCase();\n\n  return (\n    value.includes(\"выходн\") ||\n    value.includes(\"вихідн\") ||\n    value.includes(\"отпуск\") ||\n    value.includes(\"відпуст\") ||\n    value.includes(\"больнич\") ||\n    value.includes(\"лікарнян\") ||\n    value.includes(\"отсутств\") ||\n    value.includes(\"відсут\")\n  );\n}\n\nfunction formatList(array) {\n  return array.length\n    ? array.map(item => `• ${item}`).join(\"\\n\")\n    : \"—\";\n}\n\n// Проверяем, похоже ли значение на имя сотрудника.\nfunction looksLikeEmployee(value) {\n  if (isEmpty(value)) {\n    return false;\n  }\n\n  const text = String(value).trim().toLowerCase();\n\n  const forbiddenValues = [\n    \"швеи\",\n    \"швеї\",\n    \"цех\",\n    \"мастер\",\n    \"дата\",\n    \"харьков мост\",\n    \"всего посадочных мест\",\n    \"на выходном\",\n    \"работает\",\n    \"простой\",\n  ];\n\n  if (forbiddenValues.includes(text)) {\n    return false;\n  }\n\n  return (\n    text.includes(\" - \") ||\n    /[А-ЯІЇЄҐA-Z][а-яіїєґa-z]+\\s+[А-ЯІЇЄҐA-Z]\\.\\s*[А-ЯІЇЄҐA-Z]\\./i.test(text)\n  );\n}\n\n// ======================================================\n// ИЗВЛЕЧЕНИЕ СОТРУДНИКОВ\n// ======================================================\n\nfunction extractEmployees(rowPairs, allowEmptySeats = false) {\n  const result = [];\n\n  for (const pair of rowPairs) {\n    const namesRow = findRow(pair.nameRow);\n    const statusesRow = findRow(pair.statusRow);\n\n    if (!namesRow || !statusesRow) {\n      continue;\n    }\n\n    const columns = new Set([\n      ...Object.keys(namesRow),\n      ...Object.keys(statusesRow),\n    ]);\n\n    for (const column of columns) {\n      if (ignoredColumns.has(column)) {\n        continue;\n      }\n\n      const rawName = namesRow[column];\n      const rawStatus = statusesRow[column];\n\n      const nameIsEmpty = isEmpty(rawName);\n      const statusIsEmpty = isEmpty(rawStatus);\n\n      // Полностью пустая пара.\n      if (nameIsEmpty && statusIsEmpty) {\n        continue;\n      }\n\n      // Если имя есть, но это не сотрудник — пропускаем.\n      if (!nameIsEmpty && !looksLikeEmployee(rawName)) {\n        continue;\n      }\n\n      // В нижнем блоке не учитываем пустые посадочные места.\n      if (nameIsEmpty && !allowEmptySeats) {\n        continue;\n      }\n\n      const status = normalizeStatus(rawStatus);\n\n      result.push({\n        name: nameIsEmpty\n          ? \"Вільне посадкове місце\"\n          : cleanEmployeeName(rawName),\n\n        fullName: nameIsEmpty\n          ? \"\"\n          : String(rawName).trim(),\n\n        status,\n        column,\n        nameRow: pair.nameRow,\n        statusRow: pair.statusRow,\n        isEmptySeat: nameIsEmpty,\n      });\n    }\n  }\n\n  return result;\n}\n\n// ======================================================\n// ШВЕИ\n// ======================================================\n\nconst sewingEmployees = extractEmployees(\n  sewingRowPairs,\n  true\n);\n\nconst sewingWorking = [];\nconst sewingDowntimeEmployees = [];\nconst sewingDayOff = [];\nconst sewingUnknown = [];\n\nlet emptySeatDowntime = 0;\n\nfor (const employee of sewingEmployees) {\n  if (isWorkingStatus(employee.status)) {\n    if (employee.isEmptySeat) {\n      sewingUnknown.push(\n        `Вільне посадкове місце — ${employee.status}`\n      );\n    } else {\n      sewingWorking.push(employee.name);\n    }\n\n    continue;\n  }\n\n  if (isDowntimeStatus(employee.status)) {\n    if (employee.isEmptySeat) {\n      emptySeatDowntime++;\n    } else {\n      sewingDowntimeEmployees.push(employee.name);\n    }\n\n    continue;\n  }\n\n  if (isDayOffStatus(employee.status)) {\n    const label = employee.isEmptySeat\n      ? \"Вільне посадкове місце\"\n      : employee.name;\n\n    sewingDayOff.push(\n      `${label} — ${employee.status}`\n    );\n\n    continue;\n  }\n\n  const label = employee.isEmptySeat\n    ? \"Вільне посадкове місце\"\n    : employee.name;\n\n  sewingUnknown.push(\n    employee.status === \"Не внесено\"\n      ? label\n      : `${label} — ${employee.status}`\n  );\n}\n\nconst sewingDowntimeTotal =\n  sewingDowntimeEmployees.length + emptySeatDowntime;\n\nconst sewingTotal =\n  sewingWorking.length +\n  sewingDowntimeTotal +\n  sewingDayOff.length +\n  sewingUnknown.length;\n\nconst sewingAttendance = sewingTotal\n  ? Math.round(\n      (sewingWorking.length / sewingTotal) * 100\n    )\n  : 0;\n\n// ======================================================\n// ДРУГОЙ ПЕРСОНАЛ\n// ======================================================\n\nconst staffEmployees = extractEmployees(\n  staffRowPairs,\n  false\n);\n\nconst staffWorking = [];\nconst staffDowntime = [];\nconst staffDayOff = [];\nconst staffUnknown = [];\n\nfor (const employee of staffEmployees) {\n  if (isWorkingStatus(employee.status)) {\n    staffWorking.push(employee.name);\n    continue;\n  }\n\n  if (isDowntimeStatus(employee.status)) {\n    staffDowntime.push(employee.name);\n    continue;\n  }\n\n  if (isDayOffStatus(employee.status)) {\n    staffDayOff.push(\n      `${employee.name} — ${employee.status}`\n    );\n\n    continue;\n  }\n\n  staffUnknown.push(\n    employee.status === \"Не внесено\"\n      ? employee.name\n      : `${employee.name} — ${employee.status}`\n  );\n}\n\nconst staffTotal = staffEmployees.length;\n\n// ======================================================\n// ДАТА\n// ======================================================\n\nfunction getDateFromSheet() {\n  for (const row of rows) {\n    for (const value of Object.values(row)) {\n      if (isEmpty(value)) {\n        continue;\n      }\n\n      const text = String(value).trim();\n\n      if (/^\\d{2}\\.\\d{2}\\.\\d{4}$/.test(text)) {\n        return text;\n      }\n    }\n  }\n\n  return new Intl.DateTimeFormat(\"uk-UA\", {\n    timeZone: \"Europe/Kyiv\",\n    day: \"2-digit\",\n    month: \"2-digit\",\n    year: \"numeric\",\n  }).format(new Date());\n}\n\nconst reportDate = getDateFromSheet();\n\n// ======================================================\n// ТЕКСТ ПРОСТОЯ\n// ======================================================\n\nconst sewingDowntimeLines = [];\n\nfor (const name of sewingDowntimeEmployees) {\n  sewingDowntimeLines.push(`• ${name}`);\n}\n\nif (emptySeatDowntime > 0) {\n  sewingDowntimeLines.push(\n    `• Вільні посадкові місця — ${emptySeatDowntime}`\n  );\n}\n\nconst sewingDowntimeText =\n  sewingDowntimeLines.length\n    ? sewingDowntimeLines.join(\"\\n\")\n    : \"—\";\n\n// ======================================================\n// TELEGRAM-СООБЩЕНИЕ\n// ======================================================\n\nconst staffSection = staffTotal\n  ? `\n\n👷 ІНШИЙ ПЕРСОНАЛ\n\n👥 Усього працівників: ${staffTotal}\n\n✅ Працює — ${staffWorking.length}:\n${formatList(staffWorking)}\n\n⏸ Простій — ${staffDowntime.length}:\n${formatList(staffDowntime)}\n\n🏠 Вихідний / відсутні — ${staffDayOff.length}:\n${formatList(staffDayOff)}\n\n⚠️ Статус не внесено — ${staffUnknown.length}:\n${formatList(staffUnknown)}`\n  : \"\";\n\nconst message = `📋 Звіт по виробництву\n📅 ${reportDate}\n\n🧵 ШВЕЇ\n\n👥 Усього посадкових місць: ${sewingTotal}\n\n✅ Працює — ${sewingWorking.length}:\n${formatList(sewingWorking)}\n\n⏸ Простій — ${sewingDowntimeTotal}:\n${sewingDowntimeText}\n\n🏠 Вихідний / відсутні — ${sewingDayOff.length}:\n${formatList(sewingDayOff)}\n\n⚠️ Статус не внесено — ${sewingUnknown.length}:\n${formatList(sewingUnknown)}\n\n📊 Завантаженість: ${sewingAttendance}%${staffSection}`;\n\n// ======================================================\n// OUTPUT\n// ======================================================\n\nreturn [\n  {\n    json: {\n      message,\n      reportDate,\n\n      sewing: {\n        totalSeats: sewingTotal,\n        working: sewingWorking.length,\n        downtime: sewingDowntimeTotal,\n        emptySeatDowntime,\n        employeeDowntime:\n          sewingDowntimeEmployees.length,\n        dayOff: sewingDayOff.length,\n        unknown: sewingUnknown.length,\n        attendance: sewingAttendance,\n        workingNames: sewingWorking,\n        employees: sewingEmployees,\n      },\n\n      staff: {\n        total: staffTotal,\n        working: staffWorking.length,\n        downtime: staffDowntime.length,\n        dayOff: staffDayOff.length,\n        unknown: staffUnknown.length,\n        employees: staffEmployees,\n      },\n    },\n  },\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -48,
+        -48
+      ],
+      "id": "45d748eb-1d32-4f61-ae3f-3ba77dcb7f11",
+      "name": "Reserge"
+    },
+    {
+      "parameters": {
+        "chatId": "1679040654",
+        "text": "={{ $json.message }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        160,
+        -48
+      ],
+      "id": "7d3623ce-2ad4-4f6d-96f3-658f93a93e01",
+      "name": "Send a text message",
+      "webhookId": "595a78ed-a443-480f-b9a3-668e224d13e9",
+      "credentials": {
+        "telegramApi": {
+          "id": "hdmpdLRak2SZIxBW",
+          "name": "MyLinkedIn"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Reserge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reserge": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "c3516ef9-eaaa-402c-8d70-4fb6a5481461",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-07-18T05:43:02.256Z",
+      "createdAt": "2026-07-18T05:43:02.256Z",
+      "role": "workflow:owner",
+      "workflowId": "kyvueCZpEEmShbBh",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
