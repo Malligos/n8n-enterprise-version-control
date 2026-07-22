@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-06-22T09:16:56.411Z",
+  "updatedAt": "2026-07-14T05:54:09.415Z",
   "createdAt": "2026-06-05T20:36:36.324Z",
   "id": "Zy5KjiMvWnrIAo33",
   "name": "Morning Summary",
@@ -324,7 +324,7 @@
     "timeSavedMode": "fixed",
     "errorWorkflow": "ZC70w09Auv6IQKOQ",
     "callerPolicy": "workflowsFromSameOwner",
-    "availableInMCP": false
+    "availableInMCP": true
   },
   "staticData": {
     "node:Schedule Trigger": {
