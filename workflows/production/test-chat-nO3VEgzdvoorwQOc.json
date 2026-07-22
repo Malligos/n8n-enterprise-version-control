@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-03-27T16:15:26.927Z",
+  "updatedAt": "2026-07-14T05:34:44.697Z",
   "createdAt": "2026-03-27T16:08:44.715Z",
   "id": "nO3VEgzdvoorwQOc",
   "name": "Test Chat",
@@ -111,7 +111,8 @@
   },
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate"
+    "binaryMode": "separate",
+    "availableInMCP": true
   },
   "staticData": null,
   "meta": {
