@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-04-14T16:24:20.841Z",
+  "updatedAt": "2026-07-14T05:52:57.926Z",
   "createdAt": "2026-04-14T15:40:09.535Z",
   "id": "WF1XOqOQPpjuo4Ut",
   "name": "search",
@@ -163,7 +163,8 @@
   },
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate"
+    "binaryMode": "separate",
+    "availableInMCP": true
   },
   "staticData": null,
   "meta": {
