@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-04-15T11:56:07.290Z",
+  "updatedAt": "2026-07-14T05:53:18.844Z",
   "createdAt": "2026-04-15T09:48:19.204Z",
   "id": "IKSQFQW0PD220DNg",
   "name": "User facts agent",
@@ -320,7 +320,8 @@
   },
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate"
+    "binaryMode": "separate",
+    "availableInMCP": true
   },
   "staticData": null,
   "meta": {
