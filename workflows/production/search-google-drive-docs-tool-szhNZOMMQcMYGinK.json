@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-04-14T16:22:31.974Z",
+  "updatedAt": "2026-07-14T05:52:55.268Z",
   "createdAt": "2026-04-14T14:09:42.431Z",
   "id": "szhNZOMMQcMYGinK",
   "name": "Search Google drive Docs Tool",
@@ -230,7 +230,8 @@
   },
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate"
+    "binaryMode": "separate",
+    "availableInMCP": true
   },
   "staticData": null,
   "meta": {
