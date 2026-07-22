@@ -1,0 +1,81 @@
+{
+  "updatedAt": "2026-07-18T20:44:14.000Z",
+  "createdAt": "2026-07-18T20:43:54.418Z",
+  "id": "xap5XjMF4uxPdyHh",
+  "name": "tmp-get-bot-info",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "id": "5b2c58b9-7ce7-4ad3-b687-f6d4f554ef4a",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "ccb3dee3-a47f-40e6-9812-cac17a8d3ba7",
+      "name": "Get Me",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        460,
+        300
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.telegram.org/bot/getMe",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "telegramApi"
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "oQnP3EggjnEw5VgO",
+          "name": "TelegramLeadbot"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Get Me",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "nodeGroups": [],
+  "pinData": null,
+  "versionId": "52dad719-92a5-44f2-9b1b-2bfa504fb4b5",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-07-18T20:43:54.420Z",
+      "createdAt": "2026-07-18T20:43:54.420Z",
+      "role": "workflow:owner",
+      "workflowId": "xap5XjMF4uxPdyHh",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
