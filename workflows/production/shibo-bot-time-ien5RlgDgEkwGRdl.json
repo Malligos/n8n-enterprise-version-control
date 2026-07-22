@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-05-08T22:37:57.882Z",
+  "updatedAt": "2026-07-14T05:53:36.169Z",
   "createdAt": "2026-05-08T09:10:40.753Z",
   "id": "ien5RlgDgEkwGRdl",
   "name": "Shibo Bot/time",
@@ -1135,7 +1135,7 @@
     "timeSavedMode": "fixed",
     "errorWorkflow": "GKYthoAznKPEGUNo",
     "callerPolicy": "workflowsFromSameOwner",
-    "availableInMCP": false
+    "availableInMCP": true
   },
   "staticData": null,
   "meta": {
