@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-04-14T17:37:21.885Z",
+  "updatedAt": "2026-07-14T05:53:13.478Z",
   "createdAt": "2026-04-14T17:29:29.038Z",
   "id": "YL7pSBng3Kc6ldB8",
   "name": "Get_fact",
@@ -171,7 +171,8 @@
   },
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate"
+    "binaryMode": "separate",
+    "availableInMCP": true
   },
   "staticData": null,
   "meta": null,
