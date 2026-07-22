@@ -1,0 +1,656 @@
+{
+  "updatedAt": "2026-07-19T12:40:12.293Z",
+  "createdAt": "2026-07-18T20:19:13.291Z",
+  "id": "2mkohPjG6UdNI9yp",
+  "name": "Taxi",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        -48
+      ],
+      "id": "3d340450-6458-4aa2-a7c9-564c93d7ed0f",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE/edit?gid=939984159#gid=939984159",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 710055014,
+          "mode": "list",
+          "cachedResultName": "Employees",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE/edit#gid=710055014"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -192,
+        48
+      ],
+      "id": "e8ca9af3-e8bd-4b8f-bfd6-feee28733f41",
+      "name": "Get Employees",
+      "retryOnFail": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE/edit?gid=939984159#gid=939984159",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2016894178,
+          "mode": "list",
+          "cachedResultName": "Settings",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE/edit#gid=2016894178"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -192,
+        -144
+      ],
+      "id": "3e1c5afa-2c79-40fe-9772-e75314af1665",
+      "name": "Get Settings",
+      "retryOnFail": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const settings = {};\n\nfor (const item of $input.all()) {\n  const row = item.json;\n\n  const key = String(\n    row.key ||\n    row.setting ||\n    row.name ||\n    \"\"\n  ).trim();\n\n  if (!key) continue;\n\n  settings[key] =\n    row.value ??\n    row.setting_value ??\n    \"\";\n}\n\nreturn [\n  {\n    json: {\n      settings: {\n        workName:\n          settings.work_name || \"Работа\",\n\n        workLatitude:\n          Number(settings.work_latitude),\n\n        workLongitude:\n          Number(settings.work_longitude),\n\n        departureTime:\n          String(settings.departure_time || \"23:00\"),\n\n        maxPassengers:\n          Math.max(\n            1,\n            Number(settings.max_passengers || 3)\n          ),\n\n        reportChatId:\n          String(settings.report_chat_id || \"\")\n      }\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        32,
+        -144
+      ],
+      "id": "8db4326c-f7fb-43cd-8ba1-7fc4509e3d9a",
+      "name": "Collect Settings"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        288,
+        -48
+      ],
+      "id": "a1331091-1783-4e1a-92b4-2fd1ee52b932",
+      "name": "Add Settings to Employees"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const {\n  passengers,\n  settings,\n  carNumber,\n  totalCars,\n  totalEmployees\n} = $json;\n\nif (!Array.isArray(passengers) || passengers.length === 0) {\n  throw new Error(`У машины №${carNumber} нет пассажиров`);\n}\n\nconst workLatitude = Number(settings.workLatitude);\nconst workLongitude = Number(settings.workLongitude);\n\nfunction straightDistance(employee) {\n  const latDiff =\n    Number(employee.latitude) - workLatitude;\n\n  const lngDiff =\n    Number(employee.longitude) - workLongitude;\n\n  return Math.sqrt(\n    latDiff * latDiff +\n    lngDiff * lngDiff\n  );\n}\n\n/*\n  Самого дальнего пассажира делаем конечной точкой.\n  Это снижает риск, что машина сначала уедет далеко,\n  а потом вернётся назад к последнему адресу.\n*/\nconst sortedPassengers = [...passengers].sort(\n  (a, b) =>\n    straightDistance(a) - straightDistance(b)\n);\n\nconst destinationPassenger =\n  sortedPassengers[sortedPassengers.length - 1];\n\nconst intermediatePassengers =\n  sortedPassengers.slice(0, -1);\n\nconst routeRequestBody = {\n  origin: {\n    location: {\n      latLng: {\n        latitude: workLatitude,\n        longitude: workLongitude\n      }\n    }\n  },\n\n  destination: {\n    location: {\n      latLng: {\n        latitude: Number(destinationPassenger.latitude),\n        longitude: Number(destinationPassenger.longitude)\n      }\n    }\n  },\n\n  travelMode: \"DRIVE\",\n  routingPreference: \"TRAFFIC_AWARE\",\n  computeAlternativeRoutes: false,\n  languageCode: \"ru\",\n  units: \"METRIC\"\n};\n\nif (intermediatePassengers.length > 0) {\n  routeRequestBody.intermediates =\n    intermediatePassengers.map(employee => ({\n      location: {\n        latLng: {\n          latitude: Number(employee.latitude),\n          longitude: Number(employee.longitude)\n        }\n      }\n    }));\n\n  routeRequestBody.optimizeWaypointOrder = true;\n}\n\nreturn {\n  carNumber,\n  totalCars,\n  totalEmployees,\n\n  passengerCount: passengers.length,\n  passengers,\n\n  intermediatePassengers,\n  destinationPassenger,\n\n  settings,\n  routeRequestBody\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1184,
+        -48
+      ],
+      "id": "d49198da-dc36-4a2a-ac8b-5e016328d6f3",
+      "name": "Prepare Route Request"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const sources = $(\"Prepare Route Request\").all();\nconst source = sources[$itemIndex]?.json;\n\nif (!source) {\n  throw new Error(\n    `Не найдены данные маршрута для item ${$itemIndex}`\n  );\n}\n\nconst route = $json.routes?.[0];\n\nif (!route) {\n  throw new Error(\n    `Google Routes не вернул маршрут для машины №${source.carNumber}`\n  );\n}\n\nconst distanceMeters =\n  Number(route.distanceMeters || 0);\n\nconst durationSeconds =\n  Number(\n    String(route.duration || \"0s\")\n      .replace(\"s\", \"\")\n  );\n\nconst distanceKm =\n  Math.round((distanceMeters / 1000) * 10) / 10;\n\nconst durationMinutes =\n  Math.ceil(durationSeconds / 60);\n\nconst intermediatePassengers =\n  Array.isArray(source.intermediatePassengers)\n    ? source.intermediatePassengers.filter(Boolean)\n    : [];\n\nconst destinationPassenger =\n  source.destinationPassenger;\n\nif (!destinationPassenger) {\n  throw new Error(\n    `Не найдена конечная точка машины №${source.carNumber}`\n  );\n}\n\nconst optimizedIndexes =\n  Array.isArray(\n    route.optimizedIntermediateWaypointIndex\n  )\n    ? route.optimizedIntermediateWaypointIndex\n    : [];\n\n/*\n  Google возвращает список исходных индексов\n  в новом оптимизированном порядке.\n\n  Например [2, 0, 1] означает:\n  сначала intermediate[2],\n  потом intermediate[0],\n  потом intermediate[1].\n*/\nlet optimizedIntermediates =\n  [...intermediatePassengers];\n\nif (\n  optimizedIndexes.length ===\n  intermediatePassengers.length\n) {\n  const candidateOrder =\n    optimizedIndexes.map(index =>\n      intermediatePassengers[Number(index)]\n    );\n\n  if (\n    candidateOrder.length ===\n      intermediatePassengers.length &&\n    candidateOrder.every(Boolean)\n  ) {\n    optimizedIntermediates = candidateOrder;\n  }\n}\n\nconst orderedPassengers = [\n  ...optimizedIntermediates,\n  destinationPassenger\n];\n\n/*\n  Проверяем, что никто не пропал.\n*/\nif (\n  orderedPassengers.length !==\n  Number(source.passengerCount)\n) {\n  throw new Error(\n    `Машина №${source.carNumber}: ` +\n    `было ${source.passengerCount} пассажиров, ` +\n    `после оптимизации осталось ${orderedPassengers.length}`\n  );\n}\n\nconst workLatitude =\n  Number(source.settings.workLatitude);\n\nconst workLongitude =\n  Number(source.settings.workLongitude);\n\nconst routePoints = orderedPassengers\n  .map(passenger =>\n    `${Number(passenger.latitude)},` +\n    `${Number(passenger.longitude)}`\n  )\n  .join(\"/\");\n\nconst googleMapsUrl =\n  `https://www.google.com/maps/dir/` +\n  `${workLatitude},${workLongitude}/` +\n  routePoints;\n\nconst now = new Date();\n\nconst routeDate =\n  new Intl.DateTimeFormat(\"en-CA\", {\n    timeZone: \"Europe/Kyiv\",\n    year: \"numeric\",\n    month: \"2-digit\",\n    day: \"2-digit\"\n  }).format(now);\n\nreturn {\n  carNumber: source.carNumber,\n  totalCars: source.totalCars,\n  totalEmployees: source.totalEmployees,\n\n  passengerCount: orderedPassengers.length,\n  passengers: orderedPassengers,\n\n  distanceMeters,\n  distanceKm,\n  durationSeconds,\n  durationMinutes,\n\n  departureTime:\n    source.settings.departureTime,\n\n  workName:\n    source.settings.workName,\n\n  reportChatId:\n    source.settings.reportChatId,\n\n  googleMapsUrl,\n  routeDate,\n\n  createdAt: now.toLocaleString(\"sv-SE\", {\n    timeZone: \"Europe/Kyiv\"\n  })\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1568,
+        -48
+      ],
+      "id": "32df2710-bf2e-4a36-8a45-b495f8184b70",
+      "name": "Parse Route Response"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE/edit?gid=2016894178#gid=2016894178",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 939984159,
+          "mode": "list",
+          "cachedResultName": "Routes",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE/edit#gid=939984159"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "passenger_count": "={{ $json.passenger_count }}",
+            "distance_km": "={{ $json.distance_km }}",
+            "route_date": "={{ $json.route_date }}",
+            "departure_time": "={{ $json.departure_time }}",
+            "car_number": "={{ $json.car_number }}",
+            "total_cars": "={{ $json.total_cars }}",
+            "passengers": "={{ $json.passengers }}",
+            "duration_minutes": "={{ $json.duration_minutes }}",
+            "google_maps_url": "={{ $json.google_maps_url }}",
+            "created_at": "={{ $json.created_at }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "route_date",
+              "displayName": "route_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "departure_time",
+              "displayName": "departure_time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "car_number",
+              "displayName": "car_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "total_cars",
+              "displayName": "total_cars",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "passenger_count",
+              "displayName": "passenger_count",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "passengers",
+              "displayName": "passengers",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "distance_km",
+              "displayName": "distance_km",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "duration_minutes",
+              "displayName": "duration_minutes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "google_maps_url",
+              "displayName": "google_maps_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2128,
+        -48
+      ],
+      "id": "31a5d71d-5601-45aa-abe8-a8627faf07c9",
+      "name": "Save Route",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "1679040654",
+        "text": "={{ $json.message }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "disable_web_page_preview": true
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2240,
+        80
+      ],
+      "id": "11577e97-4718-44cc-8693-9a8b95bd6e19",
+      "name": "Send Route to Dispatcher",
+      "webhookId": "281e03c6-01f4-4a77-84fe-f768337d8119",
+      "credentials": {
+        "telegramApi": {
+          "id": "9xCUi3DJqhjcPWIQ",
+          "name": "Taxi tony"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const today = new Intl.DateTimeFormat(\"en-CA\", {\n  timeZone: \"Europe/Kyiv\",\n  year: \"numeric\",\n  month: \"2-digit\",\n  day: \"2-digit\"\n}).format(new Date());\n\nconst rows = $input.all()\n  .map(item => item.json);\n\nconst employees = rows.filter(row => {\n  const active =\n    String(row.active || \"\")\n      .trim()\n      .toUpperCase() === \"TRUE\";\n\n  const registered =\n    String(row.registration_status || \"\")\n      .trim()\n      .toLowerCase() === \"completed\";\n\n  const needsTaxi =\n    String(row.needs_taxi || \"\")\n      .trim()\n      .toUpperCase() === \"TRUE\";\n\n  const taxiDate =\n    String(row.taxi_date || \"\")\n      .trim();\n\n  const latitude = Number(row.latitude);\n  const longitude = Number(row.longitude);\n\n  const hasCoordinates =\n    Number.isFinite(latitude) &&\n    Number.isFinite(longitude);\n\n  return (\n    active &&\n    registered &&\n    needsTaxi &&\n    taxiDate === today &&\n    hasCoordinates\n  );\n});\n\nreturn employees.map(employee => ({\n  json: {\n    ...employee,\n    latitude: Number(employee.latitude),\n    longitude: Number(employee.longitude)\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        32,
+        48
+      ],
+      "id": "1a717c20-09f9-48fe-8ee4-7822263171e7",
+      "name": "Filter Employees Today"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const passengerNames =\n  $json.passengers\n    .map(employee => employee.name)\n    .join(\", \");\n\nconst passengerAddresses =\n  $json.passengers\n    .map(employee => employee.address)\n    .join(\" → \");\n\nreturn {\n  route_date: $json.routeDate,\n  departure_time: $json.departureTime,\n\n  car_number: $json.carNumber,\n  total_cars: $json.totalCars,\n\n  passenger_count: $json.passengerCount,\n  passengers: passengerNames,\n  addresses: passengerAddresses,\n\n  distance_km: $json.distanceKm,\n  duration_minutes: $json.durationMinutes,\n\n  google_maps_url: $json.googleMapsUrl,\n  created_at: $json.createdAt\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1888,
+        -48
+      ],
+      "id": "8440a040-a02a-4f4f-a2ff-ed51f0e6427e",
+      "name": "Prepare Route Rows"
+    },
+    {
+      "parameters": {
+        "jsCode": "const routes = $input.all()\n  .map(item => item.json)\n  .sort(\n    (a, b) => a.carNumber - b.carNumber\n  );\n\nif (\n  routes.length === 1 &&\n  routes[0].noEmployees\n) {\n  return [\n    {\n      json: {\n        chatId:\n          routes[0].settings?.reportChatId || \"\",\n\n        message:\n          \"🚖 Сегодня никто не отметил необходимость развозки.\"\n      }\n    }\n  ];\n}\n\nconst totalCars = routes.length;\n\nconst totalEmployees =\n  routes.reduce(\n    (sum, route) =>\n      sum + route.passengerCount,\n    0\n  );\n\nconst totalDistanceKm =\n  Math.round(\n    routes.reduce(\n      (sum, route) =>\n        sum + route.distanceKm,\n      0\n    ) * 10\n  ) / 10;\n\nconst totalDurationMinutes =\n  routes.reduce(\n    (sum, route) =>\n      sum + route.durationMinutes,\n    0\n  );\n\nconst date = routes[0].routeDate;\nconst departureTime =\n  routes[0].departureTime;\n\nconst routeSections = routes.map(route => {\n  const passengers = route.passengers\n    .map(\n      (employee, index) =>\n        `${index + 1}. ${employee.name}` +\n        `${employee.address ? ` — ${employee.address}` : \"\"}`\n    )\n    .join(\"\\n\");\n\n  return [\n    `🚕 Машина №${route.carNumber}`,\n    `Пассажиров: ${route.passengerCount}`,\n    \"\",\n    passengers,\n    \"\",\n    `📏 Расстояние: ${route.distanceKm} км`,\n    `⏱ Время в пути: около ${route.durationMinutes} мин`,\n    `🗺 Маршрут: ${route.googleMapsUrl}`\n  ].join(\"\\n\");\n});\n\nconst message = [\n  `🚖 Развозка на ${date}`,\n  \"\",\n  `🕚 Время выезда: ${departureTime}`,\n  `👥 Сотрудников: ${totalEmployees}`,\n  `🚕 Необходимо машин: ${totalCars}`,\n  `📏 Общее расстояние: ${totalDistanceKm} км`,\n  `⏱ Суммарное время маршрутов: около ${totalDurationMinutes} мин`,\n  \"\",\n  routeSections.join(\"\\n\\n────────────\\n\\n\")\n].join(\"\\n\");\n\nreturn [\n  {\n    json: {\n      chatId: routes[0].reportChatId,\n      totalCars,\n      totalEmployees,\n      totalDistanceKm,\n      totalDurationMinutes,\n      message\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1888,
+        80
+      ],
+      "id": "5e3ffac6-6c3d-499b-b9d0-7db53f9d3e2b",
+      "name": "Create Final Report"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nif (items.length === 0) {\n  return [\n    {\n      json: {\n        noEmployees: true,\n        totalEmployees: 0,\n        totalCars: 0\n      }\n    }\n  ];\n}\n\nconst settings = items[0].json.settings;\n\nconst employees = items.map((item, index) => ({\n  index,\n  telegramUserId: String(item.json.telegramUserId || \"\"),\n  telegramUsername: item.json.telegramUsername || \"\",\n  name: item.json.name || \"Без имени\",\n  address: item.json.address || \"\",\n  latitude: Number(item.json.latitude),\n  longitude: Number(item.json.longitude),\n  area: item.json.area || \"\"\n}));\n\nfor (const employee of employees) {\n  if (\n    !Number.isFinite(employee.latitude) ||\n    !Number.isFinite(employee.longitude)\n  ) {\n    throw new Error(\n      `Некорректные координаты у сотрудника: ${employee.name}`\n    );\n  }\n}\n\n/*\n  Добавляем работу как точку 0.\n  Сотрудники начинаются с индекса 1.\n*/\nconst locations = [\n  {\n    type: \"work\",\n    name: settings.workName || \"Работа\",\n    latitude: Number(settings.workLatitude),\n    longitude: Number(settings.workLongitude)\n  },\n  ...employees.map(employee => ({\n    type: \"employee\",\n    name: employee.name,\n    latitude: employee.latitude,\n    longitude: employee.longitude\n  }))\n];\n\nconst origins = locations.map(location => ({\n  waypoint: {\n    location: {\n      latLng: {\n        latitude: location.latitude,\n        longitude: location.longitude\n      }\n    }\n  }\n}));\n\nconst destinations = locations.map(location => ({\n  waypoint: {\n    location: {\n      latLng: {\n        latitude: location.latitude,\n        longitude: location.longitude\n      }\n    }\n  }\n}));\n\nreturn [\n  {\n    json: {\n      employees,\n      settings,\n      locations,\n\n      matrixRequestBody: {\n        origins,\n        destinations,\n        travelMode: \"DRIVE\",\n        routingPreference: \"TRAFFIC_AWARE\"\n      }\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        496,
+        -48
+      ],
+      "id": "7fda52fa-15b6-4283-91a3-037a1718f7cf",
+      "name": "Prepare Route Matrix"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://routes.googleapis.com/distanceMatrix/v2:computeRouteMatrix",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "X-Goog-FieldMask",
+              "value": "originIndex,destinationIndex,distanceMeters,duration,status,condition"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.matrixRequestBody }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        752,
+        -48
+      ],
+      "id": "6fea2723-1623-4025-b194-1533779f6f0c",
+      "name": "Calculate Route Matrix",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "BPnFnZRAx8lx8MyQ",
+          "name": "X-Goog-Api-Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const matrixItems = $input.all().map(item => item.json);\nconst source = $(\"Prepare Route Matrix\").first().json;\n\nif (source.noEmployees) {\n  return [{ json: source }];\n}\n\nconst settings = source.settings || {};\n\nconst maxPassengers = Math.max(\n  1,\n  Math.floor(Number(settings.maxPassengers || 4))\n);\n\nconst employees = Array.isArray(source.employees)\n  ? source.employees.map((employee, position) => ({\n      ...employee,\n\n      /*\n        Уникальная внутренняя позиция сотрудника.\n        Она используется только внутри алгоритма.\n      */\n      __position: position,\n\n      /*\n        Индекс сотрудника в Route Matrix.\n\n        Индекс 0 в матрице — место работы.\n        Поэтому первый сотрудник обычно имеет индекс 1.\n      */\n      __matrixIndex:\n        Number.isInteger(Number(employee.index))\n          ? Number(employee.index) + 1\n          : position + 1\n    }))\n  : [];\n\nconst employeeCount = employees.length;\n\nif (employeeCount === 0) {\n  return [\n    {\n      json: {\n        noEmployees: true,\n        totalEmployees: 0,\n        totalCars: 0,\n        settings\n      }\n    }\n  ];\n}\n\nconst totalCars = Math.ceil(\n  employeeCount / maxPassengers\n);\n\nconst locationCount = employeeCount + 1;\n\n/*\n  Настройки алгоритма.\n\n  До 10 сотрудников:\n  точный перебор всех допустимых распределений.\n\n  От 11 сотрудников:\n  быстрая многопроходная оптимизация.\n*/\nconst EXACT_OPTIMIZATION_LIMIT = 10;\n\nconst HEURISTIC_RESTARTS = Math.min(\n  30,\n  Math.max(10, employeeCount * 2)\n);\n\nconst LOCAL_SEARCH_MAX_ITERATIONS = 100;\n\nconst EPSILON = 0.001;\n\n/*\n  Матрица расстояний.\n\n  Индекс 0 — место работы.\n  Индексы 1...N — сотрудники.\n*/\nconst distances = Array.from(\n  { length: locationCount },\n  () => Array(locationCount).fill(Infinity)\n);\n\nfor (let i = 0; i < locationCount; i++) {\n  distances[i][i] = 0;\n}\n\n/*\n  Заполняем матрицу результатами Google Route Matrix.\n*/\nfor (const element of matrixItems) {\n  const originIndex = Number(element.originIndex);\n\n  const destinationIndex = Number(\n    element.destinationIndex\n  );\n\n  const distanceMeters = Number(\n    element.distanceMeters\n  );\n\n  if (\n    Number.isInteger(originIndex) &&\n    Number.isInteger(destinationIndex) &&\n    originIndex >= 0 &&\n    destinationIndex >= 0 &&\n    originIndex < locationCount &&\n    destinationIndex < locationCount &&\n    Number.isFinite(distanceMeters)\n  ) {\n    distances[originIndex][destinationIndex] =\n      distanceMeters;\n  }\n}\n\n/*\n  Удаляем технические поля перед передачей\n  сотрудников в следующие узлы.\n*/\nfunction cleanEmployee(employee) {\n  const result = { ...employee };\n\n  delete result.__position;\n  delete result.__matrixIndex;\n\n  return result;\n}\n\nfunction matrixIndexByPosition(position) {\n  const employee = employees[position];\n\n  if (!employee) {\n    return null;\n  }\n\n  return employee.__matrixIndex;\n}\n\n/*\n  Получение расстояния между двумя точками.\n\n  fromPosition === -1 означает место работы.\n  toPosition === -1 означает место работы.\n*/\nfunction distanceBetweenPositions(\n  fromPosition,\n  toPosition\n) {\n  const fromIndex =\n    fromPosition === -1\n      ? 0\n      : matrixIndexByPosition(fromPosition);\n\n  const toIndex =\n    toPosition === -1\n      ? 0\n      : matrixIndexByPosition(toPosition);\n\n  if (\n    fromIndex === null ||\n    toIndex === null ||\n    fromIndex === undefined ||\n    toIndex === undefined\n  ) {\n    return Infinity;\n  }\n\n  const direct =\n    distances[fromIndex]?.[toIndex];\n\n  if (Number.isFinite(direct)) {\n    return direct;\n  }\n\n  /*\n    Запасной вариант:\n    если прямого направления нет,\n    используем обратное расстояние.\n  */\n  const reverse =\n    distances[toIndex]?.[fromIndex];\n\n  if (Number.isFinite(reverse)) {\n    return reverse;\n  }\n\n  return Infinity;\n}\n\nfunction workDistance(position) {\n  return distanceBetweenPositions(\n    -1,\n    position\n  );\n}\n\n/*\n  Среднее расстояние между двумя сотрудниками.\n\n  Используется только для формирования\n  начальных групп в эвристическом режиме.\n*/\nfunction pairDistance(\n  positionA,\n  positionB\n) {\n  const forward =\n    distanceBetweenPositions(\n      positionA,\n      positionB\n    );\n\n  const backward =\n    distanceBetweenPositions(\n      positionB,\n      positionA\n    );\n\n  if (\n    Number.isFinite(forward) &&\n    Number.isFinite(backward)\n  ) {\n    return (forward + backward) / 2;\n  }\n\n  if (Number.isFinite(forward)) {\n    return forward;\n  }\n\n  if (Number.isFinite(backward)) {\n    return backward;\n  }\n\n  return Infinity;\n}\n\n/*\n  Генератор всех вариантов порядка пассажиров.\n\n  При вместимости машины 4 человека:\n  максимум 4! = 24 варианта.\n*/\nfunction generatePermutations(values) {\n  if (values.length <= 1) {\n    return [values.slice()];\n  }\n\n  const result = [];\n\n  for (let i = 0; i < values.length; i++) {\n    const current = values[i];\n\n    const remaining = [\n      ...values.slice(0, i),\n      ...values.slice(i + 1)\n    ];\n\n    const tails =\n      generatePermutations(remaining);\n\n    for (const tail of tails) {\n      result.push([\n        current,\n        ...tail\n      ]);\n    }\n  }\n\n  return result;\n}\n\n/*\n  Считаем длину маршрута:\n\n  Работа\n  → пассажир 1\n  → пассажир 2\n  → пассажир 3\n  → пассажир 4\n\n  Возврат машины на работу не учитывается.\n*/\nfunction routeDistance(order) {\n  if (\n    !Array.isArray(order) ||\n    order.length === 0\n  ) {\n    return 0;\n  }\n\n  let total = 0;\n  let previousPosition = -1;\n\n  for (const position of order) {\n    const segment =\n      distanceBetweenPositions(\n        previousPosition,\n        position\n      );\n\n    if (!Number.isFinite(segment)) {\n      return Infinity;\n    }\n\n    total += segment;\n    previousPosition = position;\n  }\n\n  return total;\n}\n\n/*\n  Кэш оптимального порядка пассажиров\n  для каждой группы.\n*/\nconst routeCache = new Map();\n\nfunction groupCacheKey(group) {\n  return [...group]\n    .sort((a, b) => a - b)\n    .join(\",\");\n}\n\nfunction getBestRoute(group) {\n  const normalized = [...group]\n    .sort((a, b) => a - b);\n\n  const key = groupCacheKey(normalized);\n\n  if (routeCache.has(key)) {\n    return routeCache.get(key);\n  }\n\n  if (\n    normalized.length === 0 ||\n    normalized.length > maxPassengers\n  ) {\n    const invalid = {\n      distance: Infinity,\n      order: []\n    };\n\n    routeCache.set(key, invalid);\n\n    return invalid;\n  }\n\n  let bestDistance = Infinity;\n  let bestOrder = null;\n\n  const permutations =\n    generatePermutations(normalized);\n\n  for (const order of permutations) {\n    const currentDistance =\n      routeDistance(order);\n\n    if (currentDistance < bestDistance) {\n      bestDistance = currentDistance;\n      bestOrder = order;\n    }\n  }\n\n  const result = {\n    distance: bestDistance,\n    order: bestOrder || normalized\n  };\n\n  routeCache.set(key, result);\n\n  return result;\n}\n\n/*\n  Общая длина маршрутов всех машин.\n*/\nfunction solutionDistance(groups) {\n  let total = 0;\n\n  for (const group of groups) {\n    const route = getBestRoute(group);\n\n    if (!Number.isFinite(route.distance)) {\n      return Infinity;\n    }\n\n    total += route.distance;\n  }\n\n  return total;\n}\n\n/*\n  ==================================================\n  ТОЧНАЯ ОПТИМИЗАЦИЯ ДЛЯ 1–10 СОТРУДНИКОВ\n  ==================================================\n*/\n\nfunction countBits(mask) {\n  let count = 0;\n  let value = mask;\n\n  while (value > 0) {\n    count += value & 1;\n    value >>>= 1;\n  }\n\n  return count;\n}\n\nfunction firstSetBit(mask) {\n  for (let i = 0; i < employeeCount; i++) {\n    if (mask & (1 << i)) {\n      return i;\n    }\n  }\n\n  return -1;\n}\n\nfunction positionsFromMask(mask) {\n  const result = [];\n\n  for (let i = 0; i < employeeCount; i++) {\n    if (mask & (1 << i)) {\n      result.push(i);\n    }\n  }\n\n  return result;\n}\n\n/*\n  Генерируем допустимые составы одной машины.\n\n  anchor обязательно входит в группу.\n  Это предотвращает повторную проверку\n  одинаковых перестановок машин.\n*/\nfunction generateGroupMasks(\n  remainingMask,\n  anchor,\n  minSize,\n  maxSize\n) {\n  const available = [];\n\n  for (let i = 0; i < employeeCount; i++) {\n    if (\n      i !== anchor &&\n      (remainingMask & (1 << i))\n    ) {\n      available.push(i);\n    }\n  }\n\n  const result = [];\n  const anchorMask = 1 << anchor;\n\n  function build(\n    startIndex,\n    needed,\n    currentMask\n  ) {\n    if (needed === 0) {\n      result.push(\n        currentMask | anchorMask\n      );\n\n      return;\n    }\n\n    for (\n      let i = startIndex;\n      i <= available.length - needed;\n      i++\n    ) {\n      build(\n        i + 1,\n        needed - 1,\n        currentMask | (1 << available[i])\n      );\n    }\n  }\n\n  for (\n    let size = minSize;\n    size <= maxSize;\n    size++\n  ) {\n    build(\n      0,\n      size - 1,\n      0\n    );\n  }\n\n  return result;\n}\n\nfunction exactOptimization() {\n  const memo = new Map();\n\n  function solve(\n    remainingMask,\n    carsLeft\n  ) {\n    const memoKey =\n      `${remainingMask}:${carsLeft}`;\n\n    if (memo.has(memoKey)) {\n      return memo.get(memoKey);\n    }\n\n    const remainingCount =\n      countBits(remainingMask);\n\n    if (remainingCount === 0) {\n      const result =\n        carsLeft === 0\n          ? {\n              distance: 0,\n              groups: []\n            }\n          : null;\n\n      memo.set(memoKey, result);\n\n      return result;\n    }\n\n    if (carsLeft <= 0) {\n      memo.set(memoKey, null);\n\n      return null;\n    }\n\n    /*\n      Проверяем, можно ли разместить\n      оставшихся сотрудников.\n    */\n    if (\n      remainingCount < carsLeft ||\n      remainingCount >\n        carsLeft * maxPassengers\n    ) {\n      memo.set(memoKey, null);\n\n      return null;\n    }\n\n    const anchor =\n      firstSetBit(remainingMask);\n\n    const minGroupSize = Math.max(\n      1,\n      remainingCount -\n        (carsLeft - 1) * maxPassengers\n    );\n\n    const maxGroupSize = Math.min(\n      maxPassengers,\n      remainingCount -\n        (carsLeft - 1)\n    );\n\n    const groupMasks =\n      generateGroupMasks(\n        remainingMask,\n        anchor,\n        minGroupSize,\n        maxGroupSize\n      );\n\n    let best = null;\n\n    for (const groupMask of groupMasks) {\n      const group =\n        positionsFromMask(groupMask);\n\n      const route =\n        getBestRoute(group);\n\n      if (!Number.isFinite(route.distance)) {\n        continue;\n      }\n\n      const nextMask =\n        remainingMask & ~groupMask;\n\n      const rest =\n        solve(\n          nextMask,\n          carsLeft - 1\n        );\n\n      if (!rest) {\n        continue;\n      }\n\n      const totalDistance =\n        route.distance +\n        rest.distance;\n\n      if (\n        !best ||\n        totalDistance <\n          best.distance - EPSILON\n      ) {\n        best = {\n          distance: totalDistance,\n          groups: [\n            group,\n            ...rest.groups\n          ]\n        };\n      }\n    }\n\n    memo.set(memoKey, best);\n\n    return best;\n  }\n\n  const fullMask =\n    (1 << employeeCount) - 1;\n\n  const result =\n    solve(\n      fullMask,\n      totalCars\n    );\n\n  if (!result) {\n    throw new Error(\n      \"Не удалось выполнить точную оптимизацию маршрутов\"\n    );\n  }\n\n  return {\n    groups: result.groups,\n    distance: result.distance,\n    method: \"exact_minimum_distance\"\n  };\n}\n\n/*\n  ==================================================\n  ЭВРИСТИКА ДЛЯ 11 И БОЛЕЕ СОТРУДНИКОВ\n  ==================================================\n*/\n\n/*\n  Детерминированное перемешивание.\n\n  Даёт разные стартовые варианты,\n  но результат остаётся воспроизводимым.\n*/\nfunction seededShuffle(\n  values,\n  seed\n) {\n  const result = [...values];\n\n  let state =\n    (seed + 1) * 2654435761;\n\n  function random() {\n    state ^= state << 13;\n    state ^= state >>> 17;\n    state ^= state << 5;\n\n    return (\n      (state >>> 0) /\n      4294967296\n    );\n  }\n\n  for (\n    let i = result.length - 1;\n    i > 0;\n    i--\n  ) {\n    const j = Math.floor(\n      random() * (i + 1)\n    );\n\n    [result[i], result[j]] =\n      [result[j], result[i]];\n  }\n\n  return result;\n}\n\n/*\n  Выбираем стартовые точки машин так,\n  чтобы они находились в разных направлениях.\n*/\nfunction selectAnchors(seed) {\n  const allPositions =\n    Array.from(\n      { length: employeeCount },\n      (_, index) => index\n    );\n\n  let candidates;\n\n  if (seed === 0) {\n    candidates = [...allPositions].sort(\n      (a, b) =>\n        workDistance(b) -\n        workDistance(a)\n    );\n  } else {\n    candidates =\n      seededShuffle(\n        allPositions,\n        seed\n      );\n  }\n\n  const anchors = [];\n\n  if (candidates.length > 0) {\n    anchors.push(candidates[0]);\n  }\n\n  while (\n    anchors.length < totalCars\n  ) {\n    let bestCandidate = null;\n    let bestScore = -Infinity;\n\n    for (const candidate of allPositions) {\n      if (anchors.includes(candidate)) {\n        continue;\n      }\n\n      let minAnchorDistance = Infinity;\n\n      for (const anchor of anchors) {\n        minAnchorDistance = Math.min(\n          minAnchorDistance,\n          pairDistance(\n            candidate,\n            anchor\n          )\n        );\n      }\n\n      const score =\n        minAnchorDistance +\n        workDistance(candidate) * 0.15;\n\n      if (score > bestScore) {\n        bestScore = score;\n        bestCandidate = candidate;\n      }\n    }\n\n    if (bestCandidate === null) {\n      break;\n    }\n\n    anchors.push(bestCandidate);\n  }\n\n  return anchors;\n}\n\n/*\n  Создаём начальное распределение.\n*/\nfunction buildInitialGroups(seed) {\n  const anchors =\n    selectAnchors(seed);\n\n  const groups =\n    anchors.map(anchor => [anchor]);\n\n  const assigned =\n    new Set(anchors);\n\n  let remaining =\n    Array.from(\n      { length: employeeCount },\n      (_, index) => index\n    ).filter(\n      position =>\n        !assigned.has(position)\n    );\n\n  if (seed > 0) {\n    remaining =\n      seededShuffle(\n        remaining,\n        seed * 17 + 3\n      );\n  } else {\n    remaining.sort(\n      (a, b) =>\n        workDistance(b) -\n        workDistance(a)\n    );\n  }\n\n  while (remaining.length > 0) {\n    let bestMove = null;\n\n    for (\n      let candidateIndex = 0;\n      candidateIndex < remaining.length;\n      candidateIndex++\n    ) {\n      const candidate =\n        remaining[candidateIndex];\n\n      for (\n        let groupIndex = 0;\n        groupIndex < groups.length;\n        groupIndex++\n      ) {\n        const group =\n          groups[groupIndex];\n\n        if (\n          group.length >= maxPassengers\n        ) {\n          continue;\n        }\n\n        const currentDistance =\n          getBestRoute(group).distance;\n\n        const nextDistance =\n          getBestRoute([\n            ...group,\n            candidate\n          ]).distance;\n\n        if (\n          !Number.isFinite(nextDistance)\n        ) {\n          continue;\n        }\n\n        const increase =\n          nextDistance -\n          currentDistance;\n\n        /*\n          Небольшой штраф за слишком раннее\n          заполнение одной машины.\n        */\n        const balancePenalty =\n          group.length * 25;\n\n        const score =\n          increase +\n          balancePenalty;\n\n        if (\n          !bestMove ||\n          score < bestMove.score\n        ) {\n          bestMove = {\n            candidateIndex,\n            candidate,\n            groupIndex,\n            score\n          };\n        }\n      }\n    }\n\n    if (!bestMove) {\n      throw new Error(\n        \"Не удалось создать начальные группы. Проверьте Route Matrix.\"\n      );\n    }\n\n    groups[bestMove.groupIndex].push(\n      bestMove.candidate\n    );\n\n    remaining.splice(\n      bestMove.candidateIndex,\n      1\n    );\n  }\n\n  return groups;\n}\n\n/*\n  Ищем выгодный перенос одного сотрудника\n  из одной машины в другую.\n*/\nfunction findBestRelocation(groups) {\n  let bestMove = null;\n\n  const currentTotal =\n    solutionDistance(groups);\n\n  for (\n    let fromGroupIndex = 0;\n    fromGroupIndex < groups.length;\n    fromGroupIndex++\n  ) {\n    const fromGroup =\n      groups[fromGroupIndex];\n\n    /*\n      Не оставляем пустую машину.\n    */\n    if (fromGroup.length <= 1) {\n      continue;\n    }\n\n    for (\n      let passengerIndex = 0;\n      passengerIndex < fromGroup.length;\n      passengerIndex++\n    ) {\n      const passenger =\n        fromGroup[passengerIndex];\n\n      for (\n        let toGroupIndex = 0;\n        toGroupIndex < groups.length;\n        toGroupIndex++\n      ) {\n        if (\n          fromGroupIndex === toGroupIndex\n        ) {\n          continue;\n        }\n\n        const toGroup =\n          groups[toGroupIndex];\n\n        if (\n          toGroup.length >= maxPassengers\n        ) {\n          continue;\n        }\n\n        const candidateGroups =\n          groups.map(\n            group => [...group]\n          );\n\n        candidateGroups[fromGroupIndex]\n          .splice(passengerIndex, 1);\n\n        candidateGroups[toGroupIndex]\n          .push(passenger);\n\n        const candidateTotal =\n          solutionDistance(candidateGroups);\n\n        const improvement =\n          currentTotal -\n          candidateTotal;\n\n        if (\n          improvement > EPSILON &&\n          (\n            !bestMove ||\n            improvement >\n              bestMove.improvement\n          )\n        ) {\n          bestMove = {\n            groups: candidateGroups,\n            improvement\n          };\n        }\n      }\n    }\n  }\n\n  return bestMove;\n}\n\n/*\n  Ищем выгодный обмен сотрудниками\n  между двумя машинами.\n*/\nfunction findBestSwap(groups) {\n  let bestMove = null;\n\n  const currentTotal =\n    solutionDistance(groups);\n\n  for (\n    let groupAIndex = 0;\n    groupAIndex < groups.length;\n    groupAIndex++\n  ) {\n    for (\n      let groupBIndex = groupAIndex + 1;\n      groupBIndex < groups.length;\n      groupBIndex++\n    ) {\n      const groupA =\n        groups[groupAIndex];\n\n      const groupB =\n        groups[groupBIndex];\n\n      for (\n        let passengerAIndex = 0;\n        passengerAIndex < groupA.length;\n        passengerAIndex++\n      ) {\n        for (\n          let passengerBIndex = 0;\n          passengerBIndex < groupB.length;\n          passengerBIndex++\n        ) {\n          const candidateGroups =\n            groups.map(\n              group => [...group]\n            );\n\n          const passengerA =\n            candidateGroups[groupAIndex][\n              passengerAIndex\n            ];\n\n          const passengerB =\n            candidateGroups[groupBIndex][\n              passengerBIndex\n            ];\n\n          candidateGroups[groupAIndex][\n            passengerAIndex\n          ] = passengerB;\n\n          candidateGroups[groupBIndex][\n            passengerBIndex\n          ] = passengerA;\n\n          const candidateTotal =\n            solutionDistance(candidateGroups);\n\n          const improvement =\n            currentTotal -\n            candidateTotal;\n\n          if (\n            improvement > EPSILON &&\n            (\n              !bestMove ||\n              improvement >\n                bestMove.improvement\n            )\n          ) {\n            bestMove = {\n              groups: candidateGroups,\n              improvement\n            };\n          }\n        }\n      }\n    }\n  }\n\n  return bestMove;\n}\n\n/*\n  Локальное улучшение распределения.\n*/\nfunction improveGroups(initialGroups) {\n  let groups =\n    initialGroups.map(\n      group => [...group]\n    );\n\n  for (\n    let iteration = 0;\n    iteration <\n      LOCAL_SEARCH_MAX_ITERATIONS;\n    iteration++\n  ) {\n    const relocation =\n      findBestRelocation(groups);\n\n    const swap =\n      findBestSwap(groups);\n\n    let bestMove = null;\n\n    if (\n      relocation &&\n      (\n        !swap ||\n        relocation.improvement >=\n          swap.improvement\n      )\n    ) {\n      bestMove = relocation;\n    } else if (swap) {\n      bestMove = swap;\n    }\n\n    if (!bestMove) {\n      break;\n    }\n\n    groups = bestMove.groups;\n  }\n\n  return groups;\n}\n\n/*\n  Запускаем несколько стартовых вариантов\n  и выбираем лучший.\n*/\nfunction heuristicOptimization() {\n  let bestGroups = null;\n  let bestDistance = Infinity;\n\n  for (\n    let restart = 0;\n    restart < HEURISTIC_RESTARTS;\n    restart++\n  ) {\n    const initialGroups =\n      buildInitialGroups(restart);\n\n    const improvedGroups =\n      improveGroups(initialGroups);\n\n    const distance =\n      solutionDistance(improvedGroups);\n\n    if (\n      distance <\n      bestDistance - EPSILON\n    ) {\n      bestDistance = distance;\n\n      bestGroups =\n        improvedGroups.map(\n          group => [...group]\n        );\n    }\n  }\n\n  if (!bestGroups) {\n    throw new Error(\n      \"Не удалось выполнить эвристическую оптимизацию маршрутов\"\n    );\n  }\n\n  return {\n    groups: bestGroups,\n    distance: bestDistance,\n    method:\n      \"multi_start_route_optimization\"\n  };\n}\n\n/*\n  Автоматически выбираем режим.\n*/\nconst optimization =\n  employeeCount <= EXACT_OPTIMIZATION_LIMIT\n    ? exactOptimization()\n    : heuristicOptimization();\n\n/*\n  ==================================================\n  ПРОВЕРКА РАСПРЕДЕЛЕНИЯ\n  ==================================================\n\n  Проверяем внутренние позиции сотрудников.\n\n  Это исправляет ошибку:\n  \"сотрудников 12, распределено 12, уникальных 1\"\n\n  Проверка больше не зависит от telegram_user_id.\n*/\nconst assignedPositions =\n  optimization.groups.flat();\n\nconst uniqueAssignedPositions =\n  new Set(assignedPositions);\n\nif (\n  assignedPositions.length !== employeeCount ||\n  uniqueAssignedPositions.size !== employeeCount\n) {\n  throw new Error(\n    `Ошибка распределения: сотрудников ${employeeCount}, ` +\n    `распределено ${assignedPositions.length}, ` +\n    `уникальных ${uniqueAssignedPositions.size}`\n  );\n}\n\n/*\n  Проверяем допустимость каждой позиции.\n*/\nfor (const position of assignedPositions) {\n  if (\n    !Number.isInteger(position) ||\n    position < 0 ||\n    position >= employeeCount\n  ) {\n    throw new Error(\n      `Некорректная позиция сотрудника: ${position}`\n    );\n  }\n}\n\n/*\n  Формируем итоговые машины.\n\n  Пассажиры уже расположены\n  в оптимальном порядке высадки.\n*/\nconst optimizedCars =\n  optimization.groups.map(group => {\n    if (group.length > maxPassengers) {\n      throw new Error(\n        `Превышена вместимость машины: ` +\n        `${group.length} пассажиров, максимум ${maxPassengers}`\n      );\n    }\n\n    const bestRoute =\n      getBestRoute(group);\n\n    if (\n      !Number.isFinite(\n        bestRoute.distance\n      )\n    ) {\n      throw new Error(\n        `Не удалось рассчитать маршрут для группы: ${group.join(\", \")}`\n      );\n    }\n\n    return {\n      positions: bestRoute.order,\n\n      passengers:\n        bestRoute.order.map(\n          position =>\n            cleanEmployee(\n              employees[position]\n            )\n        ),\n\n      distanceMeters:\n        bestRoute.distance\n    };\n  });\n\n/*\n  Сначала показываем наиболее длинный маршрут.\n  На общий километраж это не влияет.\n*/\noptimizedCars.sort(\n  (a, b) =>\n    b.distanceMeters -\n    a.distanceMeters\n);\n\nconst totalOptimizedDistance =\n  optimizedCars.reduce(\n    (sum, car) =>\n      sum + car.distanceMeters,\n    0\n  );\n\n/*\n  Возвращаем по одному item на каждую машину.\n*/\nreturn optimizedCars.map(\n  (car, index) => ({\n    json: {\n      carNumber: index + 1,\n\n      totalCars:\n        optimizedCars.length,\n\n      totalEmployees:\n        employeeCount,\n\n      passengerCount:\n        car.passengers.length,\n\n      /*\n        Пассажиры уже идут в порядке:\n\n        работа → первый → второй → третий → последний\n      */\n      passengers:\n        car.passengers,\n\n      routeDistanceMeters:\n        Math.round(\n          car.distanceMeters\n        ),\n\n      routeDistanceKm:\n        Number(\n          (\n            car.distanceMeters / 1000\n          ).toFixed(2)\n        ),\n\n      totalOptimizedDistanceMeters:\n        Math.round(\n          totalOptimizedDistance\n        ),\n\n      totalOptimizedDistanceKm:\n        Number(\n          (\n            totalOptimizedDistance / 1000\n          ).toFixed(2)\n        ),\n\n      optimizationMethod:\n        optimization.method,\n\n      exactOptimization:\n        employeeCount <=\n          EXACT_OPTIMIZATION_LIMIT,\n\n      maxPassengers,\n\n      settings\n    }\n  })\n);"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        -48
+      ],
+      "id": "0a2000f6-c08f-4b94-901f-60b7bf2fe049",
+      "name": "Build Economic Car Groups"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://routes.googleapis.com/directions/v2:computeRoutes",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "X-Goog-FieldMask",
+              "value": "routes.distanceMeters,routes.duration,routes.optimizedIntermediateWaypointIndex"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.routeRequestBody }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1392,
+        -48
+      ],
+      "id": "ea48450c-7582-495f-8b6f-cc96143334be",
+      "name": "Calculate Route",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "BPnFnZRAx8lx8MyQ",
+          "name": "X-Goog-Api-Key"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get Settings",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Employees",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Employees": {
+      "main": [
+        [
+          {
+            "node": "Filter Employees Today",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Settings": {
+      "main": [
+        [
+          {
+            "node": "Collect Settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Settings": {
+      "main": [
+        [
+          {
+            "node": "Add Settings to Employees",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Settings to Employees": {
+      "main": [
+        [
+          {
+            "node": "Prepare Route Matrix",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Route Request": {
+      "main": [
+        [
+          {
+            "node": "Calculate Route",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Route Response": {
+      "main": [
+        [
+          {
+            "node": "Prepare Route Rows",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create Final Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Route": {
+      "main": [
+        []
+      ]
+    },
+    "Filter Employees Today": {
+      "main": [
+        [
+          {
+            "node": "Add Settings to Employees",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Prepare Route Rows": {
+      "main": [
+        [
+          {
+            "node": "Save Route",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Final Report": {
+      "main": [
+        [
+          {
+            "node": "Send Route to Dispatcher",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Route Matrix": {
+      "main": [
+        [
+          {
+            "node": "Calculate Route Matrix",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Route Matrix": {
+      "main": [
+        [
+          {
+            "node": "Build Economic Car Groups",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Economic Car Groups": {
+      "main": [
+        [
+          {
+            "node": "Prepare Route Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Route": {
+      "main": [
+        [
+          {
+            "node": "Parse Route Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "b7a9fee5-d5e0-4fe4-ae62-79f030e48910",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-07-18T20:19:13.292Z",
+      "createdAt": "2026-07-18T20:19:13.292Z",
+      "role": "workflow:owner",
+      "workflowId": "2mkohPjG6UdNI9yp",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
