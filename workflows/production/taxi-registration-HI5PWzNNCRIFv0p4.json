@@ -1,0 +1,5711 @@
+{
+  "updatedAt": "2026-07-19T12:48:31.819Z",
+  "createdAt": "2026-07-19T09:15:01.710Z",
+  "id": "HI5PWzNNCRIFv0p4",
+  "name": "Taxi registration",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -320,
+        720
+      ],
+      "id": "4b6bf5e4-5a9f-4160-b7e5-78d7c7e5e1ea",
+      "name": "Telegram Trigger",
+      "webhookId": "94d6c293-01ab-417a-a4bc-d6bd727b428c",
+      "credentials": {
+        "telegramApi": {
+          "id": "9xCUi3DJqhjcPWIQ",
+          "name": "Taxi tony"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const message = $json.message;\n\nif (!message) {\n  return {\n    ignore: true,\n    isPrivate: false,\n    isGroup: false,\n    isTaxiCommand: false,\n    reason: \"No Telegram message\"\n  };\n}\n\nconst text = String(message.text || \"\")\n  .trim()\n  .replace(/\\s+/g, \" \");\n\nconst command = text\n  .split(/\\s+/)[0]\n  .split(\"@\")[0]\n  .toLowerCase();\n\nconst chatType = String(message.chat?.type || \"\");\nconst chatId = String(message.chat?.id || \"\");\n\nconst now = new Date();\n\nconst taxiDate = new Intl.DateTimeFormat(\"en-CA\", {\n  timeZone: \"Europe/Kyiv\",\n  year: \"numeric\",\n  month: \"2-digit\",\n  day: \"2-digit\"\n}).format(now);\n\nconst currentDateTime = new Intl.DateTimeFormat(\"sv-SE\", {\n  timeZone: \"Europe/Kyiv\",\n  year: \"numeric\",\n  month: \"2-digit\",\n  day: \"2-digit\",\n  hour: \"2-digit\",\n  minute: \"2-digit\",\n  second: \"2-digit\"\n}).format(now);\n\nconst isPrivate = chatType === \"private\";\n\nconst isGroup =\n  chatType === \"group\" ||\n  chatType === \"supergroup\";\n\nconst isPlus = text === \"+\";\nconst isMinus = text === \"-\";\n\n/*\n  Поки ID групи ще не зафіксований,\n  перевіряємо лише тип чату.\n\n  Після тесту сюди вставимо ID групи TONY.\n*/\nconst allowedGroupId = \"\";\n\nconst isAllowedGroup = allowedGroupId\n  ? chatId === allowedGroupId\n  : isGroup;\n\nconst isTaxiCommand =\n  isAllowedGroup &&\n  (isPlus || isMinus);\n\nreturn {\n  chatId,\n  chatType,\n  chatTitle: String(message.chat?.title || \"\"),\n  messageId: message.message_id || null,\n\n  telegramUserId: String(message.from?.id || \"\"),\n  telegramUsername: String(message.from?.username || \"\"),\n  telegramFirstName: String(message.from?.first_name || \"\"),\n\n  text,\n  command,\n\n  isPrivate,\n  isGroup,\n  isAllowedGroup,\n\n  isPlus,\n  isMinus,\n  isTaxiCommand,\n\n  isStart: command === \"/start\",\n  isRegister: command === \"/register\",\n\n  taxiDate,\n  taxiMarkedAt: currentDateTime,\n  currentDateTime,\n\n  ignore: false\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -96,
+        720
+      ],
+      "id": "b245de55-47c5-483f-921f-6db05352b0b4",
+      "name": "Normalize Registration Message"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "e4e5d644-622a-4eb1-8708-147ebbdf9888",
+              "leftValue": "={{ $json.isPrivate }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        128,
+        720
+      ],
+      "id": "47cfefa7-a945-4f9c-992b-b5f596e69202",
+      "name": "Is Private Chat"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE/edit?gid=710055014#gid=710055014",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 710055014,
+          "mode": "list",
+          "cachedResultName": "Employees",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE/edit#gid=710055014"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "telegram_user_id",
+              "lookupValue": "={{ $(\"Normalize Registration Message\").item.json.telegramUserId }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        352,
+        -48
+      ],
+      "id": "0061b89e-0f81-4f7a-8ec1-0dcfa0284d74",
+      "name": "Find Registration Employee",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const source =\n  $(\"Normalize Registration Message\").first().json;\n\nconst rows = $input.all()\n  .map(item => item.json)\n  .filter(row =>\n    row &&\n    Object.keys(row).length > 0 &&\n    row.telegram_user_id\n  );\n\nconst employee = rows.find(row =>\n  String(row.telegram_user_id || \"\").trim() ===\n  String(source.telegramUserId || \"\").trim()\n);\n\nconst registrationStatus = String(\n  employee?.registration_status || \"not_started\"\n)\n  .trim()\n  .toLowerCase();\n\nconst registrationStep = String(\n  employee?.registration_step || \"not_started\"\n)\n  .trim()\n  .toLowerCase();\n\nreturn [\n  {\n    json: {\n      ...source,\n      employeeFound: Boolean(employee),\n      employee: employee || null,\n      registrationStep,\n      registrationStatus,\n      employeeRegistered:\n        registrationStatus === \"completed\"\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        576,
+        -48
+      ],
+      "id": "1d3d5172-bd85-4f49-8743-daf79c702c82",
+      "name": "Prepare Registration State"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "12f1d994-14ae-45cb-919d-896548a25b2e",
+              "leftValue": "={{ $json.employeeFound }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1248,
+        48
+      ],
+      "id": "e688f243-9ef6-4787-862e-2640fdb5a962",
+      "name": "Employee Exists"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=Продовжимо реестрацію.\n\nНапишіть Ваше ім'я та Прізвище.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1696,
+        -144
+      ],
+      "id": "1ae7b113-457e-4c83-aa48-654b5de9763d",
+      "name": "Telegram Send Message",
+      "webhookId": "53364405-38f3-49e4-85de-0f3a6ac7a8c9",
+      "credentials": {
+        "telegramApi": {
+          "id": "9xCUi3DJqhjcPWIQ",
+          "name": "Taxi tony"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.command }}",
+                    "rightValue": "/start",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "f985e17d-2dc1-4f4e-9dca-e0ba317a130e"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "start"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "58886c1e-228f-4033-b39b-e55323fe2ceb",
+                    "leftValue": "={{ $json.command }}",
+                    "rightValue": "/register",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "register"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        800,
+        -64
+      ],
+      "id": "676d3b5e-0c9b-4f86-a77e-f351d7ebeed9",
+      "name": "Command Router"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "👋 Вітаємо!\n\nЦе бот системи розвезення співробітників TONY. 🚕\n\nТут ви можете зареєструватися та відмічатися на щоденне розвезення.\n\nЩоб розпочати реєстрацію, надішліть:\n/register\n\nПісля реєстрації:\n\n➕ \"+\" — якщо сьогодні вам потрібне розвезення.\n➖ \"-\" — якщо ви передумали або хочете скасувати поїздку.\n\nГарного робочого дня! 😊",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1024,
+        -240
+      ],
+      "id": "1faaa26c-217b-4bec-ab2b-43b44cf2b020",
+      "name": "Start",
+      "webhookId": "42e7e944-7a6b-41ef-b9e5-a74f51f41e88",
+      "credentials": {
+        "telegramApi": {
+          "id": "9xCUi3DJqhjcPWIQ",
+          "name": "Taxi tony"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c14fc074-b30a-48ad-be0d-76bb8ef41f84",
+              "leftValue": "={{ $json.employeeRegistered }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1024,
+        -48
+      ],
+      "id": "995ee084-4ec7-40f3-8202-63e39c87f38d",
+      "name": "Employee Registered"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=✅ Вы уже зарегистрированы в системе развозки.  Имя: {{ $json.employee.name }} Адрес: {{ $json.employee.address }}  Когда нужна развозка, отправьте + в рабочую группу.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1248,
+        -144
+      ],
+      "id": "4281857d-2c08-4ed2-a71c-a5f56e0eb682",
+      "name": "Already Registered",
+      "webhookId": "a3a55864-e0bc-4faa-9f43-896dc1d3e866",
+      "credentials": {
+        "telegramApi": {
+          "id": "9xCUi3DJqhjcPWIQ",
+          "name": "Taxi tony"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE/edit?gid=710055014#gid=710055014",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 710055014,
+          "mode": "list",
+          "cachedResultName": "Employees",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE/edit#gid=710055014"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "telegram_user_id": "={{ $json.telegramUserId }}",
+            "telegram_username": "={{ $json.telegramUsername }}",
+            "active": "TRUE",
+            "registration_status": "pending",
+            "needs_taxi": "FALSE",
+            "registration_step": "=waiting_name"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "telegram_user_id",
+              "displayName": "telegram_user_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "telegram_username",
+              "displayName": "telegram_username",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "address",
+              "displayName": "address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "latitude",
+              "displayName": "latitude",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "longitude",
+              "displayName": "longitude",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "area",
+              "displayName": "area",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "active",
+              "displayName": "active",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "registration_status",
+              "displayName": "registration_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "registration_step",
+              "displayName": "registration_step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "needs_taxi",
+              "displayName": "needs_taxi",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "taxi_date",
+              "displayName": "taxi_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "taxi_marked_at",
+              "displayName": "taxi_marked_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1472,
+        240
+      ],
+      "id": "db4fd4d5-13dc-4c2d-89a0-67fcb749ebdf",
+      "name": "Create Employee",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $(\"Prepare Registration State\").item.json.chatId }}",
+        "text": "👋 Розпочнемо реєстрацію в системі розвезення TONY.\n  \nБудь ласка, напишіть **ваше ім'я та прізвище**.  \n  \nНаприклад:** Андрій Ребров",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1696,
+        240
+      ],
+      "id": "b4bf4cbf-c4c2-4c5f-97e8-c562b362e4d9",
+      "name": "Ask Name",
+      "webhookId": "167f0a7a-c913-4e20-b5e4-22798980421a",
+      "credentials": {
+        "telegramApi": {
+          "id": "9xCUi3DJqhjcPWIQ",
+          "name": "Taxi tony"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.registrationStep }}",
+                    "rightValue": "not_started",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "b0cd3767-8a70-4a8c-a7a4-e9d471ed671e"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "not_started"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "432b450d-a2a6-4d5f-a33a-1da809c1d332",
+                    "leftValue": "={{ $json.registrationStep }}",
+                    "rightValue": "waiting_name",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "waiting_name"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "0d04f9eb-847e-4616-aa44-d3f5c6650110",
+                    "leftValue": "={{ $json.registrationStep }}",
+                    "rightValue": "waiting_address",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "waiting_address"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "748dc98b-8793-49d0-bddf-c86c259f6329",
+                    "leftValue": "={{ $json.registrationStep }}",
+                    "rightValue": "completed",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "completed"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1024,
+        784
+      ],
+      "id": "4007691f-bce2-4c29-a785-87013e0ded1d",
+      "name": "Registration Step"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const name = String($json.text || \"\")\n  .trim()\n  .replace(/\\s+/g, \" \");\n\nconst words = name.split(\" \").filter(Boolean);\n\nconst forbiddenValues = [\n  \"+\",\n  \"-\",\n  \"/start\",\n  \"/register\"\n];\n\nconst hasOnlyLetters =\n  /^[A-Za-zА-Яа-яЁёІіЇїЄєҐґ'’ʼ-]+(?:\\s+[A-Za-zА-Яа-яЁёІіЇїЄєҐґ'’ʼ-]+)+$/.test(name);\n\nconst nameValid =\n  !$json.hasLocation &&\n  name.length >= 3 &&\n  name.length <= 100 &&\n  words.length >= 2 &&\n  hasOnlyLetters &&\n  !forbiddenValues.includes(name.toLowerCase());\n\nreturn {\n  ...$json,\n  enteredName: name,\n  nameValid,\n  validationDebug: {\n    wordsCount: words.length,\n    hasOnlyLetters,\n    hasLocation: Boolean($json.hasLocation)\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1248,
+        528
+      ],
+      "id": "0c9e0c48-53c9-4726-9cd2-73ef8a213b7a",
+      "name": "Validate Name"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c7d5c386-4f24-4c4d-9aec-68690119a8f4",
+              "leftValue": "={{ $json.nameValid }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1472,
+        528
+      ],
+      "id": "16df2510-2d41-4e1f-b9a5-dbd1368e0129",
+      "name": "Name Valid"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chatId }}",
+        "text": "❌ Не вдалося розпізнати ім’я. \n Будь ласка, напишіть **ім’я та прізвище текстом**.  \n\nНаприклад: Анна Коваль",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1696,
+        720
+      ],
+      "id": "c63f90ab-3b6e-44dd-960a-5263c252d79c",
+      "name": "Invalid Name",
+      "webhookId": "167f0a7a-c913-4e20-b5e4-22798980421a",
+      "credentials": {
+        "telegramApi": {
+          "id": "9xCUi3DJqhjcPWIQ",
+          "name": "Taxi tony"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE/edit?gid=710055014#gid=710055014",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 710055014,
+          "mode": "list",
+          "cachedResultName": "Employees",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE/edit#gid=710055014"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "name": "={{ $json.enteredName }}",
+            "registration_step": "waiting_address",
+            "row_number": 0,
+            "telegram_user_id": "={{ $json.telegramUserId }}"
+          },
+          "matchingColumns": [
+            "telegram_user_id"
+          ],
+          "schema": [
+            {
+              "id": "telegram_user_id",
+              "displayName": "telegram_user_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "telegram_username",
+              "displayName": "telegram_username",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "address",
+              "displayName": "address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "latitude",
+              "displayName": "latitude",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "longitude",
+              "displayName": "longitude",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "area",
+              "displayName": "area",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "active",
+              "displayName": "active",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "registration_status",
+              "displayName": "registration_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "registration_step",
+              "displayName": "registration_step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "needs_taxi",
+              "displayName": "needs_taxi",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "taxi_date",
+              "displayName": "taxi_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "taxi_marked_at",
+              "displayName": "taxi_marked_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1696,
+        432
+      ],
+      "id": "3eb0d16d-4474-4709-8e08-c764618ac420",
+      "name": "Save Name",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $(\"Validate Name\").item.json.chatId }}",
+        "text": "📍 Тепер віправте адресу проживання.\n\n Написати адресу текстом  Наприклад: вулиця Рабоча, 75, Дніпро",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1920,
+        432
+      ],
+      "id": "09eba021-1bac-477d-8598-87711075750d",
+      "name": "Ask Address",
+      "webhookId": "167f0a7a-c913-4e20-b5e4-22798980421a",
+      "credentials": {
+        "telegramApi": {
+          "id": "9xCUi3DJqhjcPWIQ",
+          "name": "Taxi tony"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "registrationStep",
+                    "rightValue": "waiting_name",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "4e67380c-7d25-4296-8340-cce30f0c8bc2"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "waiting_name"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "ae42ecbb-99c5-44fb-bd8a-5850361da0c6",
+                    "leftValue": "registrationStep",
+                    "rightValue": "waiting_address",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "waiting_address"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1472,
+        -48
+      ],
+      "id": "0529f70a-0aad-4f26-9c4f-2abde27a2e6c",
+      "name": "Continue Registration"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=Продовжимо реестрацію.\n\nНапишіть Вашу адресу проживання.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1696,
+        48
+      ],
+      "id": "d06d9363-505d-4cd9-a0a4-0d0fabbd03dd",
+      "name": "Telegram Send Message1",
+      "webhookId": "53364405-38f3-49e4-85de-0f3a6ac7a8c9",
+      "credentials": {
+        "telegramApi": {
+          "id": "9xCUi3DJqhjcPWIQ",
+          "name": "Taxi tony"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=✅ Вы уже зарегистрированы.\n\nДля просмотра инструкции отправьте /start.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1248,
+        912
+      ],
+      "id": "8c5ca5bb-d6ca-42f4-85ce-cd7d32d04d25",
+      "name": "completed",
+      "webhookId": "53364405-38f3-49e4-85de-0f3a6ac7a8c9",
+      "credentials": {
+        "telegramApi": {
+          "id": "9xCUi3DJqhjcPWIQ",
+          "name": "Taxi tony"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=Для начала регистрации отправьте команду:\n\n/register",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1248,
+        720
+      ],
+      "id": "028fdee9-f0f0-4adc-83c1-ecaefe050f5f",
+      "name": "Not start",
+      "webhookId": "53364405-38f3-49e4-85de-0f3a6ac7a8c9",
+      "credentials": {
+        "telegramApi": {
+          "id": "9xCUi3DJqhjcPWIQ",
+          "name": "Taxi tony"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const enteredAddress = String($json.text || \"\")\n  .trim()\n  .replace(/\\s+/g, \" \");\n\nconst forbiddenValues = [\n  \"\",\n  \"+\",\n  \"-\",\n  \"/start\",\n  \"/register\"\n];\n\nconst lowerAddress = enteredAddress.toLowerCase();\n\nconst addressTextValid =\n  enteredAddress.length >= 5 &&\n  enteredAddress.length <= 200 &&\n  !forbiddenValues.includes(lowerAddress);\n\nreturn {\n  ...$json,\n  enteredAddress,\n  addressTextValid\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1248,
+        1104
+      ],
+      "id": "2543d4cf-acb3-4888-9154-fbc5f9aeb883",
+      "name": "Prepare Text Address"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "bcfc555f-3088-4858-a611-d111708fc29f",
+              "leftValue": "={{ $json.addressTextValid }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1472,
+        1104
+      ],
+      "id": "010ab232-2539-4a6c-b1f4-ac7cee167764",
+      "name": "Address Text Valid"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chatId }}",
+        "text": "❌ Не вдалося розпізнати адресу.  Будь ласка, напишіть вулицю та номер будинку текстом.  Наприклад: вулиця Робоча, 75",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1696,
+        1200
+      ],
+      "id": "454836c5-3e29-4498-88d0-6218e030b5a4",
+      "name": "Invalid Address",
+      "webhookId": "fb88eaa3-b09a-4c91-896e-52e71f706063",
+      "credentials": {
+        "telegramApi": {
+          "id": "9xCUi3DJqhjcPWIQ",
+          "name": "Taxi tony"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://maps.googleapis.com/maps/api/geocode/json",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "address",
+              "value": "={{ $json.enteredAddress }}, Дніпро, Україна"
+            },
+            {
+              "name": "key",
+              "value": "AIzaSyDPThvNKVnEAEOSsUD3Z4TiecT_A5otP18"
+            },
+            {
+              "name": "language",
+              "value": "uk"
+            },
+            {
+              "name": "region",
+              "value": "ua"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1696,
+        1008
+      ],
+      "id": "71bcdc7f-0c71-4e0b-9086-6756c2631aeb",
+      "name": "Geocode Text Address"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const source =\n  $(\"Prepare Text Address\").first().json;\n\nconst result = $json.results?.[0] || null;\n\nif (!result) {\n  return {\n    ...source,\n    addressFound: false,\n    addressError:\n      $json.error_message ||\n      $json.status ||\n      \"Address not found\"\n  };\n}\n\nconst location = result.geometry?.location;\n\nconst resolvedAddress =\n  String(result.formatted_address || \"\").trim();\n\nconst resolvedLatitude =\n  location?.lat != null\n    ? Number(location.lat)\n    : null;\n\nconst resolvedLongitude =\n  location?.lng != null\n    ? Number(location.lng)\n    : null;\n\nconst addressFound = Boolean(\n  resolvedAddress &&\n  Number.isFinite(resolvedLatitude) &&\n  Number.isFinite(resolvedLongitude)\n);\n\nreturn {\n  ...source,\n  addressFound,\n  resolvedAddress,\n  resolvedLatitude,\n  resolvedLongitude\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1920,
+        1008
+      ],
+      "id": "2f52c2df-5ac8-4d1d-9bf5-270ee74ff66a",
+      "name": "Parse Text Geocoding"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "9b297281-2726-4f3f-ac8f-c94ba7ae1a1e",
+              "leftValue": "={{ $json.addressFound }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2144,
+        1008
+      ],
+      "id": "1bcf8910-0e9e-4ca1-a566-c889c98e697a",
+      "name": "Address Found"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE/edit?gid=710055014#gid=710055014",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 710055014,
+          "mode": "list",
+          "cachedResultName": "Employees",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE/edit#gid=710055014"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "telegram_user_id": "={{ $json.telegramUserId }}",
+            "telegram_username": "={{ $json.telegramUsername }}",
+            "name": "={{ $json.employee.name }}",
+            "address": "={{ $json.resolvedAddress }}",
+            "latitude": "={{ $json.resolvedLatitude }}",
+            "longitude": "={{ $json.resolvedLongitude }}",
+            "registration_status": "completed",
+            "registration_step": "completed",
+            "active": "TRUE",
+            "needs_taxi": "FALSE"
+          },
+          "matchingColumns": [
+            "telegram_user_id"
+          ],
+          "schema": [
+            {
+              "id": "telegram_user_id",
+              "displayName": "telegram_user_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "telegram_username",
+              "displayName": "telegram_username",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "address",
+              "displayName": "address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "latitude",
+              "displayName": "latitude",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "longitude",
+              "displayName": "longitude",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "area",
+              "displayName": "area",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "active",
+              "displayName": "active",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "registration_status",
+              "displayName": "registration_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "registration_step",
+              "displayName": "registration_step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "needs_taxi",
+              "displayName": "needs_taxi",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "taxi_date",
+              "displayName": "taxi_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "taxi_marked_at",
+              "displayName": "taxi_marked_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2368,
+        912
+      ],
+      "id": "847eadb6-dba2-45db-8108-1069c8ae1270",
+      "name": "Complete Registration",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE/edit?gid=710055014#gid=710055014",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 710055014,
+          "mode": "list",
+          "cachedResultName": "Employees",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE/edit#gid=710055014"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "telegram_user_id",
+              "lookupValue": "={{ $(\"Parse Text Geocoding\").item.json.telegramUserId }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2592,
+        912
+      ],
+      "id": "b7e02605-a4b5-4d13-b98b-29e518744f80",
+      "name": "Get Completed Employee",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $(\"Parse Text Geocoding\").item.json.chatId }}",
+        "text": "=✅ Реєстрацію завершено!  Ім’я: {{ $json.name }}  Адреса: {{ $json.address }}  \n\nУ день, коли вам потрібна розвозка, надішліть + у робочу групу.  Щоб скасувати поїздку, надішліть -.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2816,
+        912
+      ],
+      "id": "98d0a3dd-146d-48e0-b841-6a199e682e8a",
+      "name": "Registration Complete",
+      "webhookId": "b6576eff-dd5b-4b15-98c7-8760eb5b28bb",
+      "credentials": {
+        "telegramApi": {
+          "id": "9xCUi3DJqhjcPWIQ",
+          "name": "Taxi tony"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $(\"Parse Text Geocoding\").item.json.chatId }}",
+        "text": "=❌ Не вдалося знайти цю адресу.\n\nПеревірте назву вулиці та номер будинку.\n\nНаприклад:\nпроспект Олександра Поля, 10",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2368,
+        1104
+      ],
+      "id": "87be50ff-9f92-4508-a23c-41ed937f001c",
+      "name": "Address Found1",
+      "webhookId": "b6576eff-dd5b-4b15-98c7-8760eb5b28bb",
+      "credentials": {
+        "telegramApi": {
+          "id": "9xCUi3DJqhjcPWIQ",
+          "name": "Taxi tony"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "525a9003-d36e-4a2c-b648-e8f7d93549c9",
+              "leftValue": "={{ $('Normalize Registration Message').item.json.isTaxiCommand }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        352,
+        1584
+      ],
+      "id": "f6f2e4c4-2d0d-49af-b04d-80323a724782",
+      "name": "Is Taxi Command"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE/edit?gid=710055014#gid=710055014",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 710055014,
+          "mode": "list",
+          "cachedResultName": "Employees",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE/edit#gid=710055014"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "telegram_user_id",
+              "lookupValue": "={{ $json.telegramUserId }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        576,
+        1584
+      ],
+      "id": "e34798a5-3f99-4afa-8956-f4fe5ed6a3ea",
+      "name": "Find Taxi Employee",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const source =\n  $(\"Normalize Registration Message\").first().json;\n\nconst rows = $input.all()\n  .map(item => item.json)\n  .filter(row =>\n    row &&\n    Object.keys(row).length > 0 &&\n    row.telegram_user_id\n  );\n\nconst employee = rows.find(row =>\n  String(row.telegram_user_id || \"\").trim() ===\n  String(source.telegramUserId || \"\").trim()\n);\n\nconst employeeFound = Boolean(employee);\n\nconst registrationStatus = String(\n  employee?.registration_status || \"\"\n)\n  .trim()\n  .toLowerCase();\n\nconst activeValue = String(\n  employee?.active || \"\"\n)\n  .trim()\n  .toUpperCase();\n\nconst needsTaxiValue = String(\n  employee?.needs_taxi || \"\"\n)\n  .trim()\n  .toUpperCase();\n\nconst employeeRegistered =\n  registrationStatus === \"completed\";\n\nconst employeeActive =\n  activeValue === \"TRUE\";\n\nconst alreadyAddedToday =\n  needsTaxiValue === \"TRUE\" &&\n  String(employee?.taxi_date || \"\").trim() ===\n    String(source.taxiDate || \"\").trim();\n\nreturn [\n  {\n    json: {\n      ...source,\n      employeeFound,\n      employee: employee || null,\n      employeeRegistered,\n      employeeActive,\n      alreadyAddedToday\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        1584
+      ],
+      "id": "8c04f35d-8876-48c5-ad06-8329a71b7199",
+      "name": "Prepare Taxi Employee"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1d7b48c6-b2bf-4433-a9ba-c040be60c34b",
+              "leftValue": "={{ $json.employeeFound }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1024,
+        1584
+      ],
+      "id": "b7ec1e27-d786-4a44-a453-953edb7700cc",
+      "name": "Employee Found"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chatId }}",
+        "text": "=❌ Ви ще не зареєстровані в системі розвезення TONY.\n\nВідкрийте особистий чат із ботом і надішліть:\n/register",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1216,
+        1888
+      ],
+      "id": "490732f1-d502-4066-9991-cc6889201a6a",
+      "name": "Not Registered",
+      "webhookId": "b6576eff-dd5b-4b15-98c7-8760eb5b28bb",
+      "credentials": {
+        "telegramApi": {
+          "id": "9xCUi3DJqhjcPWIQ",
+          "name": "Taxi tony"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "3e2fad28-ee8a-4dd9-82bb-0c2127a2b0a8",
+              "leftValue": "={{ $json.employeeRegistered }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1328,
+        1600
+      ],
+      "id": "8d33df30-740a-4f91-9b35-27d0b3b261cf",
+      "name": "Employee Registered1"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chatId }}",
+        "text": "=❌ Ваша реєстрація ще не завершена.\n\nВідкрийте особистий чат із ботом і завершіть реєстрацію.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1584,
+        1968
+      ],
+      "id": "f2d59e34-2336-4c87-8b00-1f085550db42",
+      "name": "Registration Not Completed",
+      "webhookId": "b6576eff-dd5b-4b15-98c7-8760eb5b28bb",
+      "credentials": {
+        "telegramApi": {
+          "id": "9xCUi3DJqhjcPWIQ",
+          "name": "Taxi tony"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "9516f635-0655-44f9-bca2-fa6631b5fa9c",
+              "leftValue": "={{ $json.employeeActive }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1568,
+        1600
+      ],
+      "id": "8b0cfb19-1b2d-44b6-83b3-d31bdcd5dbcb",
+      "name": "Employee Active"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chatId }}",
+        "text": "=❌ Ваш профіль неактивний.\n\nЗверніться до адміністратора системи розвезення.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1840,
+        1904
+      ],
+      "id": "f7c20d65-adaf-4246-a6f1-7a2a2f263374",
+      "name": "Employee Inactive",
+      "webhookId": "b6576eff-dd5b-4b15-98c7-8760eb5b28bb",
+      "credentials": {
+        "telegramApi": {
+          "id": "9xCUi3DJqhjcPWIQ",
+          "name": "Taxi tony"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.text }}",
+                    "rightValue": "+",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "77518585-0826-4c0a-8999-43b5b8aa1dba"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "plus"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "0869a5a3-b175-4118-85e6-c894d4711092",
+                    "leftValue": "={{ $json.text }}",
+                    "rightValue": "-",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "minus"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1776,
+        1504
+      ],
+      "id": "51b2bd50-47e2-406d-af3b-5d73fb08bc2d",
+      "name": "Switch Taxi Command"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "7cc9b975-cf75-4a9e-9f4b-c6239e32df50",
+              "leftValue": "={{ $json.alreadyAddedToday }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1984,
+        1408
+      ],
+      "id": "428e3386-e2ce-46fc-8a97-15d3ff7ce851",
+      "name": "Already Added Today"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chatId }}",
+        "text": "=ℹ️ {{ $json.employee.name }}, ви вже додані до розвозки на сьогодні.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2176,
+        1232
+      ],
+      "id": "f96ccea0-6fc7-4da5-9c84-08296c88b54b",
+      "name": "Already Added Message",
+      "webhookId": "b6576eff-dd5b-4b15-98c7-8760eb5b28bb",
+      "credentials": {
+        "telegramApi": {
+          "id": "9xCUi3DJqhjcPWIQ",
+          "name": "Taxi tony"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE/edit?gid=710055014#gid=710055014",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 710055014,
+          "mode": "list",
+          "cachedResultName": "Employees",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE/edit#gid=710055014"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "telegram_user_id": "={{ $(\"Prepare Taxi Employee\").item.json.telegramUserId }}",
+            "needs_taxi": "TRUE",
+            "taxi_date": "={{ $(\"Prepare Taxi Employee\").item.json.taxiDate }}",
+            "taxi_marked_at": "={{ $(\"Prepare Taxi Employee\").item.json.taxiMarkedAt }}",
+            "updated_at": "={{ $(\"Prepare Taxi Employee\").item.json.currentDateTime }}"
+          },
+          "matchingColumns": [
+            "telegram_user_id"
+          ],
+          "schema": [
+            {
+              "id": "telegram_user_id",
+              "displayName": "telegram_user_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "telegram_username",
+              "displayName": "telegram_username",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "address",
+              "displayName": "address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "latitude",
+              "displayName": "latitude",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "longitude",
+              "displayName": "longitude",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "area",
+              "displayName": "area",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "active",
+              "displayName": "active",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "registration_status",
+              "displayName": "registration_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "registration_step",
+              "displayName": "registration_step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "needs_taxi",
+              "displayName": "needs_taxi",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "taxi_date",
+              "displayName": "taxi_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "taxi_marked_at",
+              "displayName": "taxi_marked_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2192,
+        1504
+      ],
+      "id": "00e1eaaa-ab78-45f9-9831-0e30f747a55c",
+      "name": "Update Taxi Plus",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $(\"Prepare Taxi Employee\").item.json.chatId }}",
+        "text": "=✅ {{ $(\"Prepare Taxi Employee\").item.json.employee.name }}, вас додано до розвозки на сьогодні.\n\nЩоб скасувати поїздку, надішліть:\n-",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2480,
+        1504
+      ],
+      "id": "46b29674-821c-4ac5-981e-d3d3262b61e2",
+      "name": "Taxi Added",
+      "webhookId": "b6576eff-dd5b-4b15-98c7-8760eb5b28bb",
+      "credentials": {
+        "telegramApi": {
+          "id": "9xCUi3DJqhjcPWIQ",
+          "name": "Taxi tony"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "4d7ddd11-3231-41da-b037-9fbcfd611274",
+              "leftValue": "={{ $json.alreadyAddedToday }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1984,
+        1600
+      ],
+      "id": "87ae66d4-0553-43d2-9773-59aa6cd6b835",
+      "name": "Is Added Today"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chatId }}",
+        "text": "=ℹ️ {{ $json.employee.name }}, вас немає у сьогоднішньому списку розвозки.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2224,
+        1856
+      ],
+      "id": "c36d79ea-f1f3-425a-9d99-f3b5775c3605",
+      "name": "Not In Taxi List",
+      "webhookId": "b6576eff-dd5b-4b15-98c7-8760eb5b28bb",
+      "credentials": {
+        "telegramApi": {
+          "id": "9xCUi3DJqhjcPWIQ",
+          "name": "Taxi tony"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE/edit?gid=710055014#gid=710055014",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 710055014,
+          "mode": "list",
+          "cachedResultName": "Employees",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE/edit#gid=710055014"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "telegram_user_id": "={{ $(\"Prepare Taxi Employee\").item.json.telegramUserId }}",
+            "needs_taxi": "FALSE",
+            "taxi_date": "={{ $(\"Prepare Taxi Employee\").item.json.taxiDate }}",
+            "taxi_marked_at": "={{ $(\"Prepare Taxi Employee\").item.json.taxiMarkedAt }}",
+            "updated_at": "={{ $(\"Prepare Taxi Employee\").item.json.currentDateTime }}"
+          },
+          "matchingColumns": [
+            "telegram_user_id"
+          ],
+          "schema": [
+            {
+              "id": "telegram_user_id",
+              "displayName": "telegram_user_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "telegram_username",
+              "displayName": "telegram_username",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "address",
+              "displayName": "address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "latitude",
+              "displayName": "latitude",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "longitude",
+              "displayName": "longitude",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "area",
+              "displayName": "area",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "active",
+              "displayName": "active",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "registration_status",
+              "displayName": "registration_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "registration_step",
+              "displayName": "registration_step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "needs_taxi",
+              "displayName": "needs_taxi",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "taxi_date",
+              "displayName": "taxi_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "taxi_marked_at",
+              "displayName": "taxi_marked_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2240,
+        1664
+      ],
+      "id": "4367d27b-383e-46b1-8e4e-970dc9b572f5",
+      "name": "Update Taxi Minus",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $(\"Prepare Taxi Employee\").item.json.chatId }}",
+        "text": "=➖ {{ $(\"Prepare Taxi Employee\").item.json.employee.name }}, вас видалено зі сьогоднішньої розвозки.\n\nЩоб додатися знову, надішліть:\n+",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2480,
+        1696
+      ],
+      "id": "33cedf9c-be55-482a-8e9b-af5ff2a449bc",
+      "name": "Taxi Removed",
+      "webhookId": "b6576eff-dd5b-4b15-98c7-8760eb5b28bb",
+      "credentials": {
+        "telegramApi": {
+          "id": "9xCUi3DJqhjcPWIQ",
+          "name": "Taxi tony"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Normalize Registration Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Registration Message": {
+      "main": [
+        [
+          {
+            "node": "Is Private Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Private Chat": {
+      "main": [
+        [
+          {
+            "node": "Find Registration Employee",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Is Taxi Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Registration Employee": {
+      "main": [
+        [
+          {
+            "node": "Prepare Registration State",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Registration State": {
+      "main": [
+        [
+          {
+            "node": "Command Router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Employee Exists": {
+      "main": [
+        [
+          {
+            "node": "Continue Registration",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Employee",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Command Router": {
+      "main": [
+        [
+          {
+            "node": "Start",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Employee Registered",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Registration Step",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Employee Registered": {
+      "main": [
+        [
+          {
+            "node": "Already Registered",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Employee Exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Employee": {
+      "main": [
+        [
+          {
+            "node": "Ask Name",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Registration Step": {
+      "main": [
+        [
+          {
+            "node": "Not start",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Validate Name",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Text Address",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "completed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Name": {
+      "main": [
+        [
+          {
+            "node": "Name Valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Name Valid": {
+      "main": [
+        [
+          {
+            "node": "Save Name",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Invalid Name",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Name": {
+      "main": [
+        [
+          {
+            "node": "Ask Address",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Continue Registration": {
+      "main": [
+        [
+          {
+            "node": "Telegram Send Message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram Send Message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Text Address": {
+      "main": [
+        [
+          {
+            "node": "Address Text Valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Address Text Valid": {
+      "main": [
+        [
+          {
+            "node": "Geocode Text Address",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Invalid Address",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Geocode Text Address": {
+      "main": [
+        [
+          {
+            "node": "Parse Text Geocoding",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Text Geocoding": {
+      "main": [
+        [
+          {
+            "node": "Address Found",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Address Found": {
+      "main": [
+        [
+          {
+            "node": "Complete Registration",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Address Found1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Complete Registration": {
+      "main": [
+        [
+          {
+            "node": "Get Completed Employee",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Completed Employee": {
+      "main": [
+        [
+          {
+            "node": "Registration Complete",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Taxi Command": {
+      "main": [
+        [
+          {
+            "node": "Find Taxi Employee",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Taxi Employee": {
+      "main": [
+        [
+          {
+            "node": "Prepare Taxi Employee",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Taxi Employee": {
+      "main": [
+        [
+          {
+            "node": "Employee Found",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Employee Found": {
+      "main": [
+        [
+          {
+            "node": "Employee Registered1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Not Registered",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Employee Registered1": {
+      "main": [
+        [
+          {
+            "node": "Employee Active",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Registration Not Completed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Employee Active": {
+      "main": [
+        [
+          {
+            "node": "Switch Taxi Command",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Employee Inactive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch Taxi Command": {
+      "main": [
+        [
+          {
+            "node": "Already Added Today",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Is Added Today",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Already Added Today": {
+      "main": [
+        [
+          {
+            "node": "Already Added Message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update Taxi Plus",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Taxi Plus": {
+      "main": [
+        [
+          {
+            "node": "Taxi Added",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Added Today": {
+      "main": [
+        [
+          {
+            "node": "Update Taxi Minus",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Not In Taxi List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Taxi Minus": {
+      "main": [
+        [
+          {
+            "node": "Taxi Removed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "70b60d0a-d0ce-437e-9850-1b669841dbff",
+  "activeVersionId": "70b60d0a-d0ce-437e-9850-1b669841dbff",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-07-19T09:15:01.712Z",
+      "createdAt": "2026-07-19T09:15:01.712Z",
+      "role": "workflow:owner",
+      "workflowId": "HI5PWzNNCRIFv0p4",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-07-19T11:34:10.000Z",
+    "createdAt": "2026-07-19T11:22:24.475Z",
+    "versionId": "70b60d0a-d0ce-437e-9850-1b669841dbff",
+    "workflowId": "HI5PWzNNCRIFv0p4",
+    "nodes": [
+      {
+        "parameters": {
+          "updates": [
+            "message"
+          ],
+          "additionalFields": {}
+        },
+        "type": "n8n-nodes-base.telegramTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          -320,
+          720
+        ],
+        "id": "4b6bf5e4-5a9f-4160-b7e5-78d7c7e5e1ea",
+        "name": "Telegram Trigger",
+        "webhookId": "94d6c293-01ab-417a-a4bc-d6bd727b428c",
+        "credentials": {
+          "telegramApi": {
+            "id": "9xCUi3DJqhjcPWIQ",
+            "name": "Taxi tony"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const message = $json.message;\n\nif (!message) {\n  return {\n    ignore: true,\n    isPrivate: false,\n    isGroup: false,\n    isTaxiCommand: false,\n    reason: \"No Telegram message\"\n  };\n}\n\nconst text = String(message.text || \"\")\n  .trim()\n  .replace(/\\s+/g, \" \");\n\nconst command = text\n  .split(/\\s+/)[0]\n  .split(\"@\")[0]\n  .toLowerCase();\n\nconst chatType = String(message.chat?.type || \"\");\nconst chatId = String(message.chat?.id || \"\");\n\nconst now = new Date();\n\nconst taxiDate = new Intl.DateTimeFormat(\"en-CA\", {\n  timeZone: \"Europe/Kyiv\",\n  year: \"numeric\",\n  month: \"2-digit\",\n  day: \"2-digit\"\n}).format(now);\n\nconst currentDateTime = new Intl.DateTimeFormat(\"sv-SE\", {\n  timeZone: \"Europe/Kyiv\",\n  year: \"numeric\",\n  month: \"2-digit\",\n  day: \"2-digit\",\n  hour: \"2-digit\",\n  minute: \"2-digit\",\n  second: \"2-digit\"\n}).format(now);\n\nconst isPrivate = chatType === \"private\";\n\nconst isGroup =\n  chatType === \"group\" ||\n  chatType === \"supergroup\";\n\nconst isPlus = text === \"+\";\nconst isMinus = text === \"-\";\n\n/*\n  Поки ID групи ще не зафіксований,\n  перевіряємо лише тип чату.\n\n  Після тесту сюди вставимо ID групи TONY.\n*/\nconst allowedGroupId = \"\";\n\nconst isAllowedGroup = allowedGroupId\n  ? chatId === allowedGroupId\n  : isGroup;\n\nconst isTaxiCommand =\n  isAllowedGroup &&\n  (isPlus || isMinus);\n\nreturn {\n  chatId,\n  chatType,\n  chatTitle: String(message.chat?.title || \"\"),\n  messageId: message.message_id || null,\n\n  telegramUserId: String(message.from?.id || \"\"),\n  telegramUsername: String(message.from?.username || \"\"),\n  telegramFirstName: String(message.from?.first_name || \"\"),\n\n  text,\n  command,\n\n  isPrivate,\n  isGroup,\n  isAllowedGroup,\n\n  isPlus,\n  isMinus,\n  isTaxiCommand,\n\n  isStart: command === \"/start\",\n  isRegister: command === \"/register\",\n\n  taxiDate,\n  taxiMarkedAt: currentDateTime,\n  currentDateTime,\n\n  ignore: false\n};"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -96,
+          720
+        ],
+        "id": "b245de55-47c5-483f-921f-6db05352b0b4",
+        "name": "Normalize Registration Message"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "e4e5d644-622a-4eb1-8708-147ebbdf9888",
+                "leftValue": "={{ $json.isPrivate }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          128,
+          720
+        ],
+        "id": "47cfefa7-a945-4f9c-992b-b5f596e69202",
+        "name": "Is Private Chat"
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "https://docs.google.com/spreadsheets/d/16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE/edit?gid=710055014#gid=710055014",
+            "mode": "url"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 710055014,
+            "mode": "list",
+            "cachedResultName": "Employees",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE/edit#gid=710055014"
+          },
+          "filtersUI": {
+            "values": [
+              {
+                "lookupColumn": "telegram_user_id",
+                "lookupValue": "={{ $(\"Normalize Registration Message\").item.json.telegramUserId }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          352,
+          -48
+        ],
+        "id": "0061b89e-0f81-4f7a-8ec1-0dcfa0284d74",
+        "name": "Find Registration Employee",
+        "alwaysOutputData": true,
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "0Gdvf3Mhmj7whXEv",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const source =\n  $(\"Normalize Registration Message\").first().json;\n\nconst rows = $input.all()\n  .map(item => item.json)\n  .filter(row =>\n    row &&\n    Object.keys(row).length > 0 &&\n    row.telegram_user_id\n  );\n\nconst employee = rows.find(row =>\n  String(row.telegram_user_id || \"\").trim() ===\n  String(source.telegramUserId || \"\").trim()\n);\n\nconst registrationStatus = String(\n  employee?.registration_status || \"not_started\"\n)\n  .trim()\n  .toLowerCase();\n\nconst registrationStep = String(\n  employee?.registration_step || \"not_started\"\n)\n  .trim()\n  .toLowerCase();\n\nreturn [\n  {\n    json: {\n      ...source,\n      employeeFound: Boolean(employee),\n      employee: employee || null,\n      registrationStep,\n      registrationStatus,\n      employeeRegistered:\n        registrationStatus === \"completed\"\n    }\n  }\n];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          576,
+          -48
+        ],
+        "id": "1d3d5172-bd85-4f49-8743-daf79c702c82",
+        "name": "Prepare Registration State"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "12f1d994-14ae-45cb-919d-896548a25b2e",
+                "leftValue": "={{ $json.employeeFound }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          1248,
+          48
+        ],
+        "id": "e688f243-9ef6-4787-862e-2640fdb5a962",
+        "name": "Employee Exists"
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+          "text": "=Продовжимо реестрацію.\n\nНапишіть Ваше ім'я та Прізвище.",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          1696,
+          -144
+        ],
+        "id": "1ae7b113-457e-4c83-aa48-654b5de9763d",
+        "name": "Telegram Send Message",
+        "webhookId": "53364405-38f3-49e4-85de-0f3a6ac7a8c9",
+        "credentials": {
+          "telegramApi": {
+            "id": "9xCUi3DJqhjcPWIQ",
+            "name": "Taxi tony"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.command }}",
+                      "rightValue": "/start",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      },
+                      "id": "f985e17d-2dc1-4f4e-9dca-e0ba317a130e"
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "start"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "id": "58886c1e-228f-4033-b39b-e55323fe2ceb",
+                      "leftValue": "={{ $json.command }}",
+                      "rightValue": "/register",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "register"
+              }
+            ]
+          },
+          "options": {
+            "fallbackOutput": "extra"
+          }
+        },
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3.4,
+        "position": [
+          800,
+          -64
+        ],
+        "id": "676d3b5e-0c9b-4f86-a77e-f351d7ebeed9",
+        "name": "Command Router"
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+          "text": "👋 Вітаємо!\n\nЦе бот системи розвезення співробітників TONY. 🚕\n\nТут ви можете зареєструватися та відмічатися на щоденне розвезення.\n\nЩоб розпочати реєстрацію, надішліть:\n/register\n\nПісля реєстрації:\n\n➕ \"+\" — якщо сьогодні вам потрібне розвезення.\n➖ \"-\" — якщо ви передумали або хочете скасувати поїздку.\n\nГарного робочого дня! 😊",
+          "additionalFields": {}
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          1024,
+          -240
+        ],
+        "id": "1faaa26c-217b-4bec-ab2b-43b44cf2b020",
+        "name": "Start",
+        "webhookId": "42e7e944-7a6b-41ef-b9e5-a74f51f41e88",
+        "credentials": {
+          "telegramApi": {
+            "id": "9xCUi3DJqhjcPWIQ",
+            "name": "Taxi tony"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "c14fc074-b30a-48ad-be0d-76bb8ef41f84",
+                "leftValue": "={{ $json.employeeRegistered }}",
+                "rightValue": false,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          1024,
+          -48
+        ],
+        "id": "995ee084-4ec7-40f3-8202-63e39c87f38d",
+        "name": "Employee Registered"
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+          "text": "=✅ Вы уже зарегистрированы в системе развозки.  Имя: {{ $json.employee.name }} Адрес: {{ $json.employee.address }}  Когда нужна развозка, отправьте + в рабочую группу.",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          1248,
+          -144
+        ],
+        "id": "4281857d-2c08-4ed2-a71c-a5f56e0eb682",
+        "name": "Already Registered",
+        "webhookId": "a3a55864-e0bc-4faa-9f43-896dc1d3e866",
+        "credentials": {
+          "telegramApi": {
+            "id": "9xCUi3DJqhjcPWIQ",
+            "name": "Taxi tony"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "https://docs.google.com/spreadsheets/d/16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE/edit?gid=710055014#gid=710055014",
+            "mode": "url"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 710055014,
+            "mode": "list",
+            "cachedResultName": "Employees",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE/edit#gid=710055014"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "telegram_user_id": "={{ $json.telegramUserId }}",
+              "telegram_username": "={{ $json.telegramUsername }}",
+              "active": "TRUE",
+              "registration_status": "pending",
+              "needs_taxi": "FALSE",
+              "registration_step": "=waiting_name"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "telegram_user_id",
+                "displayName": "telegram_user_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "telegram_username",
+                "displayName": "telegram_username",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "name",
+                "displayName": "name",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "address",
+                "displayName": "address",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "latitude",
+                "displayName": "latitude",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "longitude",
+                "displayName": "longitude",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "area",
+                "displayName": "area",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "active",
+                "displayName": "active",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "registration_status",
+                "displayName": "registration_status",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "registration_step",
+                "displayName": "registration_step",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "needs_taxi",
+                "displayName": "needs_taxi",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "taxi_date",
+                "displayName": "taxi_date",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "taxi_marked_at",
+                "displayName": "taxi_marked_at",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          1472,
+          240
+        ],
+        "id": "db4fd4d5-13dc-4c2d-89a0-67fcb749ebdf",
+        "name": "Create Employee",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "0Gdvf3Mhmj7whXEv",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $(\"Prepare Registration State\").item.json.chatId }}",
+          "text": "👋 Розпочнемо реєстрацію в системі розвезення TONY.\n  \nБудь ласка, напишіть **ваше ім'я та прізвище**.  \n  \nНаприклад:** Андрій Ребров",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          1696,
+          240
+        ],
+        "id": "b4bf4cbf-c4c2-4c5f-97e8-c562b362e4d9",
+        "name": "Ask Name",
+        "webhookId": "167f0a7a-c913-4e20-b5e4-22798980421a",
+        "credentials": {
+          "telegramApi": {
+            "id": "9xCUi3DJqhjcPWIQ",
+            "name": "Taxi tony"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.registrationStep }}",
+                      "rightValue": "not_started",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      },
+                      "id": "b0cd3767-8a70-4a8c-a7a4-e9d471ed671e"
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "not_started"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "id": "432b450d-a2a6-4d5f-a33a-1da809c1d332",
+                      "leftValue": "={{ $json.registrationStep }}",
+                      "rightValue": "waiting_name",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "waiting_name"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "id": "0d04f9eb-847e-4616-aa44-d3f5c6650110",
+                      "leftValue": "={{ $json.registrationStep }}",
+                      "rightValue": "waiting_address",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "waiting_address"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "id": "748dc98b-8793-49d0-bddf-c86c259f6329",
+                      "leftValue": "={{ $json.registrationStep }}",
+                      "rightValue": "completed",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "completed"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3.4,
+        "position": [
+          1024,
+          784
+        ],
+        "id": "4007691f-bce2-4c29-a785-87013e0ded1d",
+        "name": "Registration Step"
+      },
+      {
+        "parameters": {
+          "mode": "runOnceForEachItem",
+          "jsCode": "const name = String($json.text || \"\")\n  .trim()\n  .replace(/\\s+/g, \" \");\n\nconst words = name.split(\" \").filter(Boolean);\n\nconst forbiddenValues = [\n  \"+\",\n  \"-\",\n  \"/start\",\n  \"/register\"\n];\n\nconst hasOnlyLetters =\n  /^[A-Za-zА-Яа-яЁёІіЇїЄєҐґ'’ʼ-]+(?:\\s+[A-Za-zА-Яа-яЁёІіЇїЄєҐґ'’ʼ-]+)+$/.test(name);\n\nconst nameValid =\n  !$json.hasLocation &&\n  name.length >= 3 &&\n  name.length <= 100 &&\n  words.length >= 2 &&\n  hasOnlyLetters &&\n  !forbiddenValues.includes(name.toLowerCase());\n\nreturn {\n  ...$json,\n  enteredName: name,\n  nameValid,\n  validationDebug: {\n    wordsCount: words.length,\n    hasOnlyLetters,\n    hasLocation: Boolean($json.hasLocation)\n  }\n};"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1248,
+          528
+        ],
+        "id": "0c9e0c48-53c9-4726-9cd2-73ef8a213b7a",
+        "name": "Validate Name"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "c7d5c386-4f24-4c4d-9aec-68690119a8f4",
+                "leftValue": "={{ $json.nameValid }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          1472,
+          528
+        ],
+        "id": "16df2510-2d41-4e1f-b9a5-dbd1368e0129",
+        "name": "Name Valid"
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $json.chatId }}",
+          "text": "❌ Не вдалося розпізнати ім’я. \n Будь ласка, напишіть **ім’я та прізвище текстом**.  \n\nНаприклад: Анна Коваль",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          1696,
+          720
+        ],
+        "id": "c63f90ab-3b6e-44dd-960a-5263c252d79c",
+        "name": "Invalid Name",
+        "webhookId": "167f0a7a-c913-4e20-b5e4-22798980421a",
+        "credentials": {
+          "telegramApi": {
+            "id": "9xCUi3DJqhjcPWIQ",
+            "name": "Taxi tony"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "documentId": {
+            "__rl": true,
+            "value": "https://docs.google.com/spreadsheets/d/16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE/edit?gid=710055014#gid=710055014",
+            "mode": "url"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 710055014,
+            "mode": "list",
+            "cachedResultName": "Employees",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE/edit#gid=710055014"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "name": "={{ $json.enteredName }}",
+              "registration_step": "waiting_address",
+              "row_number": 0,
+              "telegram_user_id": "={{ $json.telegramUserId }}"
+            },
+            "matchingColumns": [
+              "telegram_user_id"
+            ],
+            "schema": [
+              {
+                "id": "telegram_user_id",
+                "displayName": "telegram_user_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "telegram_username",
+                "displayName": "telegram_username",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "name",
+                "displayName": "name",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "address",
+                "displayName": "address",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "latitude",
+                "displayName": "latitude",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "longitude",
+                "displayName": "longitude",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "area",
+                "displayName": "area",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "active",
+                "displayName": "active",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "registration_status",
+                "displayName": "registration_status",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "registration_step",
+                "displayName": "registration_step",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "needs_taxi",
+                "displayName": "needs_taxi",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "taxi_date",
+                "displayName": "taxi_date",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "taxi_marked_at",
+                "displayName": "taxi_marked_at",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "row_number",
+                "displayName": "row_number",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "readOnly": true,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          1696,
+          432
+        ],
+        "id": "3eb0d16d-4474-4709-8e08-c764618ac420",
+        "name": "Save Name",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "0Gdvf3Mhmj7whXEv",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $(\"Validate Name\").item.json.chatId }}",
+          "text": "📍 Тепер віправте адресу проживання.\n\n Написати адресу текстом  Наприклад: вулиця Рабоча, 75, Дніпро",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          1920,
+          432
+        ],
+        "id": "09eba021-1bac-477d-8598-87711075750d",
+        "name": "Ask Address",
+        "webhookId": "167f0a7a-c913-4e20-b5e4-22798980421a",
+        "credentials": {
+          "telegramApi": {
+            "id": "9xCUi3DJqhjcPWIQ",
+            "name": "Taxi tony"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "leftValue": "registrationStep",
+                      "rightValue": "waiting_name",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      },
+                      "id": "4e67380c-7d25-4296-8340-cce30f0c8bc2"
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "waiting_name"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "id": "ae42ecbb-99c5-44fb-bd8a-5850361da0c6",
+                      "leftValue": "registrationStep",
+                      "rightValue": "waiting_address",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "waiting_address"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3.4,
+        "position": [
+          1472,
+          -48
+        ],
+        "id": "0529f70a-0aad-4f26-9c4f-2abde27a2e6c",
+        "name": "Continue Registration"
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+          "text": "=Продовжимо реестрацію.\n\nНапишіть Вашу адресу проживання.",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          1696,
+          48
+        ],
+        "id": "d06d9363-505d-4cd9-a0a4-0d0fabbd03dd",
+        "name": "Telegram Send Message1",
+        "webhookId": "53364405-38f3-49e4-85de-0f3a6ac7a8c9",
+        "credentials": {
+          "telegramApi": {
+            "id": "9xCUi3DJqhjcPWIQ",
+            "name": "Taxi tony"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+          "text": "=✅ Вы уже зарегистрированы.\n\nДля просмотра инструкции отправьте /start.",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          1248,
+          912
+        ],
+        "id": "8c5ca5bb-d6ca-42f4-85ce-cd7d32d04d25",
+        "name": "completed",
+        "webhookId": "53364405-38f3-49e4-85de-0f3a6ac7a8c9",
+        "credentials": {
+          "telegramApi": {
+            "id": "9xCUi3DJqhjcPWIQ",
+            "name": "Taxi tony"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+          "text": "=Для начала регистрации отправьте команду:\n\n/register",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          1248,
+          720
+        ],
+        "id": "028fdee9-f0f0-4adc-83c1-ecaefe050f5f",
+        "name": "Not start",
+        "webhookId": "53364405-38f3-49e4-85de-0f3a6ac7a8c9",
+        "credentials": {
+          "telegramApi": {
+            "id": "9xCUi3DJqhjcPWIQ",
+            "name": "Taxi tony"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "mode": "runOnceForEachItem",
+          "jsCode": "const enteredAddress = String($json.text || \"\")\n  .trim()\n  .replace(/\\s+/g, \" \");\n\nconst forbiddenValues = [\n  \"\",\n  \"+\",\n  \"-\",\n  \"/start\",\n  \"/register\"\n];\n\nconst lowerAddress = enteredAddress.toLowerCase();\n\nconst addressTextValid =\n  enteredAddress.length >= 5 &&\n  enteredAddress.length <= 200 &&\n  !forbiddenValues.includes(lowerAddress);\n\nreturn {\n  ...$json,\n  enteredAddress,\n  addressTextValid\n};"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1248,
+          1104
+        ],
+        "id": "2543d4cf-acb3-4888-9154-fbc5f9aeb883",
+        "name": "Prepare Text Address"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "bcfc555f-3088-4858-a611-d111708fc29f",
+                "leftValue": "={{ $json.addressTextValid }}",
+                "rightValue": false,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          1472,
+          1104
+        ],
+        "id": "010ab232-2539-4a6c-b1f4-ac7cee167764",
+        "name": "Address Text Valid"
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $json.chatId }}",
+          "text": "❌ Не вдалося розпізнати адресу.  Будь ласка, напишіть вулицю та номер будинку текстом.  Наприклад: вулиця Робоча, 75",
+          "additionalFields": {}
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          1696,
+          1200
+        ],
+        "id": "454836c5-3e29-4498-88d0-6218e030b5a4",
+        "name": "Invalid Address",
+        "webhookId": "fb88eaa3-b09a-4c91-896e-52e71f706063",
+        "credentials": {
+          "telegramApi": {
+            "id": "9xCUi3DJqhjcPWIQ",
+            "name": "Taxi tony"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "url": "https://maps.googleapis.com/maps/api/geocode/json",
+          "sendQuery": true,
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "address",
+                "value": "={{ $json.enteredAddress }}, Дніпро, Україна"
+              },
+              {
+                "name": "key",
+                "value": "AIzaSyDPThvNKVnEAEOSsUD3Z4TiecT_A5otP18"
+              },
+              {
+                "name": "language",
+                "value": "uk"
+              },
+              {
+                "name": "region",
+                "value": "ua"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          1696,
+          1008
+        ],
+        "id": "71bcdc7f-0c71-4e0b-9086-6756c2631aeb",
+        "name": "Geocode Text Address"
+      },
+      {
+        "parameters": {
+          "mode": "runOnceForEachItem",
+          "jsCode": "const source =\n  $(\"Prepare Text Address\").first().json;\n\nconst result = $json.results?.[0] || null;\n\nif (!result) {\n  return {\n    ...source,\n    addressFound: false,\n    addressError:\n      $json.error_message ||\n      $json.status ||\n      \"Address not found\"\n  };\n}\n\nconst location = result.geometry?.location;\n\nconst resolvedAddress =\n  String(result.formatted_address || \"\").trim();\n\nconst resolvedLatitude =\n  location?.lat != null\n    ? Number(location.lat)\n    : null;\n\nconst resolvedLongitude =\n  location?.lng != null\n    ? Number(location.lng)\n    : null;\n\nconst addressFound = Boolean(\n  resolvedAddress &&\n  Number.isFinite(resolvedLatitude) &&\n  Number.isFinite(resolvedLongitude)\n);\n\nreturn {\n  ...source,\n  addressFound,\n  resolvedAddress,\n  resolvedLatitude,\n  resolvedLongitude\n};"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1920,
+          1008
+        ],
+        "id": "2f52c2df-5ac8-4d1d-9bf5-270ee74ff66a",
+        "name": "Parse Text Geocoding"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "9b297281-2726-4f3f-ac8f-c94ba7ae1a1e",
+                "leftValue": "={{ $json.addressFound }}",
+                "rightValue": false,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          2144,
+          1008
+        ],
+        "id": "1bcf8910-0e9e-4ca1-a566-c889c98e697a",
+        "name": "Address Found"
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "documentId": {
+            "__rl": true,
+            "value": "https://docs.google.com/spreadsheets/d/16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE/edit?gid=710055014#gid=710055014",
+            "mode": "url"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 710055014,
+            "mode": "list",
+            "cachedResultName": "Employees",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE/edit#gid=710055014"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "telegram_user_id": "={{ $json.telegramUserId }}",
+              "telegram_username": "={{ $json.telegramUsername }}",
+              "name": "={{ $json.employee.name }}",
+              "address": "={{ $json.resolvedAddress }}",
+              "latitude": "={{ $json.resolvedLatitude }}",
+              "longitude": "={{ $json.resolvedLongitude }}",
+              "registration_status": "completed",
+              "registration_step": "completed",
+              "active": "TRUE",
+              "needs_taxi": "FALSE"
+            },
+            "matchingColumns": [
+              "telegram_user_id"
+            ],
+            "schema": [
+              {
+                "id": "telegram_user_id",
+                "displayName": "telegram_user_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "telegram_username",
+                "displayName": "telegram_username",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "name",
+                "displayName": "name",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "address",
+                "displayName": "address",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "latitude",
+                "displayName": "latitude",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "longitude",
+                "displayName": "longitude",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "area",
+                "displayName": "area",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "active",
+                "displayName": "active",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "registration_status",
+                "displayName": "registration_status",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "registration_step",
+                "displayName": "registration_step",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "needs_taxi",
+                "displayName": "needs_taxi",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "taxi_date",
+                "displayName": "taxi_date",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "taxi_marked_at",
+                "displayName": "taxi_marked_at",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "row_number",
+                "displayName": "row_number",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "readOnly": true,
+                "removed": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          2368,
+          912
+        ],
+        "id": "847eadb6-dba2-45db-8108-1069c8ae1270",
+        "name": "Complete Registration",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "0Gdvf3Mhmj7whXEv",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "https://docs.google.com/spreadsheets/d/16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE/edit?gid=710055014#gid=710055014",
+            "mode": "url"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 710055014,
+            "mode": "list",
+            "cachedResultName": "Employees",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE/edit#gid=710055014"
+          },
+          "filtersUI": {
+            "values": [
+              {
+                "lookupColumn": "telegram_user_id",
+                "lookupValue": "={{ $(\"Parse Text Geocoding\").item.json.telegramUserId }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          2592,
+          912
+        ],
+        "id": "b7e02605-a4b5-4d13-b98b-29e518744f80",
+        "name": "Get Completed Employee",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "0Gdvf3Mhmj7whXEv",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $(\"Parse Text Geocoding\").item.json.chatId }}",
+          "text": "=✅ Реєстрацію завершено!  Ім’я: {{ $json.name }}  Адреса: {{ $json.address }}  \n\nУ день, коли вам потрібна розвозка, надішліть + у робочу групу.  Щоб скасувати поїздку, надішліть -.",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          2816,
+          912
+        ],
+        "id": "98d0a3dd-146d-48e0-b841-6a199e682e8a",
+        "name": "Registration Complete",
+        "webhookId": "b6576eff-dd5b-4b15-98c7-8760eb5b28bb",
+        "credentials": {
+          "telegramApi": {
+            "id": "9xCUi3DJqhjcPWIQ",
+            "name": "Taxi tony"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $(\"Parse Text Geocoding\").item.json.chatId }}",
+          "text": "=❌ Не вдалося знайти цю адресу.\n\nПеревірте назву вулиці та номер будинку.\n\nНаприклад:\nпроспект Олександра Поля, 10",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          2368,
+          1104
+        ],
+        "id": "87be50ff-9f92-4508-a23c-41ed937f001c",
+        "name": "Address Found1",
+        "webhookId": "b6576eff-dd5b-4b15-98c7-8760eb5b28bb",
+        "credentials": {
+          "telegramApi": {
+            "id": "9xCUi3DJqhjcPWIQ",
+            "name": "Taxi tony"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "525a9003-d36e-4a2c-b648-e8f7d93549c9",
+                "leftValue": "={{ $('Normalize Registration Message').item.json.isTaxiCommand }}",
+                "rightValue": false,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          352,
+          1584
+        ],
+        "id": "f6f2e4c4-2d0d-49af-b04d-80323a724782",
+        "name": "Is Taxi Command"
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "https://docs.google.com/spreadsheets/d/16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE/edit?gid=710055014#gid=710055014",
+            "mode": "url"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 710055014,
+            "mode": "list",
+            "cachedResultName": "Employees",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE/edit#gid=710055014"
+          },
+          "filtersUI": {
+            "values": [
+              {
+                "lookupColumn": "telegram_user_id",
+                "lookupValue": "={{ $json.telegramUserId }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          576,
+          1584
+        ],
+        "id": "e34798a5-3f99-4afa-8956-f4fe5ed6a3ea",
+        "name": "Find Taxi Employee",
+        "alwaysOutputData": true,
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "0Gdvf3Mhmj7whXEv",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const source =\n  $(\"Normalize Registration Message\").first().json;\n\nconst rows = $input.all()\n  .map(item => item.json)\n  .filter(row =>\n    row &&\n    Object.keys(row).length > 0 &&\n    row.telegram_user_id\n  );\n\nconst employee = rows.find(row =>\n  String(row.telegram_user_id || \"\").trim() ===\n  String(source.telegramUserId || \"\").trim()\n);\n\nconst employeeFound = Boolean(employee);\n\nconst registrationStatus = String(\n  employee?.registration_status || \"\"\n)\n  .trim()\n  .toLowerCase();\n\nconst activeValue = String(\n  employee?.active || \"\"\n)\n  .trim()\n  .toUpperCase();\n\nconst needsTaxiValue = String(\n  employee?.needs_taxi || \"\"\n)\n  .trim()\n  .toUpperCase();\n\nconst employeeRegistered =\n  registrationStatus === \"completed\";\n\nconst employeeActive =\n  activeValue === \"TRUE\";\n\nconst alreadyAddedToday =\n  needsTaxiValue === \"TRUE\" &&\n  String(employee?.taxi_date || \"\").trim() ===\n    String(source.taxiDate || \"\").trim();\n\nreturn [\n  {\n    json: {\n      ...source,\n      employeeFound,\n      employee: employee || null,\n      employeeRegistered,\n      employeeActive,\n      alreadyAddedToday\n    }\n  }\n];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          800,
+          1584
+        ],
+        "id": "8c04f35d-8876-48c5-ad06-8329a71b7199",
+        "name": "Prepare Taxi Employee"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "1d7b48c6-b2bf-4433-a9ba-c040be60c34b",
+                "leftValue": "={{ $json.employeeFound }}",
+                "rightValue": false,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          1024,
+          1584
+        ],
+        "id": "b7ec1e27-d786-4a44-a453-953edb7700cc",
+        "name": "Employee Found"
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $json.chatId }}",
+          "text": "=❌ Ви ще не зареєстровані в системі розвезення TONY.\n\nВідкрийте особистий чат із ботом і надішліть:\n/register",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          1216,
+          1888
+        ],
+        "id": "490732f1-d502-4066-9991-cc6889201a6a",
+        "name": "Not Registered",
+        "webhookId": "b6576eff-dd5b-4b15-98c7-8760eb5b28bb",
+        "credentials": {
+          "telegramApi": {
+            "id": "9xCUi3DJqhjcPWIQ",
+            "name": "Taxi tony"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "3e2fad28-ee8a-4dd9-82bb-0c2127a2b0a8",
+                "leftValue": "={{ $json.employeeRegistered }}",
+                "rightValue": false,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          1328,
+          1600
+        ],
+        "id": "8d33df30-740a-4f91-9b35-27d0b3b261cf",
+        "name": "Employee Registered1"
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $json.chatId }}",
+          "text": "=❌ Ваша реєстрація ще не завершена.\n\nВідкрийте особистий чат із ботом і завершіть реєстрацію.",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          1584,
+          1968
+        ],
+        "id": "f2d59e34-2336-4c87-8b00-1f085550db42",
+        "name": "Registration Not Completed",
+        "webhookId": "b6576eff-dd5b-4b15-98c7-8760eb5b28bb",
+        "credentials": {
+          "telegramApi": {
+            "id": "9xCUi3DJqhjcPWIQ",
+            "name": "Taxi tony"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "9516f635-0655-44f9-bca2-fa6631b5fa9c",
+                "leftValue": "={{ $json.employeeActive }}",
+                "rightValue": false,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          1568,
+          1600
+        ],
+        "id": "8b0cfb19-1b2d-44b6-83b3-d31bdcd5dbcb",
+        "name": "Employee Active"
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $json.chatId }}",
+          "text": "=❌ Ваш профіль неактивний.\n\nЗверніться до адміністратора системи розвезення.",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          1840,
+          1904
+        ],
+        "id": "f7c20d65-adaf-4246-a6f1-7a2a2f263374",
+        "name": "Employee Inactive",
+        "webhookId": "b6576eff-dd5b-4b15-98c7-8760eb5b28bb",
+        "credentials": {
+          "telegramApi": {
+            "id": "9xCUi3DJqhjcPWIQ",
+            "name": "Taxi tony"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.text }}",
+                      "rightValue": "+",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      },
+                      "id": "77518585-0826-4c0a-8999-43b5b8aa1dba"
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "plus"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "id": "0869a5a3-b175-4118-85e6-c894d4711092",
+                      "leftValue": "={{ $json.text }}",
+                      "rightValue": "-",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "minus"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3.4,
+        "position": [
+          1776,
+          1504
+        ],
+        "id": "51b2bd50-47e2-406d-af3b-5d73fb08bc2d",
+        "name": "Switch Taxi Command"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "7cc9b975-cf75-4a9e-9f4b-c6239e32df50",
+                "leftValue": "={{ $json.alreadyAddedToday }}",
+                "rightValue": false,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          1984,
+          1408
+        ],
+        "id": "428e3386-e2ce-46fc-8a97-15d3ff7ce851",
+        "name": "Already Added Today"
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $json.chatId }}",
+          "text": "=ℹ️ {{ $json.employee.name }}, ви вже додані до розвозки на сьогодні.",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          2176,
+          1232
+        ],
+        "id": "f96ccea0-6fc7-4da5-9c84-08296c88b54b",
+        "name": "Already Added Message",
+        "webhookId": "b6576eff-dd5b-4b15-98c7-8760eb5b28bb",
+        "credentials": {
+          "telegramApi": {
+            "id": "9xCUi3DJqhjcPWIQ",
+            "name": "Taxi tony"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "documentId": {
+            "__rl": true,
+            "value": "https://docs.google.com/spreadsheets/d/16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE/edit?gid=710055014#gid=710055014",
+            "mode": "url"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 710055014,
+            "mode": "list",
+            "cachedResultName": "Employees",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE/edit#gid=710055014"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "telegram_user_id": "={{ $(\"Prepare Taxi Employee\").item.json.telegramUserId }}",
+              "needs_taxi": "TRUE",
+              "taxi_date": "={{ $(\"Prepare Taxi Employee\").item.json.taxiDate }}",
+              "taxi_marked_at": "={{ $(\"Prepare Taxi Employee\").item.json.taxiMarkedAt }}",
+              "updated_at": "={{ $(\"Prepare Taxi Employee\").item.json.currentDateTime }}"
+            },
+            "matchingColumns": [
+              "telegram_user_id"
+            ],
+            "schema": [
+              {
+                "id": "telegram_user_id",
+                "displayName": "telegram_user_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "telegram_username",
+                "displayName": "telegram_username",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "name",
+                "displayName": "name",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "address",
+                "displayName": "address",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "latitude",
+                "displayName": "latitude",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "longitude",
+                "displayName": "longitude",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "area",
+                "displayName": "area",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "active",
+                "displayName": "active",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "registration_status",
+                "displayName": "registration_status",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "registration_step",
+                "displayName": "registration_step",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "needs_taxi",
+                "displayName": "needs_taxi",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "taxi_date",
+                "displayName": "taxi_date",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "taxi_marked_at",
+                "displayName": "taxi_marked_at",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "created_at",
+                "displayName": "created_at",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "updated_at",
+                "displayName": "updated_at",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "row_number",
+                "displayName": "row_number",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "readOnly": true,
+                "removed": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          2192,
+          1504
+        ],
+        "id": "00e1eaaa-ab78-45f9-9831-0e30f747a55c",
+        "name": "Update Taxi Plus",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "0Gdvf3Mhmj7whXEv",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $(\"Prepare Taxi Employee\").item.json.chatId }}",
+          "text": "=✅ {{ $(\"Prepare Taxi Employee\").item.json.employee.name }}, вас додано до розвозки на сьогодні.\n\nЩоб скасувати поїздку, надішліть:\n-",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          2480,
+          1504
+        ],
+        "id": "46b29674-821c-4ac5-981e-d3d3262b61e2",
+        "name": "Taxi Added",
+        "webhookId": "b6576eff-dd5b-4b15-98c7-8760eb5b28bb",
+        "credentials": {
+          "telegramApi": {
+            "id": "9xCUi3DJqhjcPWIQ",
+            "name": "Taxi tony"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "4d7ddd11-3231-41da-b037-9fbcfd611274",
+                "leftValue": "={{ $json.alreadyAddedToday }}",
+                "rightValue": false,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          1984,
+          1600
+        ],
+        "id": "87ae66d4-0553-43d2-9773-59aa6cd6b835",
+        "name": "Is Added Today"
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $json.chatId }}",
+          "text": "=ℹ️ {{ $json.employee.name }}, вас немає у сьогоднішньому списку розвозки.",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          2224,
+          1856
+        ],
+        "id": "c36d79ea-f1f3-425a-9d99-f3b5775c3605",
+        "name": "Not In Taxi List",
+        "webhookId": "b6576eff-dd5b-4b15-98c7-8760eb5b28bb",
+        "credentials": {
+          "telegramApi": {
+            "id": "9xCUi3DJqhjcPWIQ",
+            "name": "Taxi tony"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "documentId": {
+            "__rl": true,
+            "value": "https://docs.google.com/spreadsheets/d/16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE/edit?gid=710055014#gid=710055014",
+            "mode": "url"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 710055014,
+            "mode": "list",
+            "cachedResultName": "Employees",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE/edit#gid=710055014"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "telegram_user_id": "={{ $(\"Prepare Taxi Employee\").item.json.telegramUserId }}",
+              "needs_taxi": "FALSE",
+              "taxi_date": "={{ $(\"Prepare Taxi Employee\").item.json.taxiDate }}",
+              "taxi_marked_at": "={{ $(\"Prepare Taxi Employee\").item.json.taxiMarkedAt }}",
+              "updated_at": "={{ $(\"Prepare Taxi Employee\").item.json.currentDateTime }}"
+            },
+            "matchingColumns": [
+              "telegram_user_id"
+            ],
+            "schema": [
+              {
+                "id": "telegram_user_id",
+                "displayName": "telegram_user_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "telegram_username",
+                "displayName": "telegram_username",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "name",
+                "displayName": "name",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "address",
+                "displayName": "address",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "latitude",
+                "displayName": "latitude",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "longitude",
+                "displayName": "longitude",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "area",
+                "displayName": "area",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "active",
+                "displayName": "active",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "registration_status",
+                "displayName": "registration_status",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "registration_step",
+                "displayName": "registration_step",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "needs_taxi",
+                "displayName": "needs_taxi",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "taxi_date",
+                "displayName": "taxi_date",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "taxi_marked_at",
+                "displayName": "taxi_marked_at",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "created_at",
+                "displayName": "created_at",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "updated_at",
+                "displayName": "updated_at",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "row_number",
+                "displayName": "row_number",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "readOnly": true,
+                "removed": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          2240,
+          1664
+        ],
+        "id": "4367d27b-383e-46b1-8e4e-970dc9b572f5",
+        "name": "Update Taxi Minus",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "0Gdvf3Mhmj7whXEv",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $(\"Prepare Taxi Employee\").item.json.chatId }}",
+          "text": "=➖ {{ $(\"Prepare Taxi Employee\").item.json.employee.name }}, вас видалено зі сьогоднішньої розвозки.\n\nЩоб додатися знову, надішліть:\n+",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          2480,
+          1696
+        ],
+        "id": "33cedf9c-be55-482a-8e9b-af5ff2a449bc",
+        "name": "Taxi Removed",
+        "webhookId": "b6576eff-dd5b-4b15-98c7-8760eb5b28bb",
+        "credentials": {
+          "telegramApi": {
+            "id": "9xCUi3DJqhjcPWIQ",
+            "name": "Taxi tony"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Telegram Trigger": {
+        "main": [
+          [
+            {
+              "node": "Normalize Registration Message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Normalize Registration Message": {
+        "main": [
+          [
+            {
+              "node": "Is Private Chat",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Is Private Chat": {
+        "main": [
+          [
+            {
+              "node": "Find Registration Employee",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Is Taxi Command",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Find Registration Employee": {
+        "main": [
+          [
+            {
+              "node": "Prepare Registration State",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Prepare Registration State": {
+        "main": [
+          [
+            {
+              "node": "Command Router",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Employee Exists": {
+        "main": [
+          [
+            {
+              "node": "Continue Registration",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Create Employee",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Command Router": {
+        "main": [
+          [
+            {
+              "node": "Start",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Employee Registered",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Registration Step",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Employee Registered": {
+        "main": [
+          [
+            {
+              "node": "Already Registered",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Employee Exists",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create Employee": {
+        "main": [
+          [
+            {
+              "node": "Ask Name",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Registration Step": {
+        "main": [
+          [
+            {
+              "node": "Not start",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Validate Name",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Prepare Text Address",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "completed",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Validate Name": {
+        "main": [
+          [
+            {
+              "node": "Name Valid",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Name Valid": {
+        "main": [
+          [
+            {
+              "node": "Save Name",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Invalid Name",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Save Name": {
+        "main": [
+          [
+            {
+              "node": "Ask Address",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Continue Registration": {
+        "main": [
+          [
+            {
+              "node": "Telegram Send Message",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Telegram Send Message1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Prepare Text Address": {
+        "main": [
+          [
+            {
+              "node": "Address Text Valid",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Address Text Valid": {
+        "main": [
+          [
+            {
+              "node": "Geocode Text Address",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Invalid Address",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Geocode Text Address": {
+        "main": [
+          [
+            {
+              "node": "Parse Text Geocoding",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Parse Text Geocoding": {
+        "main": [
+          [
+            {
+              "node": "Address Found",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Address Found": {
+        "main": [
+          [
+            {
+              "node": "Complete Registration",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Address Found1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Complete Registration": {
+        "main": [
+          [
+            {
+              "node": "Get Completed Employee",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Completed Employee": {
+        "main": [
+          [
+            {
+              "node": "Registration Complete",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Is Taxi Command": {
+        "main": [
+          [
+            {
+              "node": "Find Taxi Employee",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Find Taxi Employee": {
+        "main": [
+          [
+            {
+              "node": "Prepare Taxi Employee",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Prepare Taxi Employee": {
+        "main": [
+          [
+            {
+              "node": "Employee Found",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Employee Found": {
+        "main": [
+          [
+            {
+              "node": "Employee Registered1",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Not Registered",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Employee Registered1": {
+        "main": [
+          [
+            {
+              "node": "Employee Active",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Registration Not Completed",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Employee Active": {
+        "main": [
+          [
+            {
+              "node": "Switch Taxi Command",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Employee Inactive",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Switch Taxi Command": {
+        "main": [
+          [
+            {
+              "node": "Already Added Today",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Is Added Today",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Already Added Today": {
+        "main": [
+          [
+            {
+              "node": "Already Added Message",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Update Taxi Plus",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Update Taxi Plus": {
+        "main": [
+          [
+            {
+              "node": "Taxi Added",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Is Added Today": {
+        "main": [
+          [
+            {
+              "node": "Update Taxi Minus",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Not In Taxi List",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Update Taxi Minus": {
+        "main": [
+          [
+            {
+              "node": "Taxi Removed",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Buts Sergei",
+    "name": "Version 70b60d0a",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
