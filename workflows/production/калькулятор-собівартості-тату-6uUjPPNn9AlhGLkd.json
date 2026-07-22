@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-06-22T08:19:39.802Z",
+  "updatedAt": "2026-07-14T05:54:07.431Z",
   "createdAt": "2026-06-01T18:55:26.100Z",
   "id": "6uUjPPNn9AlhGLkd",
   "name": "Калькулятор собівартості тату",
@@ -94,7 +94,8 @@
   },
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate"
+    "binaryMode": "separate",
+    "availableInMCP": true
   },
   "staticData": null,
   "meta": {
