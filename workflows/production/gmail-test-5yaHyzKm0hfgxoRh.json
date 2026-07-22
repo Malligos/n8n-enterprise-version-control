@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-04-02T13:03:38.505Z",
+  "updatedAt": "2026-07-14T05:52:48.583Z",
   "createdAt": "2026-04-02T12:59:07.736Z",
   "id": "5yaHyzKm0hfgxoRh",
   "name": "gmail test",
@@ -56,7 +56,8 @@
   },
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate"
+    "binaryMode": "separate",
+    "availableInMCP": true
   },
   "staticData": null,
   "meta": {
