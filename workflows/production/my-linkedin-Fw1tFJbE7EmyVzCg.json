@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-05-26T18:48:22.280Z",
+  "updatedAt": "2026-07-14T05:53:50.910Z",
   "createdAt": "2026-05-26T17:46:39.884Z",
   "id": "Fw1tFJbE7EmyVzCg",
   "name": "My_linkedin",
@@ -508,7 +508,8 @@
   },
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate"
+    "binaryMode": "separate",
+    "availableInMCP": true
   },
   "staticData": null,
   "meta": {
