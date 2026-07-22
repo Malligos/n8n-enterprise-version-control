@@ -1,0 +1,504 @@
+{
+  "updatedAt": "2026-07-22T13:38:43.100Z",
+  "createdAt": "2026-07-22T13:08:35.624Z",
+  "id": "oCk4u6VjzAUIgr1s",
+  "name": "Gmail Triger",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {
+          "labelIds": [
+            "INBOX"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -480,
+        -16
+      ],
+      "id": "0c9b0631-6157-4fb4-ade0-5ca7df8ed995",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ixxxIk9O8nJTHaVD",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "abb65d7d-8e66-455f-b062-9dc9e4488ad3",
+              "leftValue": "={{\n  !($json.labels ?? []).some(label =>\n    [\n      'CATEGORY_PROMOTIONS',\n      'CATEGORY_SOCIAL',\n      'SPAM',\n      'TRASH'\n    ].includes(label.id || label.name)\n  )\n  &&\n  !String($json.From || '').toLowerCase().includes('no-reply')\n  &&\n  !String($json.From || '').toLowerCase().includes('noreply')\n  &&\n  !String($json.From || '').toLowerCase().includes('mailer-daemon')\n  &&\n  !($json.labels ?? []).some(label =>\n    ['HouseBox/Processed', 'HOUSEBOX_PROCESSED'].includes(\n      label.id || label.name\n    )\n  )\n}}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        -272,
+        -16
+      ],
+      "id": "6d71d099-0284-4adf-aaad-d2c0e2530628",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=Ти — старший менеджер служби підтримки інтернет-магазину товарів для дому HouseBox.\n\nТвоє завдання — проаналізувати email клієнта, визначити категорію звернення, пріоритет, тональність повідомлення, необхідність залучення людини та підготувати текст відповіді українською мовою.\n\nТОН СПІЛКУВАННЯ HOUSEBOX:\n- ввічливий;\n- спокійний;\n- турботливий;\n- конкретний;\n- без канцеляризмів;\n- без надмірних вибачень;\n- без обіцянок, які компанія не може гарантувати.\n\nКАТЕГОРІЇ:\n\ndelivery — будь-які питання про доставку, строки доставки, вартість доставки, статус доставки, місто доставки, службу доставки або зміну адреси.\nreturn — повернення чи обмін товару;\npayment — оплата, списання коштів, помилка платежу;\nproduct — характеристики, комплектація або наявність товару;\ncomplaint — скарга на товар, сервіс або співробітника;\nother — партнерство, реклама, вакансії, спам та інші звернення.\n\nПРІОРИТЕТИ:\n\nP1 — критичний:\n- юридичні погрози;\n- шахрайство;\n- витік персональних даних;\n- загроза здоров’ю;\n- подвійне або несанкціоноване списання коштів;\n- значний репутаційний ризик.\n\nP2 — високий:\n- пошкоджений або неправильний товар;\n- значна затримка доставки;\n- повторне звернення без відповіді;\n- проблема з поверненням коштів;\n- сильна емоційна скарга.\n\nP3 — стандартний:\n- інформаційні питання;\n- доставка;\n- повернення;\n- оплата;\n- характеристики або наявність товару.\n\nP4 — низький:\n- реклама;\n- партнерські пропозиції;\n- вакансії;\n- спам;\n- нерелевантні звернення.\n\nТОНАЛЬНІСТЬ:\n\npositive — позитивне повідомлення або подяка;\nneutral — спокійне інформаційне звернення;\nnegative — незадоволення або скарга;\nangry — агресивне чи дуже емоційне повідомлення.\n\nВстанови requires_human = true, якщо:\n\n- клієнт погрожує судом, поліцією, банком або державними органами;\n- згадується витік персональних даних;\n- є підозра на шахрайство;\n- клієнт повідомляє про травму або небезпечний товар;\n- потрібно повернути кошти, надати компенсацію або змінити замовлення;\n- необхідно перевірити CRM, платіжну систему, склад чи статус конкретного замовлення;\n- клієнт просить зв’язатися з менеджером;\n- у повідомленні недостатньо даних;\n- ти не впевнений у правильності відповіді;\n- пріоритет дорівнює P1.\n\nЗАБОРОНЕНО:\n\n- вигадувати номер замовлення, статус доставки, наявність товару або терміни;\n- підтверджувати повернення коштів;\n- обіцяти компенсацію або знижку;\n- визнавати юридичну відповідальність компанії;\n- повідомляти внутрішню інформацію;\n- просити у клієнта пароль, PIN-код або повні дані банківської картки;\n- відповідати на спам та рекламні пропозиції.\n\nЯкщо потрібні додаткові дані, попроси клієнта надати номер замовлення, email або номер телефону, використаний під час оформлення.\n\nЯкщо requires_human = true, підготуй лише безпечну проміжну відповідь. Повідом клієнту, що звернення передано відповідальному менеджеру. Не обіцяй конкретного часу вирішення.\n\nПоверни лише валідний JSON без Markdown і без додаткового тексту.\n\nФормат відповіді:\n\n{\n  \"priority\": \"P1 | P2 | P3 | P4\",\n  \"category\": \"delivery | return | payment | product | complaint | other\",\n  \"sentiment\": \"positive | neutral | negative | angry\",\n  \"reply_text\": \"Текст відповіді клієнту українською мовою\",\n  \"requires_human\": true\n}\n\nДані листа:\n\nEmail ID:\n{{ $json.id }}\n\nВідправник:\n{{ $json.From }}\n\nТема:\n{{ $json.Subject }}\n\nТекст:\n{{ $json.snippet }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        -64,
+        -16
+      ],
+      "id": "b285b780-c4bd-46e2-863f-74d6ecd77fd9",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "SuJ6fVcyIeq9uR1k",
+          "name": "OpenAI account Garmash"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw =\n  $json.output?.[0]?.content?.[0]?.text ??\n  $json.text ??\n  '';\n\nif (!raw) {\n  throw new Error('AI response is empty');\n}\n\nconst cleaned = String(raw)\n  .replace(/```json/gi, '')\n  .replace(/```/g, '')\n  .trim();\n\nlet parsed;\n\ntry {\n  parsed = JSON.parse(cleaned);\n} catch (error) {\n  throw new Error(`Invalid AI JSON: ${cleaned}`);\n}\n\nconst source = $('Filter').first().json;\n\nreturn [\n  {\n    json: {\n      email_id: source.id,\n      thread_id: source.threadId,\n      sender: source.From,\n      recipient: source.To,\n      subject: source.Subject,\n      email_text:\n        source.textPlain ??\n        source.text ??\n        source.snippet ??\n        '',\n      priority: parsed.priority,\n      category: parsed.category,\n      sentiment: parsed.sentiment,\n      reply_text: parsed.reply_text,\n      requires_human: Boolean(parsed.requires_human),\n    },\n  },\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        288,
+        -16
+      ],
+      "id": "9c70356c-36ef-4873-81af-bf6ca58ab105",
+      "name": "Parse AI Response"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.priority }}",
+                    "rightValue": "P1",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "7f644f50-56ab-4aba-b1b9-34d464ae2c18"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "P1"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "9c8e1d3b-e438-498f-ab9d-0b0734b2b7de",
+                    "leftValue": "={{ $json.priority }}",
+                    "rightValue": "P2",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "P2"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "1c4bb789-4d3b-4606-b7a0-44426ca816da",
+                    "leftValue": "={{ $json.priority }}",
+                    "rightValue": "P3",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "P3"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "94ff6d9d-d9b8-4144-882f-6dda9e1fb5ef",
+                    "leftValue": "={{ $json.priority }}",
+                    "rightValue": "P4",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "P4"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        496,
+        -16
+      ],
+      "id": "cd42f4cb-0b0b-4d4e-be66-d8cbe6a7137d",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1_lCLG2qiku3p3VrUIpK4brdcLx-GNi4_x7_o5RCgpxU",
+          "mode": "list",
+          "cachedResultName": "Email Support Logs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_lCLG2qiku3p3VrUIpK4brdcLx-GNi4_x7_o5RCgpxU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_lCLG2qiku3p3VrUIpK4brdcLx-GNi4_x7_o5RCgpxU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "email_id": "={{ $json.email_id }}",
+            "sender": "={{ $json.sender }}",
+            "subject": "={{ $json.subject }}",
+            "priority": "={{ $json.priority }}",
+            "category": "={{ $json.category }}",
+            "sentiment": "={{ $json.sentiment }}",
+            "reply_text": "={{ $json.reply_text }}",
+            "requires_human": "={{ $json.requires_human }}",
+            "processed_at": "={{ $now }}",
+            "prompt_version": "GPT-40-mini",
+            "action": "={{\n  $json.priority === 'P1'\n    ? 'escalated'\n    : $json.priority === 'P2'\n      ? 'draft'\n      : $json.priority === 'P3'\n        ? 'draft'\n        : 'ignored'\n}}",
+            "email_text": "={{ $json.email_text }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "processed_at",
+              "displayName": "processed_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email_id",
+              "displayName": "email_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sender",
+              "displayName": "sender",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "subject",
+              "displayName": "subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "priority",
+              "displayName": "priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sentiment",
+              "displayName": "sentiment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "reply_text",
+              "displayName": "reply_text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "requires_human",
+              "displayName": "requires_human",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "prompt_version",
+              "displayName": "prompt_version",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email_text",
+              "displayName": "email_text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "action",
+              "displayName": "action",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        992,
+        32
+      ],
+      "id": "9112b97d-80d5-4f5d-8da8-f6ff70bbe9c5",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Parse AI Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse AI Response": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "f074b35e-cb72-4806-9d35-751092a329da",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-07-22T13:08:35.625Z",
+      "createdAt": "2026-07-22T13:08:35.625Z",
+      "role": "workflow:owner",
+      "workflowId": "oCk4u6VjzAUIgr1s",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
