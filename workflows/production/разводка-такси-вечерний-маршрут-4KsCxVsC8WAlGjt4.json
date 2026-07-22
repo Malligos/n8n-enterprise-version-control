@@ -1,0 +1,229 @@
+{
+  "updatedAt": "2026-07-19T11:10:14.000Z",
+  "createdAt": "2026-07-18T21:16:43.350Z",
+  "id": "4KsCxVsC8WAlGjt4",
+  "name": "Разводка такси — вечерний маршрут",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "id": "b08809c2-c865-4f58-a450-ece05da9defe",
+      "name": "Каждый день в 20:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        240,
+        300
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "triggerAtHour": 20,
+              "triggerAtMinute": 0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "c33db18c-358c-4c92-bd64-a2ec3039beff",
+      "name": "Смены сегодня",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        460,
+        300
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "read",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE",
+          "cachedResultName": "Разводка такси — Локации сотрудников"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "id",
+          "value": "710055014"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Date",
+              "lookupValue": "={{ $now.toFormat(\"yyyy-MM-dd\") }}"
+            }
+          ]
+        },
+        "combineFilters": "AND",
+        "options": {
+          "returnAllMatches": "returnAllMatches"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      },
+      "alwaysOutputData": true
+    },
+    {
+      "id": "be2cf1c6-3e82-4faa-8156-dae856c05850",
+      "name": "Все сотрудники",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        700,
+        300
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "read",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE",
+          "cachedResultName": "Разводка такси — Локации сотрудников"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Сотрудники"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      },
+      "executeOnce": true
+    },
+    {
+      "id": "ab09eeb7-a364-418e-bdba-be501e6e3755",
+      "name": "Построить маршрут",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        940,
+        300
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "\nconst officeLat = 48.4618624, officeLon = 35.0466196;\n\nfunction haversine(lat1, lon1, lat2, lon2) {\n  const R = 6371;\n  const toRad = d => d * Math.PI / 180;\n  const dLat = toRad(lat2 - lat1);\n  const dLon = toRad(lon2 - lon1);\n  const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;\n  return 2 * R * Math.asin(Math.sqrt(a));\n}\n\nconst shifts = $('Смены сегодня').all().map(i => i.json).filter(s => s && s.Id);\nconst employees = $('Все сотрудники').all().map(i => i.json).filter(e => e && e.Id);\nconst empById = {};\nfor (const e of employees) empById[String(e.Id)] = e;\n\nconst points = [];\nconst missing = [];\nfor (const s of shifts) {\n  const emp = empById[String(s.Id)];\n  if (!emp || !emp.Location) { missing.push(s.Name || s.Id); continue; }\n  const m = String(emp.Location).match(/(-?\\d+\\.?\\d*)\\s*,\\s*(-?\\d+\\.?\\d*)/);\n  if (!m) { missing.push(s.Name || s.Id); continue; }\n  points.push({ name: s.Name, id: s.Id, lat: parseFloat(m[1]), lon: parseFloat(m[2]) });\n}\n\nlet current = { lat: officeLat, lon: officeLon };\nconst remaining = [...points];\nconst route = [];\nwhile (remaining.length) {\n  let bestIdx = 0, bestDist = Infinity;\n  for (let i = 0; i < remaining.length; i++) {\n    const d = haversine(current.lat, current.lon, remaining[i].lat, remaining[i].lon);\n    if (d < bestDist) { bestDist = d; bestIdx = i; }\n  }\n  const next = remaining.splice(bestIdx, 1)[0];\n  route.push(next);\n  current = next;\n}\n\nconst groupSize = 4;\nconst groups = [];\nfor (let i = 0; i < route.length; i += groupSize) {\n  groups.push(route.slice(i, i + groupSize));\n}\n\nlet text = '🚕 Развозка на ' + $now.toFormat('dd.MM.yyyy') + '\\n\\n';\nif (groups.length === 0) {\n  text += 'Сегодня никто не отметился на смену.';\n} else {\n  groups.forEach((g, gi) => {\n    text += 'Машина ' + (gi + 1) + ':\\n';\n    g.forEach((p, pi) => {\n      const mapLink = 'https://maps.google.com/?q=' + p.lat + ',' + p.lon;\n      text += (pi + 1) + '. ' + p.name + ' — ' + mapLink + '\\n';\n    });\n    text += '\\n';\n  });\n}\nif (missing.length) {\n  text += '⚠️ Без сохранённого домашнего адреса: ' + missing.join(', ');\n}\n\nconst chatIdRow = employees.find(e => e.ChatId);\nconst chatId = chatIdRow ? chatIdRow.ChatId : '';\n\nreturn [{ json: { text, chatId, groupsCount: groups.length } }];\n"
+      }
+    },
+    {
+      "id": "4ec92265-bf50-43c9-b507-d01079d597f1",
+      "name": "Отправить маршрут",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1180,
+        300
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "={{ $json.chatId }}",
+        "text": "={{ $json.text }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "disable_web_page_preview": true
+        }
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "9xCUi3DJqhjcPWIQ",
+          "name": "Taxi tony"
+        }
+      },
+      "webhookId": "28788710-e341-4bc9-a80a-aba8cb295e98"
+    }
+  ],
+  "connections": {
+    "Каждый день в 20:00": {
+      "main": [
+        [
+          {
+            "node": "Смены сегодня",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Смены сегодня": {
+      "main": [
+        [
+          {
+            "node": "Все сотрудники",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Все сотрудники": {
+      "main": [
+        [
+          {
+            "node": "Построить маршрут",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Построить маршрут": {
+      "main": [
+        [
+          {
+            "node": "Отправить маршрут",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": {
+    "node:Каждый день в 20:00": {
+      "recurrenceRules": [
+        null
+      ],
+      "recurrenceRuleSignatures": [
+        null
+      ]
+    }
+  },
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "nodeGroups": [],
+  "pinData": null,
+  "versionId": "1a7ec81f-f4d3-4da4-9348-594739dc5572",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-07-18T21:16:43.352Z",
+      "createdAt": "2026-07-18T21:16:43.352Z",
+      "role": "workflow:owner",
+      "workflowId": "4KsCxVsC8WAlGjt4",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
