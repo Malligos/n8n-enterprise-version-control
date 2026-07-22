@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-12T12:29:55.519Z",
+  "updatedAt": "2026-07-14T05:54:29.319Z",
   "createdAt": "2026-07-12T12:25:05.572Z",
   "id": "80bkVTAxs3V0Rdgz",
   "name": "test airtable",
@@ -366,7 +366,7 @@
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
-    "availableInMCP": false
+    "availableInMCP": true
   },
   "staticData": null,
   "meta": {
