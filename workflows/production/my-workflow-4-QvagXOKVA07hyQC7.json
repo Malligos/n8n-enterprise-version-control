@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-03-31T19:10:17.281Z",
+  "updatedAt": "2026-07-14T05:52:45.144Z",
   "createdAt": "2026-03-31T19:09:52.807Z",
   "id": "QvagXOKVA07hyQC7",
   "name": "My workflow 4",
@@ -54,7 +54,8 @@
   },
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate"
+    "binaryMode": "separate",
+    "availableInMCP": true
   },
   "staticData": null,
   "meta": {
