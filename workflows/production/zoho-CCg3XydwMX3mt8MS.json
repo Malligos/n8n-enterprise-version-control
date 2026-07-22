@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-05-03T09:53:19.861Z",
+  "updatedAt": "2026-07-14T05:53:08.029Z",
   "createdAt": "2026-05-03T09:31:07.751Z",
   "id": "CCg3XydwMX3mt8MS",
   "name": "Zoho",
@@ -57,7 +57,8 @@
   },
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate"
+    "binaryMode": "separate",
+    "availableInMCP": true
   },
   "staticData": null,
   "meta": {
