@@ -1,0 +1,463 @@
+{
+  "updatedAt": "2026-07-18T21:06:20.000Z",
+  "createdAt": "2026-07-18T21:05:39.572Z",
+  "id": "3Vp6dQnmQzxV6dcz",
+  "name": "tmp-restructure-sheets",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "id": "4ebbc7be-4385-48c1-8576-f87b0081f2f6",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        100
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "8b3e4bd0-50ae-4928-a335-9e60e49d19b3",
+      "name": "Переименовать Локации в Смены",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        460,
+        40
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://sheets.googleapis.com/v4/spreadsheets/16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE:batchUpdate",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleSheetsOAuth2Api",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": {
+          "requests": [
+            {
+              "updateSheetProperties": {
+                "properties": {
+                  "sheetId": 710055014,
+                  "title": "Смены"
+                },
+                "fields": "title"
+              }
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "id": "0ddd6c9a-271f-4d7e-9c0f-4a1b0645889c",
+      "name": "Очистить лист Смены",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        700,
+        40
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE",
+          "cachedResultName": "Разводка такси — Локации сотрудников"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "id",
+          "value": "710055014"
+        },
+        "clear": "wholeSheet",
+        "keepFirstRow": false
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "id": "1a966e18-5e2b-4c4c-8124-5017feefc803",
+      "name": "Пустая строка Смены",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        940,
+        40
+      ],
+      "parameters": {
+        "mode": "manual",
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "Name",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "2",
+              "name": "Id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "3",
+              "name": "Date",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "4",
+              "name": "Timestamp",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "7ac5b5fa-37f9-4fcc-82d5-ba138bacfdef",
+      "name": "Создать заголовки Смены",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1180,
+        40
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "append",
+        "dataMode": "autoMapInputData",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE",
+          "cachedResultName": "Разводка такси — Локации сотрудников"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "id",
+          "value": "710055014"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "schema": []
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "id": "17278b08-ab82-455a-9e1c-41797e13d6c7",
+      "name": "Удалить пустую строку Смены",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1420,
+        40
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE",
+          "cachedResultName": "Разводка такси — Локации сотрудников"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "id",
+          "value": "710055014"
+        },
+        "clear": "specificRows",
+        "startIndex": 2,
+        "rowsToDelete": 1
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "id": "b23db52f-9a9a-4660-9d32-9763ab475109",
+      "name": "Создать лист Сотрудники",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        700,
+        200
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "create",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE",
+          "cachedResultName": "Разводка такси — Локации сотрудников"
+        },
+        "title": "Сотрудники"
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "id": "74654952-b3fa-4d2c-83a6-31fa5951eb24",
+      "name": "Пустая строка Сотрудники",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        940,
+        200
+      ],
+      "parameters": {
+        "mode": "manual",
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "Name",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "2",
+              "name": "Id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "3",
+              "name": "Location",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "4",
+              "name": "Updated",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "1fb369a5-ed4f-4518-8eaf-c8b0840ae5d2",
+      "name": "Создать заголовки Сотрудники",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1180,
+        200
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "append",
+        "dataMode": "autoMapInputData",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE",
+          "cachedResultName": "Разводка такси — Локации сотрудников"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Сотрудники"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "schema": []
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "id": "baafd09b-424a-42aa-bbe1-9b502344d434",
+      "name": "Удалить пустую строку Сотрудники",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1420,
+        200
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE",
+          "cachedResultName": "Разводка такси — Локации сотрудников"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Сотрудники"
+        },
+        "clear": "specificRows",
+        "startIndex": 2,
+        "rowsToDelete": 1
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Переименовать Локации в Смены",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Создать лист Сотрудники",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Переименовать Локации в Смены": {
+      "main": [
+        [
+          {
+            "node": "Очистить лист Смены",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Очистить лист Смены": {
+      "main": [
+        [
+          {
+            "node": "Пустая строка Смены",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Пустая строка Смены": {
+      "main": [
+        [
+          {
+            "node": "Создать заголовки Смены",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Создать заголовки Смены": {
+      "main": [
+        [
+          {
+            "node": "Удалить пустую строку Смены",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Создать лист Сотрудники": {
+      "main": [
+        [
+          {
+            "node": "Пустая строка Сотрудники",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Пустая строка Сотрудники": {
+      "main": [
+        [
+          {
+            "node": "Создать заголовки Сотрудники",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Создать заголовки Сотрудники": {
+      "main": [
+        [
+          {
+            "node": "Удалить пустую строку Сотрудники",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "nodeGroups": [],
+  "pinData": null,
+  "versionId": "858054cb-59f4-48b6-8ee3-a5d3d10093e9",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-07-18T21:05:39.581Z",
+      "createdAt": "2026-07-18T21:05:39.581Z",
+      "role": "workflow:owner",
+      "workflowId": "3Vp6dQnmQzxV6dcz",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
