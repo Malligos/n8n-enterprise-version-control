@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-05-14T18:08:52.951Z",
+  "updatedAt": "2026-07-14T05:53:46.447Z",
   "createdAt": "2026-05-14T17:49:40.690Z",
   "id": "yCUX08KXvisRlKJU",
   "name": "tatto ai",
@@ -759,7 +759,8 @@
   },
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate"
+    "binaryMode": "separate",
+    "availableInMCP": true
   },
   "staticData": null,
   "meta": {
