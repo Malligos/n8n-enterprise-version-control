@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-05-03T09:41:52.728Z",
+  "updatedAt": "2026-07-14T05:53:31.885Z",
   "createdAt": "2026-04-28T19:28:44.561Z",
   "id": "JbMYQGPk18mCfWEa",
   "name": "Telegram Ai chat bot",
@@ -790,7 +790,8 @@
   },
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate"
+    "binaryMode": "separate",
+    "availableInMCP": true
   },
   "staticData": null,
   "meta": {
