@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-03-31T19:03:17.911Z",
+  "updatedAt": "2026-07-14T05:52:42.104Z",
   "createdAt": "2026-03-31T19:03:17.911Z",
   "id": "zAold10B8VcrCkoG",
   "name": "Chat with the news",
@@ -200,7 +200,7 @@
   },
   "settings": {
     "executionOrder": "v1",
-    "availableInMCP": false
+    "availableInMCP": true
   },
   "staticData": null,
   "meta": {
