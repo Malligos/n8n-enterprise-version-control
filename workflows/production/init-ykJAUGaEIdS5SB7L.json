@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-05-30T21:06:39.432Z",
+  "updatedAt": "2026-07-14T05:53:56.111Z",
   "createdAt": "2026-05-14T11:46:35.621Z",
   "id": "ykJAUGaEIdS5SB7L",
   "name": "init",
@@ -85,7 +85,8 @@
   },
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate"
+    "binaryMode": "separate",
+    "availableInMCP": true
   },
   "staticData": null,
   "meta": {
