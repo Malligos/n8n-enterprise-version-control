@@ -1,0 +1,825 @@
+{
+  "updatedAt": "2026-07-22T14:45:43.078Z",
+  "createdAt": "2026-07-22T14:09:11.177Z",
+  "id": "MYNCppTMac1VywWC",
+  "name": "voice",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1XryIF532x_MnoDmnmi_QsFmgwn53CfDC",
+          "mode": "list",
+          "cachedResultName": "calls",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1XryIF532x_MnoDmnmi_QsFmgwn53CfDC"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -544,
+        -16
+      ],
+      "id": "26f713fe-9d77-44d1-b260-fdd6f212df73",
+      "name": "Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "qRRESWy20XGpuBxE",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -336,
+        -16
+      ],
+      "id": "a9768f96-97d4-437c-8d85-de1bc97625ea",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "qRRESWy20XGpuBxE",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "fcf9713a-af01-487d-9bae-b2f6c08873e8",
+              "leftValue": "={{\n  [\n    'audio/mpeg',\n    'audio/mp3',\n    'audio/wav',\n    'audio/x-wav',\n    'audio/m4a',\n    'audio/mp4',\n    'audio/x-m4a'\n  ].includes(\n    $binary.data.mimeType ||\n    $json.mimeType ||\n    ''\n  )\n}}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -128,
+        -16
+      ],
+      "id": "50b2a6fd-9702-4de5-8b00-7e6e5a999203",
+      "name": "IF"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        80,
+        -112
+      ],
+      "id": "3d0b4f97-24a7-49ca-81d1-3e63450aee01",
+      "name": "Transcribe a recording",
+      "credentials": {
+        "openAiApi": {
+          "id": "wmMo2Lknq3Hi5ts2",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "3e034afc-df00-48d9-8f1b-fa7658a05a0b",
+              "leftValue": "={{\n  ![\n    'залиште повідомлення',\n    'після звукового сигналу',\n    'абонент тимчасово недоступний',\n    'ваш дзвінок переадресовано',\n    'you have reached',\n    'please leave a message',\n    'after the beep',\n    'voicemail'\n  ].some(phrase =>\n    String($json.text || '')\n      .toLowerCase()\n      .includes(phrase)\n  )\n}}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        288,
+        -112
+      ],
+      "id": "405ddb85-235c-41ce-8798-523747fe6a59",
+      "name": "Voicemail Filter"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "Ти — старший QA-аналітик служби підтримки e-commerce компанії HouseBox.\n\nТвоє завдання — проаналізувати транскрипцію дзвінка між агентом підтримки та клієнтом і об’єктивно оцінити якість обслуговування.\n\nАналізуй лише те, що прямо присутнє у транскрипції. Не вигадуй репліки, дії або факти, яких немає в тексті.\n\nОціни дзвінок за 8 критеріями від 1 до 5.\n\nШКАЛА:\n\n5 — відмінно, критерій виконано повністю;\n4 — добре, є незначні недоліки;\n3 — задовільно, критерій виконано частково;\n2 — погано, є значні проблеми;\n1 — критерій не виконано або агент припустився критичної помилки.\n\nКРИТЕРІЇ:\n\n1. Greetings\nЧи привітався агент, представився, назвав компанію та пояснив мету розмови.\n\n2. Active Listening\nЧи давав агент клієнту висловитися, не перебивав, підтверджував розуміння та реагував на сказане.\n\n3. Needs Discovery\nЧи ставив агент уточнювальні питання та чи з’ясував реальну потребу або проблему клієнта.\n\n4. Empathy\nЧи визнав агент емоції клієнта, проявив розуміння та коректно реагував на незадоволення.\n\n5. Expert Knowledge\nЧи показав агент знання продукту, процесів, правил та політик компанії. Чи не давав суперечливу або сумнівну інформацію.\n\n6. Clear Solution\nЧи запропонував агент конкретне та зрозуміле вирішення проблеми.\n\n7. Next Steps\nЧи пояснив агент, що буде далі, хто відповідальний і в які строки буде виконано наступну дію.\n\n8. End of Talk / Customer Satisfaction\nЧи підсумував агент розмову, запитав, чи залишилися питання, і чи переконався, що клієнт зрозумів рішення.\n\nЗАГАЛЬНА ОЦІНКА:\n\noverall_score — середня оцінка за всіма 8 критеріями, округлена до одного знака після коми.\n\nRATING BAND:\n\nGood — overall_score від 4.0 до 5.0;\nFair — overall_score від 3.0 до 3.9;\nPoor — overall_score нижче 3.0.\n\npositive_feedback:\nКоротко опиши 2–4 сильні сторони агента. Якщо сильних сторін немає, прямо це вкажи.\n\nnegative_feedback:\nКоротко опиши головні помилки агента та конкретні рекомендації для покращення.\n\nКРИТИЧНІ ПОМИЛКИ:\n\nОкремо враховуй:\n- грубість або агресію;\n- перебивання клієнта;\n- ігнорування проблеми;\n- неправдиву інформацію;\n- відмову допомагати без пояснення;\n- відсутність конкретного рішення;\n- відсутність наступних кроків;\n- юридично або репутаційно небезпечні обіцянки;\n- запит паролів, PIN-кодів або повних банківських даних.\n\nПоверни лише валідний JSON без Markdown і додаткового тексту.\n\nФормат:\n\n{\n  \"overall_score\": 3.8,\n  \"rating_band\": \"Good | Fair | Poor\",\n  \"positive_feedback\": \"Текст\",\n  \"negative_feedback\": \"Текст\",\n  \"greetings\": {\n    \"score\": 1,\n    \"comment\": \"Текст\"\n  },\n  \"active_listening\": {\n    \"score\": 1,\n    \"comment\": \"Текст\"\n  },\n  \"needs_discovery\": {\n    \"score\": 1,\n    \"comment\": \"Текст\"\n  },\n  \"empathy\": {\n    \"score\": 1,\n    \"comment\": \"Текст\"\n  },\n  \"expert_knowledge\": {\n    \"score\": 1,\n    \"comment\": \"Текст\"\n  },\n  \"clear_solution\": {\n    \"score\": 1,\n    \"comment\": \"Текст\"\n  },\n  \"next_steps\": {\n    \"score\": 1,\n    \"comment\": \"Текст\"\n  },\n  \"end_of_talk\": {\n    \"score\": 1,\n    \"comment\": \"Текст\"\n  }\n}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        496,
+        -144
+      ],
+      "id": "46fef329-f04e-41fe-918f-ba01a4823f73",
+      "name": "AI QA Analysis",
+      "credentials": {
+        "openAiApi": {
+          "id": "wmMo2Lknq3Hi5ts2",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw =\n  $json.output?.[0]?.content?.[0]?.text ??\n  $json.text ??\n  '';\n\nif (!raw) {\n  throw new Error('AI response is empty');\n}\n\nconst cleaned = String(raw)\n  .replace(/```json/gi, '')\n  .replace(/```/g, '')\n  .trim();\n\nlet parsed;\n\ntry {\n  parsed = JSON.parse(cleaned);\n} catch (error) {\n  throw new Error(`AI returned invalid JSON: ${cleaned}`);\n}\n\nreturn [\n  {\n    json: {\n      overall_score: Number(parsed.overall_score),\n      rating_band: parsed.rating_band,\n      positive_feedback: parsed.positive_feedback,\n      negative_feedback: parsed.negative_feedback,\n\n      greetings_score: Number(parsed.greetings?.score),\n      greetings_comment: parsed.greetings?.comment,\n\n      active_listening_score: Number(parsed.active_listening?.score),\n      active_listening_comment: parsed.active_listening?.comment,\n\n      needs_discovery_score: Number(parsed.needs_discovery?.score),\n      needs_discovery_comment: parsed.needs_discovery?.comment,\n\n      empathy_score: Number(parsed.empathy?.score),\n      empathy_comment: parsed.empathy?.comment,\n\n      expert_knowledge_score: Number(parsed.expert_knowledge?.score),\n      expert_knowledge_comment: parsed.expert_knowledge?.comment,\n\n      clear_solution_score: Number(parsed.clear_solution?.score),\n      clear_solution_comment: parsed.clear_solution?.comment,\n\n      next_steps_score: Number(parsed.next_steps?.score),\n      next_steps_comment: parsed.next_steps?.comment,\n\n      end_of_talk_score: Number(parsed.end_of_talk?.score),\n      end_of_talk_comment: parsed.end_of_talk?.comment,\n    },\n  },\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        848,
+        -144
+      ],
+      "id": "8e2e111d-6d00-423d-b5f7-7e82b61c949b",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1t_6-4-6DSkDxdLB_UNI8F-_4oY976nED-ZwsF1vhOLo",
+          "mode": "list",
+          "cachedResultName": "Новая таблица",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1t_6-4-6DSkDxdLB_UNI8F-_4oY976nED-ZwsF1vhOLo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1t_6-4-6DSkDxdLB_UNI8F-_4oY976nED-ZwsF1vhOLo/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "processed_at": "={{ $json.processed_at }}",
+            "file_name": "={{ $json.file_name }}",
+            "file_id": "={{ $json.file_id }}",
+            "file_url": "={{ $json.file_url }}",
+            "call_duration": "={{ $json.call_duration }}",
+            "transcription": "={{ $json.transcription }}",
+            "overall_score": "={{ $json.overall_score }}",
+            "rating_band": "={{ $json.rating_band }}",
+            "positive_feedback": "={{ $json.positive_feedback }}",
+            "negative_feedback": "={{ $json.negative_feedback }}",
+            "greetings_score": "={{ $json.greetings_score }}",
+            "greetings_comment": "={{ $json.greetings_comment }}",
+            "active_listening_score": "={{ $json.active_listening_score }}",
+            "active_listening_comment": "={{ $json.active_listening_comment }}",
+            "needs_discovery_score": "={{ $json.needs_discovery_score }}",
+            "needs_discovery_comment": "={{ $json.needs_discovery_comment }}",
+            "empathy_score": "={{ $json.empathy_score }}",
+            "empathy_comment": "={{ $json.empathy_comment }}",
+            "expert_knowledge_score": "={{ $json.expert_knowledge_score }}",
+            "expert_knowledge_comment": "={{ $json.expert_knowledge_comment }}",
+            "clear_solution_score": "={{ $json.clear_solution_score }}",
+            "clear_solution_comment": "={{ $json.clear_solution_comment }}",
+            "next_steps_score": "={{ $json.next_steps_score }}",
+            "next_steps_comment": "={{ $json.next_steps_comment }}",
+            "end_of_talk_comment": "={{ $json.end_of_talk_comment }}",
+            "end_of_talk_score": "={{ $json.end_of_talk_score }}",
+            "alert_sent": "={{ $json.alert_sent }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "processed_at",
+              "displayName": "processed_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "file_name",
+              "displayName": "file_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "file_id",
+              "displayName": "file_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "file_url",
+              "displayName": "file_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "call_duration",
+              "displayName": "call_duration",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "transcription",
+              "displayName": "transcription",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "overall_score",
+              "displayName": "overall_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "rating_band",
+              "displayName": "rating_band",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "positive_feedback",
+              "displayName": "positive_feedback",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "negative_feedback",
+              "displayName": "negative_feedback",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "greetings_score",
+              "displayName": "greetings_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "greetings_comment",
+              "displayName": "greetings_comment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "active_listening_score",
+              "displayName": "active_listening_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "active_listening_comment",
+              "displayName": "active_listening_comment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "needs_discovery_score",
+              "displayName": "needs_discovery_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "needs_discovery_comment",
+              "displayName": "needs_discovery_comment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "empathy_score",
+              "displayName": "empathy_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "empathy_comment",
+              "displayName": "empathy_comment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "expert_knowledge_score",
+              "displayName": "expert_knowledge_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "expert_knowledge_comment",
+              "displayName": "expert_knowledge_comment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "clear_solution_score",
+              "displayName": "clear_solution_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "clear_solution_comment",
+              "displayName": "clear_solution_comment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "next_steps_score",
+              "displayName": "next_steps_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "next_steps_comment",
+              "displayName": "next_steps_comment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "end_of_talk_score",
+              "displayName": "end_of_talk_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "end_of_talk_comment",
+              "displayName": "end_of_talk_comment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "alert_sent",
+              "displayName": "alert_sent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1984,
+        0
+      ],
+      "id": "e5ea7b56-5f38-4592-ab4c-7826bc169f42",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const qa = $json;\n\nconst drive = $('Google Drive Trigger').first().json;\nconst transcription = $('Transcribe a recording').first().json;\n\nconst fileId = drive.id ?? '';\nconst fileName = drive.name ?? '';\n\nconst transcriptText =\n  transcription.text ??\n  transcription.transcription ??\n  transcription.output ??\n  '';\n\nconst duration =\n  transcription.duration ??\n  transcription.audio_duration ??\n  transcription.metadata?.duration ??\n  '';\n\nreturn [\n  {\n    json: {\n      processed_at: new Date().toISOString(),\n\n      file_name: fileName,\n      file_id: fileId,\n      file_url: fileId\n        ? `https://drive.google.com/file/d/${fileId}/view`\n        : '',\n\n      call_duration: duration,\n      transcription: transcriptText,\n\n      overall_score: qa.overall_score,\n      rating_band: qa.rating_band,\n      positive_feedback: qa.positive_feedback,\n      negative_feedback: qa.negative_feedback,\n\n      greetings_score: qa.greetings_score,\n      greetings_comment: qa.greetings_comment,\n\n      active_listening_score: qa.active_listening_score,\n      active_listening_comment: qa.active_listening_comment,\n\n      needs_discovery_score: qa.needs_discovery_score,\n      needs_discovery_comment: qa.needs_discovery_comment,\n\n      empathy_score: qa.empathy_score,\n      empathy_comment: qa.empathy_comment,\n\n      expert_knowledge_score: qa.expert_knowledge_score,\n      expert_knowledge_comment: qa.expert_knowledge_comment,\n\n      clear_solution_score: qa.clear_solution_score,\n      clear_solution_comment: qa.clear_solution_comment,\n\n      next_steps_score: qa.next_steps_score,\n      next_steps_comment: qa.next_steps_comment,\n\n      end_of_talk_score: qa.end_of_talk_score,\n      end_of_talk_comment: qa.end_of_talk_comment,\n\n      alert_sent: ''\n    },\n  },\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1056,
+        -144
+      ],
+      "id": "4dba1e31-6e00-4f16-9e64-f89b9ff496f0",
+      "name": "Prepare Google Sheets Row"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b70ed19e-7ff4-4f56-b507-14e3a92650fe",
+              "leftValue": "={{ Number($json.overall_score) }}",
+              "rightValue": 3,
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1360,
+        -48
+      ],
+      "id": "b5636bd6-d2e4-4c21-abd3-7809b32da6eb",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "03422d9f-492f-44a0-8727-a63accd0cb6e",
+              "name": "alert_sent",
+              "value": "=Yes",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1568,
+        -144
+      ],
+      "id": "307e1a9f-ca33-4ce4-920f-5599b5f86036",
+      "name": "Set Alert Sent Yes",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "chatId": "1679040654",
+        "text": "=🚨 Критичний дзвінок  📁 Файл: {{ $json.file_name }} ⭐ Оцінка: {{ $json.overall_score }} / 5 📊 Рейтинг: {{ $json.rating_band }}  ❌ Основні проблеми: {{ $json.negative_feedback }}  🎧 Прослухати: {{ $json.file_url }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1808,
+        -208
+      ],
+      "id": "e60b9416-86d3-4e79-b273-6bc74204ea4d",
+      "name": "Telegram Send Message",
+      "webhookId": "df9a7359-7280-4946-b66f-20bdb563ee28",
+      "credentials": {
+        "telegramApi": {
+          "id": "HdYtgfV1noTqi1CX",
+          "name": "My_ai"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "03422d9f-492f-44a0-8727-a63accd0cb6e",
+              "name": "alert_sent",
+              "value": "=No",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1584,
+        16
+      ],
+      "id": "8aae5976-8a12-46ec-868b-77407f7f6ef5",
+      "name": "Set Alert Sent No",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -320,
+        -336
+      ],
+      "id": "6016b037-8f6a-4d69-b1b4-f51c6d23fd50",
+      "name": "Telegram Trigger",
+      "webhookId": "b8fae262-0e96-4094-b346-ac443f13ce82",
+      "credentials": {
+        "telegramApi": {
+          "id": "HdYtgfV1noTqi1CX",
+          "name": "My_ai"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording": {
+      "main": [
+        [
+          {
+            "node": "Voicemail Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Voicemail Filter": {
+      "main": [
+        [
+          {
+            "node": "AI QA Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI QA Analysis": {
+      "main": [
+        [
+          {
+            "node": "Structured Output Parser",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "main": [
+        [
+          {
+            "node": "Prepare Google Sheets Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Google Sheets Row": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Set Alert Sent Yes",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set Alert Sent No",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Alert Sent Yes": {
+      "main": [
+        [
+          {
+            "node": "Telegram Send Message",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Alert Sent No": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Send Message": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "f6ca90f6-24b1-4c0b-aec7-544343df3387",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-07-22T14:09:11.178Z",
+      "createdAt": "2026-07-22T14:09:11.178Z",
+      "role": "workflow:owner",
+      "workflowId": "MYNCppTMac1VywWC",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
