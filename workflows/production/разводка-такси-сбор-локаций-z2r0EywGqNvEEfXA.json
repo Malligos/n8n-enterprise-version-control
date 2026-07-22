@@ -1,0 +1,383 @@
+{
+  "updatedAt": "2026-07-18T21:12:15.000Z",
+  "createdAt": "2026-07-18T20:36:21.818Z",
+  "id": "z2r0EywGqNvEEfXA",
+  "name": "Разводка такси — сбор локаций",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ String($json.message.location?.latitude ?? \"\") }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEmpty"
+                    },
+                    "id": "1b1e94cf-ceaf-4393-89dd-46dee3f7f2a0"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.text }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "rightValue": "+",
+                    "id": "8c689575-1e92-4551-a6ce-adff20ed4949"
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "none"
+        }
+      },
+      "id": "c4981ede-0d80-4969-b7f9-65c8d88acdea",
+      "name": "Определить тип сообщения",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        464,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "Name",
+              "value": "={{ (($json.message.from.first_name || \"\") + \" \" + ($json.message.from.last_name || \"\")).trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "2",
+              "name": "Id",
+              "value": "={{ $json.message.from.id }}",
+              "type": "string"
+            },
+            {
+              "id": "3",
+              "name": "Date",
+              "value": "={{ $now.toFormat(\"yyyy-MM-dd\") }}",
+              "type": "string"
+            },
+            {
+              "id": "4",
+              "name": "Location",
+              "value": "={{ $json.message.location.latitude }}, {{ $json.message.location.longitude }} — https://maps.google.com/?q={{ $json.message.location.latitude }},{{ $json.message.location.longitude }}",
+              "type": "string"
+            },
+            {
+              "id": "5",
+              "name": "Timestamp",
+              "value": "={{ $now.toFormat(\"yyyy-MM-dd HH:mm\") }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5d2a9235-54f5-4a26-88ba-dc9194bf928d",
+      "name": "Подготовить строку",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        704,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE",
+          "cachedResultName": "Разводка такси — Локации сотрудников"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Локации"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "Id",
+            "Date"
+          ],
+          "value": {
+            "Name": "={{ $json.Name }}",
+            "Id": "={{ $json.Id }}",
+            "Date": "={{ $json.Date }}",
+            "Location": "={{ $json.Location }}",
+            "Timestamp": "={{ $json.Timestamp }}"
+          },
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Id",
+              "displayName": "Id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Location",
+              "displayName": "Location",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d2ba8b72-c0f2-4e53-a6ba-2a012d1ecfcf",
+      "name": "Записать в таблицу",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        944,
+        208
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Сообщение в группе').item.json.message.chat.id }}",
+        "text": "✅ Локация записана. Хорошей смены!",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "539571c8-b29f-49b1-92aa-1709b07e3d02",
+      "name": "Подтвердить сохранение",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1184,
+        208
+      ],
+      "webhookId": "5ed795b7-f2d1-4226-9cd0-5beff8b72261",
+      "credentials": {
+        "telegramApi": {
+          "id": "9xCUi3DJqhjcPWIQ",
+          "name": "Taxi tony"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.message.chat.id }}",
+        "text": "📍 Отметьте, пожалуйста, вашу геолокацию на сегодня — нажмите на кнопку ниже.",
+        "replyMarkup": "replyKeyboard",
+        "replyKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "📍 Отправить геолокацию",
+                    "additionalFields": {
+                      "request_location": true
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "replyKeyboardOptions": {
+          "resize_keyboard": true,
+          "one_time_keyboard": true
+        },
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "21c9c0a7-591f-4d3d-95d3-7e0e53c0c169",
+      "name": "Запросить геолокацию",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        704,
+        432
+      ],
+      "webhookId": "6b735e09-a335-4fec-94c1-db4156b54659",
+      "credentials": {
+        "telegramApi": {
+          "id": "9xCUi3DJqhjcPWIQ",
+          "name": "Taxi tony"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        240,
+        304
+      ],
+      "id": "068629f8-af79-4a70-ad48-86e52e56c5b6",
+      "name": "Telegram Trigger",
+      "webhookId": "795011b8-3350-4847-aed6-fc58dfe2ba32",
+      "credentials": {
+        "telegramApi": {
+          "id": "9xCUi3DJqhjcPWIQ",
+          "name": "Taxi tony"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Определить тип сообщения": {
+      "main": [
+        [
+          {
+            "node": "Подготовить строку",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Запросить геолокацию",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Подготовить строку": {
+      "main": [
+        [
+          {
+            "node": "Записать в таблицу",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Записать в таблицу": {
+      "main": [
+        [
+          {
+            "node": "Подтвердить сохранение",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Определить тип сообщения",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp",
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "c0902cb4-8a31-4f05-b37a-10981ea7cdfa",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-07-18T20:36:21.823Z",
+      "createdAt": "2026-07-18T20:36:21.823Z",
+      "role": "workflow:owner",
+      "workflowId": "z2r0EywGqNvEEfXA",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
