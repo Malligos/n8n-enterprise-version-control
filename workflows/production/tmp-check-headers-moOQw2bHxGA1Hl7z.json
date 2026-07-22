@@ -1,0 +1,90 @@
+{
+  "updatedAt": "2026-07-18T20:39:41.000Z",
+  "createdAt": "2026-07-18T20:29:38.219Z",
+  "id": "moOQw2bHxGA1Hl7z",
+  "name": "tmp-check-headers",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "id": "9fab0282-6c84-4599-8534-d788f7f4d51b",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "2d8b1691-f804-4d82-becd-8b9fc7caf618",
+      "name": "Проверить заголовки",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        460,
+        300
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "read",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE",
+          "cachedResultName": "Разводка такси — Локации сотрудников"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Локации"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Проверить заголовки",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "nodeGroups": [],
+  "pinData": null,
+  "versionId": "08007a28-e273-484b-8cf6-675ce7e3cc35",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-07-18T20:29:38.221Z",
+      "createdAt": "2026-07-18T20:29:38.221Z",
+      "role": "workflow:owner",
+      "workflowId": "moOQw2bHxGA1Hl7z",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
