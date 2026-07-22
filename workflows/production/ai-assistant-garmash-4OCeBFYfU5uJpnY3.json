@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-02T13:44:30.610Z",
+  "updatedAt": "2026-07-14T05:54:15.764Z",
   "createdAt": "2026-06-04T19:28:46.828Z",
   "id": "4OCeBFYfU5uJpnY3",
   "name": "Ai_assistant_Garmash",
@@ -2806,7 +2806,7 @@
     "timeSavedMode": "fixed",
     "errorWorkflow": "ZC70w09Auv6IQKOQ",
     "callerPolicy": "workflowsFromSameOwner",
-    "availableInMCP": false
+    "availableInMCP": true
   },
   "staticData": null,
   "meta": {
