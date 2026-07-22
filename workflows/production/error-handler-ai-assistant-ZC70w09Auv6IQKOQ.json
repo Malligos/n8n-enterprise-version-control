@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-06-06T19:35:33.781Z",
+  "updatedAt": "2026-07-14T05:54:03.221Z",
   "createdAt": "2026-06-06T19:34:34.369Z",
   "id": "ZC70w09Auv6IQKOQ",
   "name": "Error Handler — AI Assistant",
@@ -55,7 +55,8 @@
   },
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate"
+    "binaryMode": "separate",
+    "availableInMCP": true
   },
   "staticData": null,
   "meta": {
