@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-04T20:36:27.495Z",
+  "updatedAt": "2026-07-18T20:18:55.145Z",
   "createdAt": "2026-04-07T19:13:57.410Z",
   "id": "9zCUGUaLm3M33LhO",
   "name": "Tony work",
@@ -1302,7 +1302,7 @@
     "timeSavedMode": "fixed",
     "errorWorkflow": "oYc7VMcDoy6gkP90",
     "callerPolicy": "workflowsFromSameOwner",
-    "availableInMCP": false,
+    "availableInMCP": true,
     "timezone": "Europe/Kyiv"
   },
   "staticData": null,
