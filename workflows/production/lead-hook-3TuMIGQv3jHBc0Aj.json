@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-05-04T17:13:44.877Z",
+  "updatedAt": "2026-07-14T05:53:34.070Z",
   "createdAt": "2026-05-02T18:43:45.096Z",
   "id": "3TuMIGQv3jHBc0Aj",
   "name": "Lead hook",
@@ -791,7 +791,8 @@
   },
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate"
+    "binaryMode": "separate",
+    "availableInMCP": true
   },
   "staticData": null,
   "meta": {
