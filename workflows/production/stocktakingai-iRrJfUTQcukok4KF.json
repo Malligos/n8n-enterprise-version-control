@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-06-28T10:40:26.672Z",
+  "updatedAt": "2026-07-14T05:54:11.621Z",
   "createdAt": "2026-06-28T10:24:39.613Z",
   "id": "iRrJfUTQcukok4KF",
   "name": "stocktakingAI",
@@ -297,7 +297,7 @@
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
-    "availableInMCP": false
+    "availableInMCP": true
   },
   "staticData": null,
   "meta": {
