@@ -1,0 +1,657 @@
+{
+  "updatedAt": "2026-07-19T11:10:30.000Z",
+  "createdAt": "2026-07-18T21:09:03.985Z",
+  "id": "rWfLNmHuqfvQbAqk",
+  "name": "Разводка такси — бот (адреса и смены)",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "id": "d504fcea-b2ab-40f3-b3a8-7935c4a99b10",
+      "name": "Сообщение в группе",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        240,
+        300
+      ],
+      "parameters": {
+        "updates": [
+          "message"
+        ]
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "9xCUi3DJqhjcPWIQ",
+          "name": "Taxi tony"
+        }
+      },
+      "webhookId": "2657a0fa-2c38-4ff2-a1ed-b1e322a861fc"
+    },
+    {
+      "id": "a4fd9226-376a-4367-a6c3-9ad19313bdcf",
+      "name": "Определить тип сообщения",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        460,
+        300
+      ],
+      "parameters": {
+        "mode": "rules",
+        "rules": {
+          "values": [
+            {
+              "outputKey": "location",
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ String($json.message.location?.latitude ?? \"\") }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEmpty"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "outputKey": "plus",
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.text }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "rightValue": "+"
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "none"
+        }
+      }
+    },
+    {
+      "id": "62389622-6e54-4deb-9afc-3207d929f8a7",
+      "name": "Подготовить домашний адрес",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        700,
+        180
+      ],
+      "parameters": {
+        "mode": "manual",
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "Name",
+              "value": "={{ (($json.message.from.first_name || \"\") + \" \" + ($json.message.from.last_name || \"\")).trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "2",
+              "name": "Id",
+              "value": "={{ $json.message.from.id }}",
+              "type": "string"
+            },
+            {
+              "id": "3",
+              "name": "Location",
+              "value": "={{ $json.message.location.latitude }}, {{ $json.message.location.longitude }} — https://maps.google.com/?q={{ $json.message.location.latitude }},{{ $json.message.location.longitude }}",
+              "type": "string"
+            },
+            {
+              "id": "4",
+              "name": "Updated",
+              "value": "={{ $now.toFormat(\"yyyy-MM-dd\") }}",
+              "type": "string"
+            },
+            {
+              "id": "5",
+              "name": "ChatId",
+              "value": "={{ $json.message.chat.id }}",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "b0d1d709-458c-4231-903a-718add5a7358",
+      "name": "Сохранить домашний адрес",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        940,
+        180
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "appendOrUpdate",
+        "dataMode": "defineBelow",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE",
+          "cachedResultName": "Разводка такси — Локации сотрудников"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Сотрудники"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "Id"
+          ],
+          "value": {
+            "Name": "={{ $json.Name }}",
+            "Id": "={{ $json.Id }}",
+            "Location": "={{ $json.Location }}",
+            "Updated": "={{ $json.Updated }}",
+            "ChatId": "={{ $json.ChatId }}"
+          },
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "Id",
+              "displayName": "Id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Location",
+              "displayName": "Location",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "Updated",
+              "displayName": "Updated",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "ChatId",
+              "displayName": "ChatId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "id": "f59f30df-6890-42f0-8c83-0090ce70db2f",
+      "name": "Подтвердить адрес",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1180,
+        180
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "={{ $('Сообщение в группе').item.json.message.chat.id }}",
+        "text": "🏠 Домашний адрес сохранён! Теперь просто отправляйте + в дни, когда вы на смене — вечером мы соберём машины.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "9xCUi3DJqhjcPWIQ",
+          "name": "Taxi tony"
+        }
+      },
+      "webhookId": "3c4c470b-c4aa-4b68-a187-8e9899ca6670"
+    },
+    {
+      "id": "0ba12948-e048-4a19-84e0-808b99dcf488",
+      "name": "Найти домашний адрес",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        700,
+        420
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "read",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE",
+          "cachedResultName": "Разводка такси — Локации сотрудников"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Сотрудники"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Id",
+              "lookupValue": "={{ $json.message.from.id }}"
+            }
+          ]
+        },
+        "combineFilters": "AND",
+        "options": {
+          "returnFirstMatch": true
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      },
+      "alwaysOutputData": true
+    },
+    {
+      "id": "b34c5cf2-c960-4061-904f-3d91197a3240",
+      "name": "Есть домашний адрес?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        940,
+        420
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ String($json.Id ?? \"\") }}",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "a15c06a2-5daa-40e6-b89e-f0d898c1ae0a",
+      "name": "Подготовить отметку смены",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1180,
+        360
+      ],
+      "parameters": {
+        "mode": "manual",
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "Name",
+              "value": "={{ $json.Name }}",
+              "type": "string"
+            },
+            {
+              "id": "2",
+              "name": "Id",
+              "value": "={{ $json.Id }}",
+              "type": "string"
+            },
+            {
+              "id": "3",
+              "name": "Date",
+              "value": "={{ $now.toFormat(\"yyyy-MM-dd\") }}",
+              "type": "string"
+            },
+            {
+              "id": "4",
+              "name": "Timestamp",
+              "value": "={{ $now.toFormat(\"yyyy-MM-dd HH:mm\") }}",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "1f586272-48be-474a-8127-23d2a5543ad1",
+      "name": "Отметить смену",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1420,
+        360
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "appendOrUpdate",
+        "dataMode": "defineBelow",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE",
+          "cachedResultName": "Разводка такси — Локации сотрудников"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "id",
+          "value": "710055014"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "Id",
+            "Date"
+          ],
+          "value": {
+            "Name": "={{ $json.Name }}",
+            "Id": "={{ $json.Id }}",
+            "Date": "={{ $json.Date }}",
+            "Timestamp": "={{ $json.Timestamp }}"
+          },
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "Id",
+              "displayName": "Id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "id": "f92f099a-b912-45a6-8f77-a9ee81b569a9",
+      "name": "Подтвердить смену",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1660,
+        360
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "={{ $('Сообщение в группе').item.json.message.chat.id }}",
+        "text": "✅ Смена отмечена. Вечером сформируем маршрут развозки.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "9xCUi3DJqhjcPWIQ",
+          "name": "Taxi tony"
+        }
+      },
+      "webhookId": "953448bd-b1ef-4977-a001-7045b96e3e3c"
+    },
+    {
+      "id": "2a8cb80b-f373-45f0-ab9f-70f6f87fe7e5",
+      "name": "Запросить домашний адрес",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1180,
+        500
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "={{ $('Сообщение в группе').item.json.message.chat.id }}",
+        "text": "Сначала отправьте, пожалуйста, ваш домашний адрес (геолокацию) — нажмите на кнопку ниже. После этого просто пишите + в дни смены.",
+        "replyMarkup": "replyKeyboard",
+        "replyKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "🏠 Отправить домашний адрес",
+                    "additionalFields": {
+                      "request_location": true
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "replyKeyboardOptions": {
+          "resize_keyboard": true,
+          "one_time_keyboard": true
+        },
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "9xCUi3DJqhjcPWIQ",
+          "name": "Taxi tony"
+        }
+      },
+      "webhookId": "703ff770-2160-45bc-b8e7-96b0102fa582"
+    }
+  ],
+  "connections": {
+    "Сообщение в группе": {
+      "main": [
+        [
+          {
+            "node": "Определить тип сообщения",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Определить тип сообщения": {
+      "main": [
+        [
+          {
+            "node": "Подготовить домашний адрес",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Найти домашний адрес",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Подготовить домашний адрес": {
+      "main": [
+        [
+          {
+            "node": "Сохранить домашний адрес",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Сохранить домашний адрес": {
+      "main": [
+        [
+          {
+            "node": "Подтвердить адрес",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Найти домашний адрес": {
+      "main": [
+        [
+          {
+            "node": "Есть домашний адрес?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Есть домашний адрес?": {
+      "main": [
+        [
+          {
+            "node": "Подготовить отметку смены",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Запросить домашний адрес",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Подготовить отметку смены": {
+      "main": [
+        [
+          {
+            "node": "Отметить смену",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Отметить смену": {
+      "main": [
+        [
+          {
+            "node": "Подтвердить смену",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "nodeGroups": [],
+  "pinData": null,
+  "versionId": "23fa25c3-4fde-472c-bf0c-9383e7aa1c7a",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-07-18T21:09:03.987Z",
+      "createdAt": "2026-07-18T21:09:03.987Z",
+      "role": "workflow:owner",
+      "workflowId": "rWfLNmHuqfvQbAqk",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
