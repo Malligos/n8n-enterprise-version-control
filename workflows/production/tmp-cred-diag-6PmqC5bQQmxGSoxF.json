@@ -1,0 +1,90 @@
+{
+  "updatedAt": "2026-07-18T21:11:14.000Z",
+  "createdAt": "2026-07-18T21:10:44.585Z",
+  "id": "6PmqC5bQQmxGSoxF",
+  "name": "tmp-cred-diag",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "id": "1bb90589-ecdd-47b8-a817-3bd72dcc6e66",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "22fa8c84-0b18-4ba9-91b9-e63ff0b5c16e",
+      "name": "Read",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        460,
+        300
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "read",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE",
+          "cachedResultName": "x"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Сотрудники"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "nodeGroups": [],
+  "pinData": null,
+  "versionId": "3df45a0d-a382-40ac-ae4a-c840797cadfe",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-07-18T21:10:44.586Z",
+      "createdAt": "2026-07-18T21:10:44.586Z",
+      "role": "workflow:owner",
+      "workflowId": "6PmqC5bQQmxGSoxF",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
