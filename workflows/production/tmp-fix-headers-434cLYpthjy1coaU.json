@@ -1,0 +1,192 @@
+{
+  "updatedAt": "2026-07-18T20:39:42.000Z",
+  "createdAt": "2026-07-18T20:31:15.429Z",
+  "id": "434cLYpthjy1coaU",
+  "name": "tmp-fix-headers",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "id": "5344f57c-740b-4131-a835-7448b8a36f07",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "4d3308be-29a2-45d5-b7b7-94f8988d5e2d",
+      "name": "Очистить лист",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        460,
+        300
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE",
+          "cachedResultName": "Разводка такси — Локации сотрудников"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Локации"
+        },
+        "clear": "wholeSheet",
+        "keepFirstRow": false
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "id": "ef9a600f-e910-408a-aba5-61deaa1f7fb4",
+      "name": "Добавить заголовки v2",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        680,
+        300
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "append",
+        "dataMode": "defineBelow",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "16VeSQ2byuecoi5eeSfswoMVFLiCMoId7RRq-er86zWE",
+          "cachedResultName": "Разводка такси — Локации сотрудников"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Локации"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "Name",
+            "Id": "Id",
+            "Date": "Date",
+            "Location": "Location",
+            "Timestamp": "Timestamp"
+          },
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Id",
+              "displayName": "Id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Location",
+              "displayName": "Location",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Очистить лист",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Очистить лист": {
+      "main": [
+        [
+          {
+            "node": "Добавить заголовки v2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "nodeGroups": [],
+  "pinData": null,
+  "versionId": "f6bf0b6c-8add-4f2d-ac9e-8b9da09f93fa",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-07-18T20:31:15.431Z",
+      "createdAt": "2026-07-18T20:31:15.431Z",
+      "role": "workflow:owner",
+      "workflowId": "434cLYpthjy1coaU",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
