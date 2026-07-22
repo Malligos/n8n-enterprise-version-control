@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-04-15T12:06:07.745Z",
+  "updatedAt": "2026-07-14T05:53:22.213Z",
   "createdAt": "2026-04-15T11:13:16.684Z",
   "id": "YsTEyM5Eqpt7jJiq",
   "name": "complete_task",
@@ -168,7 +168,8 @@
   },
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate"
+    "binaryMode": "separate",
+    "availableInMCP": true
   },
   "staticData": null,
   "meta": null,
