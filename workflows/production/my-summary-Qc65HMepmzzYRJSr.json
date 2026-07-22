@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-05T05:17:00.729Z",
+  "updatedAt": "2026-07-14T07:11:46.060Z",
   "createdAt": "2026-07-04T20:48:25.684Z",
   "id": "Qc65HMepmzzYRJSr",
   "name": "My summary",
@@ -123,33 +123,7 @@
     },
     {
       "parameters": {
-        "operation": "getAll",
-        "filters": {
-          "projectId": "6gpWRQ9w7pjJG4W6"
-        }
-      },
-      "type": "n8n-nodes-base.todoist",
-      "typeVersion": 2.2,
-      "position": [
-        224,
-        384
-      ],
-      "id": "abf11d25-8314-49cc-b5f5-342af3a49586",
-      "name": "Get many tasks",
-      "alwaysOutputData": true,
-      "retryOnFail": true,
-      "executeOnce": true,
-      "maxTries": 5,
-      "credentials": {
-        "todoistApi": {
-          "id": "UDxyIrQxJzhLUks1",
-          "name": "MyTodoist account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "jsCode": "const events = $('Get many events').all().map(item => ({\n  title: item.json.summary || 'Без назви',\n  start: item.json.start?.dateTime || item.json.start?.date || '',\n  end: item.json.end?.dateTime || item.json.end?.date || '',\n  description: item.json.description || ''\n}));\n\nconst tasks = $('Get many tasks').all().map(item => ({\n  title: item.json.content || 'Без назви',\n  description: item.json.description || '',\n  due: item.json.due?.date || ''\n}));\n\nconst payments = $('Check Due Payments').all().map(item => ({\n  name: item.json.payment_name || '',\n  amount: item.json.amount || '',\n  category: item.json.category || '',\n  payment_day: item.json.payment_day || '',\n  days_left: item.json.days_left || ''\n}));\n\nreturn [\n  {\n    json: {\n      events,\n      tasks,\n      payments\n    }\n  }\n];"
+        "jsCode": "const events = $('Get many events').all().map(item => ({\n  title: item.json.summary || 'Без назви',\n  start: item.json.start?.dateTime || item.json.start?.date || '',\n  end: item.json.end?.dateTime || item.json.end?.date || '',\n  description: item.json.description || ''\n}));\n\nconst tasks = $('Get many tasks').all().map(item => ({\n  title: item.json.Title || 'Без назви',\n  description: item.json.Description || '',\n  due: item.json.Deadline || ''\n}));\n\nconst payments = $('Check Due Payments').all().map(item => ({\n  name: item.json.payment_name || '',\n  amount: item.json.amount || '',\n  category: item.json.category || '',\n  payment_day: item.json.payment_day || '',\n  days_left: item.json.days_left || ''\n}));\n\nreturn [\n  {\n    json: {\n      events,\n      tasks,\n      payments\n    }\n  }\n];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -175,38 +149,6 @@
     },
     {
       "parameters": {
-        "documentId": {
-          "__rl": true,
-          "value": "https://docs.google.com/spreadsheets/d/1OBMzm4aX3McDP_p_yF6MVDzD3s0zoQdST5-m-0ruSIw/edit?gid=356654616#gid=356654616",
-          "mode": "url"
-        },
-        "sheetName": {
-          "__rl": true,
-          "value": 356654616,
-          "mode": "list",
-          "cachedResultName": "Recurring Payments",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1OBMzm4aX3McDP_p_yF6MVDzD3s0zoQdST5-m-0ruSIw/edit#gid=356654616"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.googleSheets",
-      "typeVersion": 4.7,
-      "position": [
-        0,
-        0
-      ],
-      "id": "984d9628-5704-4e64-9641-f9a70454254d",
-      "name": "Recurring Payments",
-      "alwaysOutputData": true,
-      "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "0Gdvf3Mhmj7whXEv",
-          "name": "Google Sheets account"
-        }
-      }
-    },
-    {
-      "parameters": {
         "jsCode": "const today = new Date();\n\nconst currentDay = today.getDate();\n\nconst reminders = [];\n\nfor (const item of items) {\n\n  const paymentDay = Number(item.json.Day);\n  const reminderDays = Number(item.json[\"Reminder Days\"]);\n\n  const daysLeft = paymentDay - currentDay;\n\n  if (daysLeft === reminderDays) {\n\n    reminders.push({\n      json: {\n        payment_name: item.json.Name,\n        amount: item.json.Amount,\n        category: item.json.Category,\n        payment_day: paymentDay,\n        days_left: daysLeft\n      }\n    });\n\n  }\n\n}\n\nreturn reminders;"
       },
       "type": "n8n-nodes-base.code",
@@ -217,6 +159,75 @@
       ],
       "id": "1a8f210f-ab71-4e41-aca0-1b87f70ef1f1",
       "name": "Check Due Payments"
+    },
+    {
+      "id": "e7bced9a-3005-4dd7-94df-0d03610f67e8",
+      "name": "Recurring Payments",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "resource": "record",
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appVMQY0wNMWdr4IQ",
+          "mode": "id",
+          "cachedResultName": "Ai Assistant"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblUpxmVozMSKuuxq",
+          "mode": "id",
+          "cachedResultName": "Recurring Payments"
+        },
+        "returnAll": true,
+        "options": {}
+      },
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "P2Yfe7gSyX92kB5u",
+          "name": "My Airtable"
+        }
+      }
+    },
+    {
+      "id": "8f4b0760-2da7-4c06-b974-876ccc65fddb",
+      "name": "Get many tasks",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        224,
+        384
+      ],
+      "parameters": {
+        "resource": "record",
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appVMQY0wNMWdr4IQ",
+          "mode": "id",
+          "cachedResultName": "Ai Assistant"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblW6qbDmkrP33Rwl",
+          "mode": "id",
+          "cachedResultName": "Tasks"
+        },
+        "filterByFormula": "{Status}='active'",
+        "returnAll": true,
+        "options": {}
+      },
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "P2Yfe7gSyX92kB5u",
+          "name": "My Airtable"
+        }
+      }
     }
   ],
   "connections": {
@@ -229,12 +240,12 @@
             "index": 0
           },
           {
-            "node": "Get many tasks",
+            "node": "Recurring Payments",
             "type": "main",
             "index": 0
           },
           {
-            "node": "Recurring Payments",
+            "node": "Get many tasks",
             "type": "main",
             "index": 0
           }
@@ -263,17 +274,6 @@
         ]
       ]
     },
-    "Get many tasks": {
-      "main": [
-        [
-          {
-            "node": "Merge",
-            "type": "main",
-            "index": 2
-          }
-        ]
-      ]
-    },
     "Prepare Summary Data": {
       "main": [
         [
@@ -296,6 +296,17 @@
         ]
       ]
     },
+    "Check Due Payments": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
     "Recurring Payments": {
       "main": [
         [
@@ -307,13 +318,13 @@
         ]
       ]
     },
-    "Check Due Payments": {
+    "Get many tasks": {
       "main": [
         [
           {
             "node": "Merge",
             "type": "main",
-            "index": 0
+            "index": 2
           }
         ]
       ]
@@ -322,7 +333,7 @@
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
-    "availableInMCP": false
+    "availableInMCP": true
   },
   "staticData": {
     "node:Schedule Trigger": {
@@ -334,11 +345,14 @@
       ]
     }
   },
-  "meta": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
   "nodeGroups": [],
   "pinData": {},
-  "versionId": "603eb898-f0d3-4ab2-9e70-a302c28bad70",
-  "activeVersionId": "603eb898-f0d3-4ab2-9e70-a302c28bad70",
+  "versionId": "49bafe7a-6904-4af5-8a5c-bfbf15693eed",
+  "activeVersionId": "49bafe7a-6904-4af5-8a5c-bfbf15693eed",
   "triggerCount": 1,
   "shared": [
     {
@@ -350,9 +364,9 @@
     }
   ],
   "activeVersion": {
-    "updatedAt": "2026-07-05T05:17:12.000Z",
-    "createdAt": "2026-07-05T05:17:00.730Z",
-    "versionId": "603eb898-f0d3-4ab2-9e70-a302c28bad70",
+    "updatedAt": "2026-07-14T07:12:07.000Z",
+    "createdAt": "2026-07-14T07:11:46.063Z",
+    "versionId": "49bafe7a-6904-4af5-8a5c-bfbf15693eed",
     "workflowId": "Qc65HMepmzzYRJSr",
     "nodes": [
       {
@@ -472,33 +486,7 @@
       },
       {
         "parameters": {
-          "operation": "getAll",
-          "filters": {
-            "projectId": "6gpWRQ9w7pjJG4W6"
-          }
-        },
-        "type": "n8n-nodes-base.todoist",
-        "typeVersion": 2.2,
-        "position": [
-          224,
-          384
-        ],
-        "id": "abf11d25-8314-49cc-b5f5-342af3a49586",
-        "name": "Get many tasks",
-        "alwaysOutputData": true,
-        "retryOnFail": true,
-        "executeOnce": true,
-        "maxTries": 5,
-        "credentials": {
-          "todoistApi": {
-            "id": "UDxyIrQxJzhLUks1",
-            "name": "MyTodoist account"
-          }
-        }
-      },
-      {
-        "parameters": {
-          "jsCode": "const events = $('Get many events').all().map(item => ({\n  title: item.json.summary || 'Без назви',\n  start: item.json.start?.dateTime || item.json.start?.date || '',\n  end: item.json.end?.dateTime || item.json.end?.date || '',\n  description: item.json.description || ''\n}));\n\nconst tasks = $('Get many tasks').all().map(item => ({\n  title: item.json.content || 'Без назви',\n  description: item.json.description || '',\n  due: item.json.due?.date || ''\n}));\n\nconst payments = $('Check Due Payments').all().map(item => ({\n  name: item.json.payment_name || '',\n  amount: item.json.amount || '',\n  category: item.json.category || '',\n  payment_day: item.json.payment_day || '',\n  days_left: item.json.days_left || ''\n}));\n\nreturn [\n  {\n    json: {\n      events,\n      tasks,\n      payments\n    }\n  }\n];"
+          "jsCode": "const events = $('Get many events').all().map(item => ({\n  title: item.json.summary || 'Без назви',\n  start: item.json.start?.dateTime || item.json.start?.date || '',\n  end: item.json.end?.dateTime || item.json.end?.date || '',\n  description: item.json.description || ''\n}));\n\nconst tasks = $('Get many tasks').all().map(item => ({\n  title: item.json.Title || 'Без назви',\n  description: item.json.Description || '',\n  due: item.json.Deadline || ''\n}));\n\nconst payments = $('Check Due Payments').all().map(item => ({\n  name: item.json.payment_name || '',\n  amount: item.json.amount || '',\n  category: item.json.category || '',\n  payment_day: item.json.payment_day || '',\n  days_left: item.json.days_left || ''\n}));\n\nreturn [\n  {\n    json: {\n      events,\n      tasks,\n      payments\n    }\n  }\n];"
         },
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
@@ -524,38 +512,6 @@
       },
       {
         "parameters": {
-          "documentId": {
-            "__rl": true,
-            "value": "https://docs.google.com/spreadsheets/d/1OBMzm4aX3McDP_p_yF6MVDzD3s0zoQdST5-m-0ruSIw/edit?gid=356654616#gid=356654616",
-            "mode": "url"
-          },
-          "sheetName": {
-            "__rl": true,
-            "value": 356654616,
-            "mode": "list",
-            "cachedResultName": "Recurring Payments",
-            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1OBMzm4aX3McDP_p_yF6MVDzD3s0zoQdST5-m-0ruSIw/edit#gid=356654616"
-          },
-          "options": {}
-        },
-        "type": "n8n-nodes-base.googleSheets",
-        "typeVersion": 4.7,
-        "position": [
-          0,
-          0
-        ],
-        "id": "984d9628-5704-4e64-9641-f9a70454254d",
-        "name": "Recurring Payments",
-        "alwaysOutputData": true,
-        "credentials": {
-          "googleSheetsOAuth2Api": {
-            "id": "0Gdvf3Mhmj7whXEv",
-            "name": "Google Sheets account"
-          }
-        }
-      },
-      {
-        "parameters": {
           "jsCode": "const today = new Date();\n\nconst currentDay = today.getDate();\n\nconst reminders = [];\n\nfor (const item of items) {\n\n  const paymentDay = Number(item.json.Day);\n  const reminderDays = Number(item.json[\"Reminder Days\"]);\n\n  const daysLeft = paymentDay - currentDay;\n\n  if (daysLeft === reminderDays) {\n\n    reminders.push({\n      json: {\n        payment_name: item.json.Name,\n        amount: item.json.Amount,\n        category: item.json.Category,\n        payment_day: paymentDay,\n        days_left: daysLeft\n      }\n    });\n\n  }\n\n}\n\nreturn reminders;"
         },
         "type": "n8n-nodes-base.code",
@@ -566,6 +522,75 @@
         ],
         "id": "1a8f210f-ab71-4e41-aca0-1b87f70ef1f1",
         "name": "Check Due Payments"
+      },
+      {
+        "id": "e7bced9a-3005-4dd7-94df-0d03610f67e8",
+        "name": "Recurring Payments",
+        "type": "n8n-nodes-base.airtable",
+        "typeVersion": 2.2,
+        "position": [
+          0,
+          0
+        ],
+        "parameters": {
+          "resource": "record",
+          "operation": "search",
+          "base": {
+            "__rl": true,
+            "value": "appVMQY0wNMWdr4IQ",
+            "mode": "id",
+            "cachedResultName": "Ai Assistant"
+          },
+          "table": {
+            "__rl": true,
+            "value": "tblUpxmVozMSKuuxq",
+            "mode": "id",
+            "cachedResultName": "Recurring Payments"
+          },
+          "returnAll": true,
+          "options": {}
+        },
+        "credentials": {
+          "airtableTokenApi": {
+            "id": "P2Yfe7gSyX92kB5u",
+            "name": "My Airtable"
+          }
+        }
+      },
+      {
+        "id": "8f4b0760-2da7-4c06-b974-876ccc65fddb",
+        "name": "Get many tasks",
+        "type": "n8n-nodes-base.airtable",
+        "typeVersion": 2.2,
+        "position": [
+          224,
+          384
+        ],
+        "parameters": {
+          "resource": "record",
+          "operation": "search",
+          "base": {
+            "__rl": true,
+            "value": "appVMQY0wNMWdr4IQ",
+            "mode": "id",
+            "cachedResultName": "Ai Assistant"
+          },
+          "table": {
+            "__rl": true,
+            "value": "tblW6qbDmkrP33Rwl",
+            "mode": "id",
+            "cachedResultName": "Tasks"
+          },
+          "filterByFormula": "{Status}='active'",
+          "returnAll": true,
+          "options": {}
+        },
+        "credentials": {
+          "airtableTokenApi": {
+            "id": "P2Yfe7gSyX92kB5u",
+            "name": "My Airtable"
+          }
+        }
       }
     ],
     "connections": {
@@ -578,12 +603,12 @@
               "index": 0
             },
             {
-              "node": "Get many tasks",
+              "node": "Recurring Payments",
               "type": "main",
               "index": 0
             },
             {
-              "node": "Recurring Payments",
+              "node": "Get many tasks",
               "type": "main",
               "index": 0
             }
@@ -612,17 +637,6 @@
           ]
         ]
       },
-      "Get many tasks": {
-        "main": [
-          [
-            {
-              "node": "Merge",
-              "type": "main",
-              "index": 2
-            }
-          ]
-        ]
-      },
       "Prepare Summary Data": {
         "main": [
           [
@@ -645,6 +659,17 @@
           ]
         ]
       },
+      "Check Due Payments": {
+        "main": [
+          [
+            {
+              "node": "Merge",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
       "Recurring Payments": {
         "main": [
           [
@@ -656,23 +681,23 @@
           ]
         ]
       },
-      "Check Due Payments": {
+      "Get many tasks": {
         "main": [
           [
             {
               "node": "Merge",
               "type": "main",
-              "index": 0
+              "index": 2
             }
           ]
         ]
       }
     },
     "nodeGroups": [],
-    "authors": "Buts Sergei",
-    "name": "Version 603eb898",
+    "authors": "Buts Sergei (via MCP)",
+    "name": "Version 49bafe7a",
     "description": "",
-    "autosaved": true
+    "autosaved": false
   },
   "tags": []
 }
