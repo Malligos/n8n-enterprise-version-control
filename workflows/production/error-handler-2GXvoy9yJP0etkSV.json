@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-03-29T19:14:00.672Z",
+  "updatedAt": "2026-07-14T05:52:39.521Z",
   "createdAt": "2026-03-29T19:01:34.092Z",
   "id": "2GXvoy9yJP0etkSV",
   "name": "Error Handler",
@@ -57,7 +57,8 @@
   },
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate"
+    "binaryMode": "separate",
+    "availableInMCP": true
   },
   "staticData": null,
   "meta": {
