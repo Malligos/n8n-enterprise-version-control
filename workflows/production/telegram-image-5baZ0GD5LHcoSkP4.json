@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-04-20T19:35:04.629Z",
+  "updatedAt": "2026-07-14T05:53:27.244Z",
   "createdAt": "2026-04-20T17:54:18.871Z",
   "id": "5baZ0GD5LHcoSkP4",
   "name": "Telegram image",
@@ -518,7 +518,8 @@
   },
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate"
+    "binaryMode": "separate",
+    "availableInMCP": true
   },
   "staticData": null,
   "meta": {
