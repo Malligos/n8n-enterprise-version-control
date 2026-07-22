@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-04-03T15:33:52.384Z",
+  "updatedAt": "2026-07-14T05:52:51.852Z",
   "createdAt": "2026-04-02T13:11:33.537Z",
   "id": "ZYXgl0Rer1Us44vv",
   "name": "Homework 4",
@@ -645,7 +645,8 @@
   },
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate"
+    "binaryMode": "separate",
+    "availableInMCP": true
   },
   "staticData": {
     "node:Gmail Trigger": {
