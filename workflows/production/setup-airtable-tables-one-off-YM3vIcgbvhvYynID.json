@@ -1,0 +1,109 @@
+{
+  "updatedAt": "2026-07-14T06:25:53.000Z",
+  "createdAt": "2026-07-14T06:17:30.941Z",
+  "id": "YM3vIcgbvhvYynID",
+  "name": "Setup Airtable Tables (one-off)",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "id": "4d1aa00e-2830-451e-8f53-b2020c33f0c1",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "c9df2127-5611-4ff8-abaf-52bbb0846b0a",
+      "name": "Build Table Definitions",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ],
+      "parameters": {
+        "jsCode": "\nconst tables = [\n  {\n    name: 'Notes',\n    description: 'AI Assistant notes (migrated from Notion)',\n    fields: [\n      { name: 'Name', type: 'singleLineText' },\n      { name: 'Content', type: 'multilineText' },\n      { name: 'Type', type: 'singleSelect', options: { choices: [ { name: 'note' }, { name: 'idea' }, { name: 'reminder' }, { name: 'other' } ] } },\n      { name: 'Created', type: 'dateTime', options: { dateFormat: { name: 'iso' }, timeFormat: { name: '24hour' }, timeZone: 'client' } }\n    ]\n  },\n  {\n    name: 'Transactions',\n    description: 'AI Assistant finance transactions (migrated from Google Sheets)',\n    fields: [\n      { name: 'Date', type: 'date', options: { dateFormat: { name: 'iso' } } },\n      { name: 'Type', type: 'singleSelect', options: { choices: [ { name: 'income' }, { name: 'expense' } ] } },\n      { name: 'Category', type: 'singleLineText' },\n      { name: 'Amount', type: 'number', options: { precision: 2 } },\n      { name: 'Currency', type: 'singleSelect', options: { choices: [ { name: 'UAH' }, { name: 'USD' }, { name: 'EUR' } ] } },\n      { name: 'Description', type: 'multilineText' },\n      { name: 'Source', type: 'singleLineText' },\n      { name: 'Created At', type: 'dateTime', options: { dateFormat: { name: 'iso' }, timeFormat: { name: '24hour' }, timeZone: 'client' } }\n    ]\n  },\n  {\n    name: 'Recurring Payments',\n    description: 'Recurring payments (migrated from Google Sheets)',\n    fields: [\n      { name: 'Name', type: 'singleLineText' },\n      { name: 'Amount', type: 'number', options: { precision: 2 } },\n      { name: 'Day', type: 'number', options: { precision: 0 } },\n      { name: 'Category', type: 'singleLineText' },\n      { name: 'Reminder Days', type: 'number', options: { precision: 0 } },\n      { name: 'Active', type: 'checkbox', options: { icon: 'check', color: 'greenBright' } }\n    ]\n  },\n  {\n    name: 'Meetings',\n    description: 'Pending meeting confirmations (migrated from n8n Data Table)',\n    fields: [\n      { name: 'title', type: 'singleLineText' },\n      { name: 'chat_id', type: 'singleLineText' },\n      { name: 'action_type', type: 'singleLineText' },\n      { name: 'description', type: 'multilineText' },\n      { name: 'date', type: 'singleLineText' },\n      { name: 'time', type: 'singleLineText' },\n      { name: 'end_time', type: 'singleLineText' },\n      { name: 'priority', type: 'singleSelect', options: { choices: [ { name: 'Low' }, { name: 'Medium' }, { name: 'High' } ] } },\n      { name: 'status', type: 'singleSelect', options: { choices: [ { name: 'pending' }, { name: 'completed' }, { name: 'cancelled' }, { name: 'expired' } ] } },\n      { name: 'created_at', type: 'dateTime', options: { dateFormat: { name: 'iso' }, timeFormat: { name: '24hour' }, timeZone: 'client' } }\n    ]\n  }\n];\n\nreturn tables.map(t => ({ json: t }));\n"
+      }
+    },
+    {
+      "id": "e19b55be-8a21-4e0b-8233-681b32e2baeb",
+      "name": "Create Airtable Table",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        448,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.airtable.com/v0/meta/bases/appVMQY0wNMWdr4IQ/tables",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "airtableTokenApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {}
+      },
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "P2Yfe7gSyX92kB5u",
+          "name": "My Airtable"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Build Table Definitions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Table Definitions": {
+      "main": [
+        [
+          {
+            "node": "Create Airtable Table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "nodeGroups": [],
+  "pinData": null,
+  "versionId": "0bc58d0f-af57-4f43-a198-abe48ab4e2c9",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-07-14T06:17:30.970Z",
+      "createdAt": "2026-07-14T06:17:30.970Z",
+      "role": "workflow:owner",
+      "workflowId": "YM3vIcgbvhvYynID",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
