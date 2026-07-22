@@ -1,0 +1,95 @@
+{
+  "updatedAt": "2026-07-18T21:04:29.000Z",
+  "createdAt": "2026-07-18T21:03:26.325Z",
+  "id": "VLCy00cDuFMUJP7Q",
+  "name": "tmp-geocode-office",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "id": "678762e4-ccc7-4a8d-84e7-5a675e4d4fb0",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "e25bd235-d8d0-49eb-a446-57a33522fcdd",
+      "name": "Геокодировать офис",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        460,
+        300
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "https://nominatim.openstreetmap.org/search",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "format",
+              "value": "json"
+            },
+            {
+              "name": "q",
+              "value": "вул. Шевченка 59, Дніпро, Україна"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "TaxiDispatchBot/1.0 (n8n workflow)"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Геокодировать офис",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "nodeGroups": [],
+  "pinData": null,
+  "versionId": "a7a3ddad-80d7-4d92-b991-add61629c566",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-07-18T21:03:26.326Z",
+      "createdAt": "2026-07-18T21:03:26.326Z",
+      "role": "workflow:owner",
+      "workflowId": "VLCy00cDuFMUJP7Q",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
