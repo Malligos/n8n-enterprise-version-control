@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-02T19:15:17.357Z",
+  "updatedAt": "2026-07-18T20:19:02.409Z",
   "createdAt": "2026-04-08T10:23:54.502Z",
   "id": "oYc7VMcDoy6gkP90",
   "name": "error for tony",
@@ -127,7 +127,8 @@
   },
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate"
+    "binaryMode": "separate",
+    "availableInMCP": true
   },
   "staticData": null,
   "meta": {
