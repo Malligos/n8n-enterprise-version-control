@@ -1,0 +1,498 @@
+{
+  "updatedAt": "2026-07-23T18:21:53.239Z",
+  "createdAt": "2026-07-23T17:36:08.255Z",
+  "id": "7Nn893zg9c5M0bSu",
+  "name": "HouseBox - SLA Watcher",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -336,
+        -128
+      ],
+      "id": "6fbd5432-5135-410a-99e8-8745303fce0c",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1G3w3GOlOs7OvZeRITe7aULnCGgkvPba6vHUQKgVvkpg",
+          "mode": "list",
+          "cachedResultName": "HouseBox Ticket Routing",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1G3w3GOlOs7OvZeRITe7aULnCGgkvPba6vHUQKgVvkpg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Tickets",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1G3w3GOlOs7OvZeRITe7aULnCGgkvPba6vHUQKgVvkpg/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -112,
+        -128
+      ],
+      "id": "9ed04c91-d73c-4cdb-b2e0-a307bb4a5035",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const now = Date.now();\n\nreturn $input.all().map((item) => {\n  const ticket = item.json;\n\n  const deadlineMs = new Date(ticket.sla_deadline).getTime();\n  const currentLevel = Number(ticket.escalation_level || 0);\n\n  if (!Number.isFinite(deadlineMs)) {\n    return {\n      json: {\n        ...ticket,\n        is_open: false,\n        is_overdue: false,\n        escalation_needed: false,\n        target_escalation_level: currentLevel,\n        overdue_minutes: 0,\n        sla_error: 'Invalid SLA deadline',\n      },\n    };\n  }\n\n  const isOpen = String(ticket.status || '').toUpperCase() === 'OPEN';\n  const overdueMs = now - deadlineMs;\n  const overdueMinutes = Math.max(0, Math.floor(overdueMs / 60000));\n  const isOverdue = isOpen && overdueMs >= 0;\n\n  let targetEscalationLevel = 0;\n\n  if (isOverdue) {\n    if (overdueMinutes >= 60) {\n      targetEscalationLevel = 3;\n    } else if (overdueMinutes >= 30) {\n      targetEscalationLevel = 2;\n    } else {\n      targetEscalationLevel = 1;\n    }\n  }\n\n  const escalationNeeded =\n    isOpen &&\n    isOverdue &&\n    targetEscalationLevel > currentLevel;\n\n  return {\n    json: {\n      ...ticket,\n      is_open: isOpen,\n      is_overdue: isOverdue,\n      overdue_minutes: overdueMinutes,\n      current_escalation_level: currentLevel,\n      target_escalation_level: targetEscalationLevel,\n      escalation_needed: escalationNeeded,\n      checked_at: new Date(now).toISOString(),\n    },\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        112,
+        -128
+      ],
+      "id": "87ac7a62-36be-4041-8725-ddf3ee84d454",
+      "name": "Check SLA Status"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "dac08382-6314-445d-a791-f460090b1d13",
+              "leftValue": "={{ $json.escalation_needed }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        336,
+        -128
+      ],
+      "id": "a08d91f6-5e23-43f0-bec2-95d473288f75",
+      "name": "Escalation Needed"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6607c769-c4f9-476d-87cc-cf90a0e87295",
+              "name": "escalation_recipient",
+              "value": "={{\n({\n  1: \"Assigned Manager\",\n  2: \"Support Lead\",\n  3: \"Operations Manager\"\n})[$json.target_escalation_level] || \"Support Lead\"\n}}",
+              "type": "string"
+            },
+            {
+              "id": "179c6635-a27b-4911-9205-cd1be5e2506b",
+              "name": "escalation_title",
+              "value": "={{\n({\n  1: \"Перше порушення SLA\",\n  2: \"Повторна ескалація SLA\",\n  3: \"Критична ескалація SLA\"\n})[$json.target_escalation_level] || \"Порушення SLA\"\n}}",
+              "type": "string"
+            },
+            {
+              "id": "3ebe9c9c-bc91-46be-ba75-6f0b595edec6",
+              "name": "new_escalation_level",
+              "value": "={{ $json.target_escalation_level }}",
+              "type": "string"
+            },
+            {
+              "id": "753228c3-7704-426b-9656-f65f9ac1a03f",
+              "name": "escalation_time",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        560,
+        -128
+      ],
+      "id": "b58489ba-0273-4a7e-80c8-d0b2509b6034",
+      "name": "Prepare Escalation"
+    },
+    {
+      "parameters": {
+        "chatId": "1679040654",
+        "text": "=🚨 {{ $json.escalation_title }}  🎫 Тікет: {{ $json.ticket_id }}  📌 Тема: {{ $json.subject }}  📂 Категорія: {{ $json.category }} 🔥 Пріоритет: {{ $json.priority }}  👨‍💼 Відповідальний: {{ $json.owner }}  📈 Рівень ескалації: {{ $json.target_escalation_level }}  👤 Ескалація для: {{ $json.escalation_recipient }}  ⏰ SLA-дедлайн: {{ $json.sla_deadline }}  ⌛ Прострочено: {{ $json.overdue_minutes }} хвилин  🧠 Причина: {{ $json.reasoning }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        784,
+        -128
+      ],
+      "id": "d00848f5-6900-46c6-9e89-28eaa7ce33bc",
+      "name": "Send SLA Escalation",
+      "webhookId": "778072d5-c30a-4f15-8491-0679bc8fcfdf",
+      "credentials": {
+        "telegramApi": {
+          "id": "9xCUi3DJqhjcPWIQ",
+          "name": "Taxi tony"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1G3w3GOlOs7OvZeRITe7aULnCGgkvPba6vHUQKgVvkpg",
+          "mode": "list",
+          "cachedResultName": "HouseBox Ticket Routing",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1G3w3GOlOs7OvZeRITe7aULnCGgkvPba6vHUQKgVvkpg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Tickets",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1G3w3GOlOs7OvZeRITe7aULnCGgkvPba6vHUQKgVvkpg/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $('Prepare Escalation').item.json.row_number }}",
+            "escalation_level": "={{ $('Prepare Escalation').item.json.target_escalation_level }}",
+            "last_escalation_at": "={{ $('Prepare Escalation').item.json.escalation_time }}",
+            "alert_sent": "Yes"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "ticket_id",
+              "displayName": "ticket_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "received_at",
+              "displayName": "received_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "sender",
+              "displayName": "sender",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "subject",
+              "displayName": "subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "email_text",
+              "displayName": "email_text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "priority",
+              "displayName": "priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "owner",
+              "displayName": "owner",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "sla_minutes",
+              "displayName": "sla_minutes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "sla_deadline",
+              "displayName": "sla_deadline",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "reasoning",
+              "displayName": "reasoning",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "alert_sent",
+              "displayName": "alert_sent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "escalation_level",
+              "displayName": "escalation_level",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "last_escalation_at",
+              "displayName": "last_escalation_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "gmail_message_id",
+              "displayName": "gmail_message_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "gmail_thread_id",
+              "displayName": "gmail_thread_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1008,
+        -128
+      ],
+      "id": "0e0bc7d9-d54e-4813-823e-bf19ba4b3a8c",
+      "name": "Update Escalation Status",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Check SLA Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check SLA Status": {
+      "main": [
+        [
+          {
+            "node": "Escalation Needed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Escalation Needed": {
+      "main": [
+        [
+          {
+            "node": "Prepare Escalation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Escalation": {
+      "main": [
+        [
+          {
+            "node": "Send SLA Escalation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send SLA Escalation": {
+      "main": [
+        [
+          {
+            "node": "Update Escalation Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "e4441d21-287b-4d71-b933-4dff0dd26d17",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-07-23T17:36:08.259Z",
+      "createdAt": "2026-07-23T17:36:08.259Z",
+      "role": "workflow:owner",
+      "workflowId": "7Nn893zg9c5M0bSu",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
