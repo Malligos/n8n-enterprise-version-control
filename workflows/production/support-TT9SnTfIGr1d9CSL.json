@@ -1,0 +1,594 @@
+{
+  "updatedAt": "2026-07-23T18:17:02.702Z",
+  "createdAt": "2026-07-23T16:56:38.376Z",
+  "id": "TT9SnTfIGr1d9CSL",
+  "name": "Support",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {
+          "labelIds": []
+        }
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -336,
+        -32
+      ],
+      "id": "52732de8-f882-4fb8-902d-c809894c372e",
+      "name": "New Support Email",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ixxxIk9O8nJTHaVD",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a74f8586-9cd3-45f6-b723-dfdd0b211618",
+              "name": "ticket_id",
+              "value": "={{ 'TKT-' + Date.now() }}",
+              "type": "string"
+            },
+            {
+              "id": "c2f9dd9a-7821-43c0-89c7-e07f2dda9e5a",
+              "name": "received_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "a1c0995f-aad6-4ff5-97e0-b702b761dc89",
+              "name": "sender",
+              "value": "={{ $json.From || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "559d4750-53a1-4aa6-9a5c-aa1f5c99191a",
+              "name": "subject",
+              "value": "={{ $json.Subject || '(Без теми)' }}",
+              "type": "string"
+            },
+            {
+              "id": "9f83a8cc-6676-4d1a-b1c3-6425126d0ab3",
+              "name": "email_text",
+              "value": "={{ $json.textPlain || $json.text || $json.snippet || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "8db53219-4262-4a70-aa16-a52b71b3081a",
+              "name": "gmail_message_id",
+              "value": "={{ $json.id || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "6bbe8f3a-e570-4763-811e-0f21ef50b511",
+              "name": "gmail_thread_id",
+              "value": "={{ $json.threadId || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "507a7412-832a-4e0a-9a65-199365528ae2",
+              "name": "status",
+              "value": "OPEN",
+              "type": "string"
+            },
+            {
+              "id": "15db914b-76d3-4b6a-8ede-f7f2e356dae5",
+              "name": "escalation_level",
+              "value": 0,
+              "type": "number"
+            },
+            {
+              "id": "f2b019b9-cdce-4d9a-8af9-49ecd9221c5a",
+              "name": "sender_email",
+              "value": "={{ ($json.From || '').match(/<(.+?)>/)?.[1] || $json.From }}",
+              "type": "string"
+            },
+            {
+              "id": "d671ec68-3750-4a05-ba9f-09de92bd1806",
+              "name": "customer_name",
+              "value": "={{ ($json.From || '').replace(/<.*>/,'').replace(/\"/g,'').trim() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -128,
+        -32
+      ],
+      "id": "d7918b59-f555-44c1-8b49-a38710d3e6e1",
+      "name": "Prepare Ticket"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1-MINI",
+          "cachedResultUrl": ""
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "Ти AI-класифікатор служби підтримки інтернет-магазину HouseBox.\n\nТвоє завдання — проаналізувати звернення клієнта та визначити:\n\n1. Категорію\n2. Пріоритет\n3. Коротке пояснення\n\nКатегорії:\n\nOrders\nПитання щодо замовлення, статусу доставки, трекінгу.\n\nReturns & Refunds\nПовернення товару, обмін, компенсація.\n\nTechnical Issues\nПомилки сайту, проблеми з оплатою, технічні несправності.\n\nProduct Questions\nЗапитання про характеристики товарів або їх наявність.\n\nSpam\nРеклама, автоматичні повідомлення, спам.\n\nПріоритети:\n\nP1\nКритична проблема.\nНаприклад:\n- подвійне списання коштів;\n- шахрайство;\n- VIP-скарга;\n- повністю втрачено замовлення.\n\nP2\nВисокий.\nНаприклад:\n- пошкоджений товар;\n- повернення;\n- серйозна проблема з доставкою.\n\nP3\nЗвичайний.\nНаприклад:\n- статус замовлення;\n- консультація;\n- питання щодо товару.\n\nP4\nНизький.\nНаприклад:\n- реклама;\n- партнерські пропозиції;\n- спам.\n\nПеред остаточним рішенням подумай покроково, але НЕ показуй свої внутрішні міркування.\n\nПоле reasoning повинно містити рівно 2–3 повні речення.\n\nПерше речення пояснює вибір категорії.\nДруге речення пояснює вибір пріоритету.\nЗа потреби третє речення описує ризик, терміновість або можливий вплив на клієнта.\n\nНе повертай reasoning одним коротким реченням.\nПоверни лише валідний JSON-об’єкт без Markdown, без блоків коду, без ```json і без додаткового тексту.\n\nФормат:\n\n{\n  \"category\":\"\",\n  \"priority\":\"\",\n  \"reasoning\":\"\",\n  \"confidence\":0.0\n}"
+            },
+            {
+              "content": "=Проаналізуй звернення.\n\nТема:\n\n{{ $json.subject }}\n\nТекст:\n\n{{ $json.email_text }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        80,
+        -32
+      ],
+      "id": "c99eb836-e3dc-454b-be12-7ffff7799f5b",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "wmMo2Lknq3Hi5ts2",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw =\n  $json.output?.[0]?.content?.[0]?.text ??\n  $json.output_text ??\n  $json.text ??\n  '';\n\nif (!raw) {\n  throw new Error('AI response is empty');\n}\n\nlet parsed;\n\ntry {\n  parsed = JSON.parse(raw);\n} catch (error) {\n  throw new Error(`Invalid JSON returned by AI:\\n${raw}`);\n}\n\nconst source = $('Prepare Ticket').first().json;\n\nreturn [\n  {\n    json: {\n      ...source,\n\n      category: parsed.category,\n      priority: parsed.priority,\n      reasoning: parsed.reasoning,\n      confidence: Number(parsed.confidence)\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        432,
+        -32
+      ],
+      "id": "0d6bd4d7-f62d-4c62-813f-72be68220f32",
+      "name": "Parse AI Response"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6d3083c9-37c9-4564-9d95-e7960cbf2bac",
+              "name": "owner",
+              "value": "={{\n({\n  \"Orders\": \"Customer Support\",\n  \"Returns & Refunds\": \"Finance Team\",\n  \"Technical Issues\": \"Technical Team\",\n  \"Product Questions\": \"Sales Team\",\n  \"Spam\": \"Marketing\"\n})[$json.category] || \"Customer Support\"\n}}",
+              "type": "string"
+            },
+            {
+              "id": "169817c8-91a5-40f8-9ccc-f92f2cfd4525",
+              "name": "sla_minutes",
+              "value": "={{\n({\n  \"P1\": 15,\n  \"P2\": 60,\n  \"P3\": 240,\n  \"P4\": 1440\n})[$json.priority] || 240\n}}",
+              "type": "string"
+            },
+            {
+              "id": "340aaf0e-cc8e-4bc3-814e-45dc2d769568",
+              "name": "escalation_level",
+              "value": 0,
+              "type": "number"
+            },
+            {
+              "id": "ad3f1f29-4728-48d3-964d-7916b9fbce86",
+              "name": "alert_sent",
+              "value": "No",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        640,
+        -32
+      ],
+      "id": "89e3b649-a8f5-4d23-b383-59dd1619c0a5",
+      "name": "Assign Owner & SLA"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "54bcde57-ed9d-490e-8664-aa031ae0e98e",
+              "name": "sla_deadline",
+              "value": "={{\nnew Date(\nDate.now() + ($json.sla_minutes * 60 * 1000)\n).toISOString()\n}}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        880,
+        -32
+      ],
+      "id": "1e50c886-6d32-4a4c-8fb6-bffef1551156",
+      "name": "Calculate SLA Deadline"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1G3w3GOlOs7OvZeRITe7aULnCGgkvPba6vHUQKgVvkpg",
+          "mode": "list",
+          "cachedResultName": "HouseBox Ticket Routing",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1G3w3GOlOs7OvZeRITe7aULnCGgkvPba6vHUQKgVvkpg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Tickets",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1G3w3GOlOs7OvZeRITe7aULnCGgkvPba6vHUQKgVvkpg/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ticket_id": "={{ $('Parse AI Response').item.json.ticket_id }}",
+            "received_at": "={{ $('Parse AI Response').item.json.received_at }}",
+            "sender": "={{ $('Parse AI Response').item.json.sender }}",
+            "subject": "={{ $('Parse AI Response').item.json.subject }}",
+            "email_text": "={{ $('Parse AI Response').item.json.email_text }}",
+            "category": "={{ $('Parse AI Response').item.json.category }}",
+            "priority": "={{ $('Parse AI Response').item.json.priority }}",
+            "owner": "={{ $json.owner }}",
+            "sla_minutes": "={{ $json.sla_minutes }}",
+            "sla_deadline": "={{ $json.sla_deadline }}",
+            "status": "={{ $('Parse AI Response').item.json.status }}",
+            "reasoning": "={{ $('Parse AI Response').item.json.reasoning }}",
+            "gmail_message_id": "={{ $('Parse AI Response').item.json.gmail_message_id }}",
+            "gmail_thread_id": "={{ $('Parse AI Response').item.json.gmail_thread_id }}",
+            "alert_sent": "={{ $json.alert_sent }}",
+            "escalation_level": "={{ $json.escalation_level }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "ticket_id",
+              "displayName": "ticket_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "received_at",
+              "displayName": "received_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "sender",
+              "displayName": "sender",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "subject",
+              "displayName": "subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "email_text",
+              "displayName": "email_text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "priority",
+              "displayName": "priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "owner",
+              "displayName": "owner",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "sla_minutes",
+              "displayName": "sla_minutes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "sla_deadline",
+              "displayName": "sla_deadline",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "reasoning",
+              "displayName": "reasoning",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "alert_sent",
+              "displayName": "alert_sent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "escalation_level",
+              "displayName": "escalation_level",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "last_escalation_at",
+              "displayName": "last_escalation_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "gmail_message_id",
+              "displayName": "gmail_message_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "gmail_thread_id",
+              "displayName": "gmail_thread_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1088,
+        -32
+      ],
+      "id": "ed28a514-b5d9-4a24-885b-342bf55e51aa",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0Gdvf3Mhmj7whXEv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "1679040654",
+        "text": "=📩 Новий тікет HouseBox\n\n🎫 ID: {{ $json.ticket_id }}\n\n👤 Клієнт: {{ $('Parse AI Response').item.json.customer_name }}\n📧 Email: {{ $('Parse AI Response').item.json.sender_email }}\n\n📌 Тема:\n{{ $('Parse AI Response').item.json.subject }}\n\n📂 Категорія: {{ $('Parse AI Response').item.json.category }}\n🔥 Пріоритет: {{ $('Parse AI Response').item.json.priority }}\n👨‍💼 Відповідальний: {{ $('Calculate SLA Deadline').item.json.owner }}\n\n⏱ SLA: {{ $('Calculate SLA Deadline').item.json.sla_minutes }} хвилин\n🕓 Дедлайн: {{ $('Calculate SLA Deadline').item.json.sla_deadline }}\n\n🧠 Обґрунтування:\n{{ $('Parse AI Response').item.json.reasoning }}\n\n🎯 Впевненість AI:\n{{ $('Parse AI Response').item.json.confidence * 100 }}%",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1296,
+        -32
+      ],
+      "id": "89d6e075-e90a-4309-ba98-0a4d6afc9e09",
+      "name": "Send Ticket Notification",
+      "webhookId": "20ac11e7-5dee-4729-be8f-59b81f4f142d",
+      "credentials": {
+        "telegramApi": {
+          "id": "9xCUi3DJqhjcPWIQ",
+          "name": "Taxi tony"
+        }
+      },
+      "disabled": true
+    }
+  ],
+  "connections": {
+    "New Support Email": {
+      "main": [
+        [
+          {
+            "node": "Prepare Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Ticket": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Parse AI Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse AI Response": {
+      "main": [
+        [
+          {
+            "node": "Assign Owner & SLA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assign Owner & SLA": {
+      "main": [
+        [
+          {
+            "node": "Calculate SLA Deadline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate SLA Deadline": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send Ticket Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "a7db7cb6-4f54-4d6f-9c08-20ebcaf15ed3",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-07-23T16:56:38.378Z",
+      "createdAt": "2026-07-23T16:56:38.378Z",
+      "role": "workflow:owner",
+      "workflowId": "TT9SnTfIGr1d9CSL",
+      "projectId": "tpHcOqN3nfT7Wyud"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
